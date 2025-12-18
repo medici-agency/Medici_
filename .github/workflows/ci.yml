@@ -1,0 +1,237 @@
+# Medici Theme - CI/CD Pipeline
+# Runs PHPStan static analysis and PHP CodeSniffer on every push/PR
+#
+# Documentation: https://docs.github.com/en/actions
+# PHPStan: https://phpstan.org/
+# PHPCS: https://github.com/squizlabs/PHP_CodeSniffer
+
+name: CI
+
+on:
+  push:
+    branches: [main, develop, 'claude/*']
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # =========================================
+  # PHPStan Static Analysis
+  # =========================================
+  phpstan:
+    name: PHPStan (Level 5)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, xml, ctype, iconv, intl
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock', '**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run PHPStan
+        run: composer phpstan
+
+  # =========================================
+  # PHP CodeSniffer (WordPress Standards)
+  # =========================================
+  phpcs:
+    name: PHPCS (WordPress)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, xml
+          coverage: none
+          tools: composer:v2, cs2pr
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock', '**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Configure PHPCS
+        run: |
+          vendor/bin/phpcs --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/phpcompatibility/php-compatibility,vendor/phpcompatibility/phpcompatibility-paragonie,vendor/phpcompatibility/phpcompatibility-wp
+
+      - name: Run PHPCS
+        run: vendor/bin/phpcs --standard=WordPress --extensions=php --ignore=vendor/ inc/ --report=checkstyle | cs2pr
+        continue-on-error: true
+
+  # =========================================
+  # PHP Compatibility Check
+  # =========================================
+  php-compatibility:
+    name: PHP Compatibility (8.1+)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, xml
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock', '**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Configure PHPCS
+        run: |
+          vendor/bin/phpcs --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/phpcompatibility/php-compatibility,vendor/phpcompatibility/phpcompatibility-paragonie,vendor/phpcompatibility/phpcompatibility-wp
+
+      - name: Check PHP 8.1+ Compatibility
+        run: vendor/bin/phpcs --standard=PHPCompatibilityWP --extensions=php --ignore=vendor/ --runtime-set testVersion 8.1- inc/ functions.php
+        continue-on-error: true
+
+  # =========================================
+  # Prettier Code Formatting
+  # =========================================
+  prettier:
+    name: Prettier Format Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Prettier check
+        run: npm run format:check
+
+  # =========================================
+  # ESLint JavaScript Linting
+  # =========================================
+  eslint:
+    name: ESLint (JavaScript)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint:js
+        continue-on-error: true
+
+  # =========================================
+  # StyleLint CSS Linting
+  # =========================================
+  stylelint:
+    name: StyleLint (CSS)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run StyleLint
+        run: npm run lint:css
+        continue-on-error: true
+
+  # =========================================
+  # CSS Validation (Balance Check)
+  # =========================================
+  css-check:
+    name: CSS Balance Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check CSS bracket balance
+        run: |
+          echo "Checking CSS bracket balance..."
+          errors=0
+          for file in css/**/*.css css/*.css; do
+            if [ -f "$file" ]; then
+              open=$(grep -c "{" "$file" || echo 0)
+              close=$(grep -c "}" "$file" || echo 0)
+              if [ "$open" != "$close" ]; then
+                echo "❌ $file: { = $open, } = $close (IMBALANCED!)"
+                errors=$((errors + 1))
+              else
+                echo "✅ $file: { = $open, } = $close"
+              fi
+            fi
+          done
+          if [ $errors -gt 0 ]; then
+            echo "::error::Found $errors CSS files with bracket imbalance!"
+            exit 1
+          fi
+          echo "All CSS files have balanced brackets!"

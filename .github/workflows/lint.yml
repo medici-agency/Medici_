@@ -1,0 +1,257 @@
+# Medici Theme - Code Quality Workflow
+# Автоматична перевірка якості коду при push та pull request
+
+name: Code Quality
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - '**.php'
+      - '**.js'
+      - '**.css'
+      - '.github/workflows/lint.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - '**.php'
+      - '**.js'
+      - '**.css'
+
+jobs:
+  # ============================================================================
+  # PHP Linting (WordPress Coding Standards)
+  # ============================================================================
+  php-lint:
+    name: PHP Coding Standards
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer, cs2pr
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install PHP_CodeSniffer with WordPress standards
+        run: |
+          # Allow the PHPCS installer plugin.
+          composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+          # Install PHPCS 3.x (WPCS 3.3 is NOT compatible with PHPCS 4.x).
+          composer global require "squizlabs/php_codesniffer=^3.13" "wp-coding-standards/wpcs=^3.3" "phpcompatibility/phpcompatibility-wp=^2.1" -W
+
+      - name: Run PHP_CodeSniffer
+        run: |
+          ~/.composer/vendor/bin/phpcs \
+            --standard=WordPress \
+            --extensions=php \
+            --ignore=vendor/,node_modules/ \
+            --report=checkstyle \
+            --report-file=phpcs-report.xml \
+            . || true
+
+      - name: Show PHPCS results
+        if: always()
+        run: |
+          if [ -f phpcs-report.xml ]; then
+            ~/.composer/vendor/bin/phpcs \
+              --standard=WordPress \
+              --extensions=php \
+              --ignore=vendor/,node_modules/ \
+              --report=summary \
+              . || true
+          fi
+
+  # ============================================================================
+  # JavaScript Linting (ESLint)
+  # ============================================================================
+  js-lint:
+    name: JavaScript Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install ESLint
+        run: |
+          npm install -g eslint
+          npm install -g eslint-plugin-jsdoc
+
+      - name: Create ESLint config
+        run: |
+          cat > .eslintrc.json << 'EOF'
+          {
+            "env": {
+              "browser": true,
+              "es2021": true
+            },
+            "extends": "eslint:recommended",
+            "parserOptions": {
+              "ecmaVersion": "latest",
+              "sourceType": "script"
+            },
+            "rules": {
+              "no-unused-vars": "warn",
+              "no-console": ["warn", { "allow": ["error", "warn"] }],
+              "no-undef": "warn",
+              "semi": ["error", "always"],
+              "quotes": ["warn", "single", { "allowTemplateLiterals": true }]
+            },
+            "globals": {
+              "twemoji": "readonly",
+              "mediciData": "readonly",
+              "wp": "readonly",
+              "jQuery": "readonly"
+            }
+          }
+          EOF
+
+      - name: Run ESLint
+        run: |
+          eslint js/**/*.js \
+            --ignore-pattern "*.min.js" \
+            --ignore-pattern "twemoji/" \
+            --format stylish || true
+
+  # ============================================================================
+  # CSS Linting (Stylelint)
+  # ============================================================================
+  css-lint:
+    name: CSS Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Stylelint
+        run: |
+          npm install -g stylelint
+          npm install -g stylelint-config-standard
+
+      - name: Create Stylelint config
+        run: |
+          cat > .stylelintrc.json << 'EOF'
+          {
+            "extends": "stylelint-config-standard",
+            "rules": {
+              "no-descending-specificity": null,
+              "selector-class-pattern": null,
+              "custom-property-pattern": null,
+              "declaration-block-no-redundant-longhand-properties": null,
+              "no-duplicate-selectors": "warn",
+              "declaration-no-important": "warn",
+              "font-family-no-missing-generic-family-keyword": null,
+              "property-no-vendor-prefix": null,
+              "selector-no-vendor-prefix": null,
+              "value-no-vendor-prefix": null,
+              "alpha-value-notation": null,
+              "color-function-notation": null
+            },
+            "ignoreFiles": [
+              "**/*.min.css",
+              "css/fontawesome/**",
+              "node_modules/**"
+            ]
+          }
+          EOF
+
+      - name: Run Stylelint
+        run: |
+          stylelint "css/**/*.css" \
+            --formatter verbose || true
+
+  # ============================================================================
+  # CSS Brace Balance Check
+  # ============================================================================
+  css-syntax:
+    name: CSS Syntax Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check CSS brace balance
+        run: |
+          echo "Checking CSS brace balance..."
+          errors=0
+          for file in $(find css -name "*.css" -type f); do
+            open=$(grep -o "{" "$file" | wc -l)
+            close=$(grep -o "}" "$file" | wc -l)
+            if [ "$open" != "$close" ]; then
+              echo "❌ $file: { = $open, } = $close (MISMATCH!)"
+              errors=$((errors + 1))
+            else
+              echo "✅ $file: { = $open, } = $close"
+            fi
+          done
+          if [ $errors -gt 0 ]; then
+            echo ""
+            echo "❌ Found $errors files with unbalanced braces!"
+            exit 1
+          else
+            echo ""
+            echo "✅ All CSS files have balanced braces!"
+          fi
+
+  # ============================================================================
+  # PHP Syntax Check
+  # ============================================================================
+  php-syntax:
+    name: PHP Syntax Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Check PHP syntax
+        run: |
+          echo "Checking PHP syntax..."
+          errors=0
+          for file in $(find . -name "*.php" -type f -not -path "./vendor/*"); do
+            if ! php -l "$file" > /dev/null 2>&1; then
+              echo "❌ Syntax error in: $file"
+              php -l "$file"
+              errors=$((errors + 1))
+            fi
+          done
+          if [ $errors -gt 0 ]; then
+            echo ""
+            echo "❌ Found $errors files with PHP syntax errors!"
+            exit 1
+          else
+            echo ""
+            echo "✅ All PHP files have valid syntax!"
+          fi
