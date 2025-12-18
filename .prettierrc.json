@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json.schemastore.org/prettierrc",
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "useTabs": true,
+  "trailingComma": "es5",
+  "printWidth": 100,
+  "bracketSpacing": true,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "plugins": ["@prettier/plugin-php"],
+  "overrides": [
+    {
+      "files": "*.php",
+      "options": {
+        "parser": "php"
+      }
+    },
+    {
+      "files": ["*.css", "*.scss"],
+      "options": {
+        "singleQuote": false
+      }
+    },
+    {
+      "files": "*.json",
+      "options": {
+        "tabWidth": 2,
+        "useTabs": false
+      }
+    },
+    {
+      "files": "*.md",
+      "options": {
+        "proseWrap": "preserve"
+      }
+    }
+  ]
+}

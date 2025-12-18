@@ -1,0 +1,270 @@
+{
+  "file": "CODING-RULES-WORDPRESS.md",
+  "version": "3.0.0",
+  "description": "WordPress Coding Standards, Типізація PHP, PSR-4, Composer, DI, GeneratePress організація",
+  "lines": 1635,
+  "sections": 30,
+  "difficulty": "intermediate",
+  "readTime": "12-15 minutes",
+  "keywords": [
+    "WordPress Coding Standards",
+    "strict_types",
+    "Typization",
+    "PSR-4",
+    "Composer",
+    "Autoloading",
+    "Dependency Injection",
+    "Service Container",
+    "MVC",
+    "Naming Conventions",
+    "Security",
+    "Text Domain",
+    "Hooks Priority",
+    "Nullable Types",
+    "Union Types",
+    "Value Objects",
+    "Constructor Promotion",
+    "Child Theme",
+    "Elements First"
+  ],
+  "sections_map": {
+    "part_1": {
+      "title": "ПРАВИЛА WORDPRESS КОДУВАННЯ",
+      "sections": {
+        "1": {
+          "title": "PHP Tags та Базовий Синтаксис",
+          "line_start": 44,
+          "criticality": "HIGH",
+          "description": "Повні теги, відступи, скобки, коментарі"
+        },
+        "2": {
+          "title": "Naming Conventions",
+          "line_start": 106,
+          "criticality": "HIGH",
+          "description": "snake_case для функцій, PascalCase для класів"
+        },
+        "3": {
+          "title": "Whitespace та Indentation",
+          "line_start": 182,
+          "criticality": "MEDIUM",
+          "description": "Tabs 4 spaces, no trailing whitespace"
+        },
+        "4": {
+          "title": "Formatting Standards",
+          "line_start": 301,
+          "criticality": "MEDIUM",
+          "description": "Масиви, операції, рядки, PHPDoc"
+        },
+        "5": {
+          "title": "Control Structures",
+          "line_start": 403,
+          "criticality": "MEDIUM",
+          "description": "if, else, for, while, switch форматування"
+        },
+        "6": {
+          "title": "Security (ОБОВ'ЯЗКОВО!)",
+          "line_start": 450,
+          "criticality": "CRITICAL",
+          "description": "esc_*, sanitize_*, nonces, capabilities, prepared statements"
+        },
+        "7": {
+          "title": "Text Domain (ЗАВЖДИ!)",
+          "line_start": 496,
+          "criticality": "HIGH",
+          "description": "medici.agency для translation functions"
+        },
+        "8": {
+          "title": "Hooks Priority",
+          "line_start": 526,
+          "criticality": "HIGH",
+          "description": "1-5 early, 10 standard, 50-999 late"
+        },
+        "9": {
+          "title": "Додаткові Правила",
+          "line_start": 539,
+          "criticality": "MEDIUM",
+          "description": "Yoda conditions, strict comparisons, ternary operator"
+        }
+      }
+    },
+    "part_2": {
+      "title": "ТИПІЗАЦІЯ ТА STRICT_TYPES У WORDPRESS",
+      "sections": {
+        "0": {
+          "title": "Загальна інформація",
+          "line_start": 614,
+          "criticality": "HIGH",
+          "description": "declare(strict_types=1) обов'язково"
+        },
+        "1": {
+          "title": "Правильна декларація strict_types",
+          "line_start": 622,
+          "criticality": "CRITICAL",
+          "description": "Перший рядок після <?php"
+        },
+        "2": {
+          "title": "Типізація функцій та методів",
+          "line_start": 647,
+          "criticality": "HIGH",
+          "description": "int, string, array, bool, float, object return types"
+        },
+        "3": {
+          "title": "Типізація властивостей класу",
+          "line_start": 681,
+          "criticality": "HIGH",
+          "description": "PHP 7.4+ property typing"
+        },
+        "4": {
+          "title": "Nullable типи та Union Types",
+          "line_start": 719,
+          "criticality": "MEDIUM",
+          "description": "?int, string|null, int|string (PHP 8.0+)"
+        },
+        "5": {
+          "title": "Value Objects та Constructor Promotion",
+          "line_start": 778,
+          "criticality": "LOW",
+          "description": "PHP 8.0+ constructor property promotion"
+        },
+        "6": {
+          "title": "Return Type для WordPress функцій",
+          "line_start": 844,
+          "criticality": "MEDIUM",
+          "description": "WP_Post|null, WP_Error|WP_User"
+        },
+        "7": {
+          "title": "Практичні приклади для Medici Theme",
+          "line_start": 878,
+          "criticality": "HIGH",
+          "description": "Blog Module, Meta, Settings з типізацією"
+        }
+      }
+    },
+    "part_3": {
+      "title": "СУЧАСНА ОРГАНІЗАЦІЯ КОДУ ДЛЯ WORDPRESS",
+      "sections": {
+        "0": {
+          "title": "Загальна концепція",
+          "line_start": 985,
+          "criticality": "MEDIUM",
+          "description": "PSR-4, Composer, DI advantages"
+        },
+        "1": {
+          "title": "Структура проєкту за PSR-4",
+          "line_start": 989,
+          "criticality": "HIGH",
+          "description": "Namespace Medici\\Theme, inc/classes"
+        },
+        "2": {
+          "title": "Налаштування Autoloading (Composer)",
+          "line_start": 1015,
+          "criticality": "HIGH",
+          "description": "composer.json, autoload PSR-4"
+        },
+        "3": {
+          "title": "Service Container (DI)",
+          "line_start": 1066,
+          "criticality": "MEDIUM",
+          "description": "Dependency Injection pattern"
+        },
+        "4": {
+          "title": "Сучасні стартові шаблони",
+          "line_start": 1117,
+          "criticality": "LOW",
+          "description": "Boilerplates recommendations"
+        },
+        "5": {
+          "title": "Відокремлення логіки від представлення (MVC)",
+          "line_start": 1138,
+          "criticality": "MEDIUM",
+          "description": "Controller-View pattern"
+        },
+        "6": {
+          "title": "Практичний приклад: Medici Theme з PSR-4",
+          "line_start": 1199,
+          "criticality": "HIGH",
+          "description": "Повна PSR-4 структура для Medici"
+        }
+      }
+    },
+    "part_4": {
+      "title": "СУЧАСНА ОРГАНІЗАЦІЯ КОДУ ДЛЯ GENERATEPRESS",
+      "sections": {
+        "0": {
+          "title": "Загальна концепція",
+          "line_start": 1308,
+          "criticality": "MEDIUM",
+          "description": "Elements First, без редагування templates"
+        },
+        "1": {
+          "title": "Гібридна структура Child Theme",
+          "line_start": 1312,
+          "criticality": "HIGH",
+          "description": "inc/ modular structure"
+        },
+        "2": {
+          "title": "Стратегія \"Elements First\"",
+          "line_start": 1359,
+          "criticality": "HIGH",
+          "description": "page-hero, content-template, hooks замість templates"
+        },
+        "3": {
+          "title": "Організація CSS: Global Styles",
+          "line_start": 1404,
+          "criticality": "MEDIUM",
+          "description": "Global Styles замість style.css"
+        },
+        "4": {
+          "title": "PHP-хуки для модифікації GeneratePress",
+          "line_start": 1456,
+          "criticality": "HIGH",
+          "description": "generate_*, priority правила"
+        },
+        "5": {
+          "title": "Оптимізація та скрипти",
+          "line_start": 1514,
+          "criticality": "HIGH",
+          "description": "Conditional loading, defer, fonts optimization"
+        },
+        "6": {
+          "title": "Інтеграція з GenerateBlocks Pro 2.x",
+          "line_start": 1565,
+          "criticality": "HIGH",
+          "description": "Patterns registration, JSON structures"
+        },
+        "7": {
+          "title": "Практичний приклад: повна інтеграція",
+          "line_start": 1604,
+          "criticality": "MEDIUM",
+          "description": "functions.php повна структура"
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "php_version": "7.4+ (8.0+ recommended)",
+    "wordpress_version": "6.0+",
+    "composer": "optional (PSR-4)",
+    "generatepress": "GeneratePress Premium",
+    "generateblocks": "GenerateBlocks Pro 2.x"
+  },
+  "related_files": [
+    "CODING-RULES-CORE.md",
+    "CODING-RULES-ADVANCED.md",
+    "QUICK-REFERENCE.md",
+    "CHECKLIST.md",
+    "CLAUDE.md"
+  ],
+  "use_cases": [
+    "WordPress Coding Standards дотримання",
+    "declare(strict_types=1) використання",
+    "Типізація функцій та класів",
+    "PSR-4 autoloading налаштування",
+    "Composer integration",
+    "Dependency Injection implementation",
+    "Security best practices (esc_*, sanitize_*)",
+    "Text domain management",
+    "Hooks priority налаштування",
+    "GeneratePress Child Theme organization"
+  ]
+}

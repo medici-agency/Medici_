@@ -1,0 +1,8 @@
+# PHPStan Baseline - All errors fixed!
+# This file is empty because all 23 original errors have been resolved.
+# Generated: 2025-12-15
+#
+# To regenerate after fixes: composer phpstan:baseline
+
+parameters:
+    ignoreErrors: []

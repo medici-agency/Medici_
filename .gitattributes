@@ -1,0 +1,114 @@
+# Medici Theme - Git Attributes
+# https://git-scm.com/docs/gitattributes
+
+# Auto detect text files and perform LF normalization
+* text=auto eol=lf
+
+# ============================================================================
+# SOURCE CODE
+# ============================================================================
+
+# PHP files
+*.php text eol=lf diff=php
+
+# JavaScript files
+*.js text eol=lf
+
+# CSS files
+*.css text eol=lf
+
+# HTML files
+*.html text eol=lf
+*.htm text eol=lf
+
+# JSON files
+*.json text eol=lf
+
+# XML files
+*.xml text eol=lf
+
+# YAML files
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# ============================================================================
+# DOCUMENTATION
+# ============================================================================
+
+*.md text eol=lf diff=markdown
+*.txt text eol=lf
+LICENSE text eol=lf
+CHANGELOG text eol=lf
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+.editorconfig text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+.htaccess text eol=lf
+*.ini text eol=lf
+
+# ============================================================================
+# BINARY FILES (do not normalize)
+# ============================================================================
+
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.avif binary
+*.svg text eol=lf
+
+# Fonts
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary
+
+# Archives
+*.zip binary
+*.tar binary
+*.gz binary
+
+# ============================================================================
+# EXPORT IGNORE (exclude from releases)
+# ============================================================================
+
+# Development files
+.editorconfig export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
+.github/ export-ignore
+tests/ export-ignore
+phpcs.xml export-ignore
+phpunit.xml export-ignore
+package.json export-ignore
+package-lock.json export-ignore
+node_modules/ export-ignore
+composer.json export-ignore
+composer.lock export-ignore
+vendor/ export-ignore
+
+# Documentation (optional - keep for releases if needed)
+# CLAUDE.md export-ignore
+# CODING-RULES*.md export-ignore
+# AUDIT-REPORT.md export-ignore
+
+# ============================================================================
+# LINGUIST (GitHub language statistics)
+# ============================================================================
+
+# Exclude vendor files from language statistics
+assets/twemoji/svg/* linguist-vendored
+js/twemoji/*.js linguist-vendored
+css/fontawesome/* linguist-vendored
+
+# Mark generated files
+*.min.js linguist-generated
+*.min.css linguist-generated

@@ -1,0 +1,166 @@
+{
+  "file": "CODING-RULES-ADVANCED.md",
+  "version": "3.0.0",
+  "description": "Продвинуті техніки GeneratePress & GenerateBlocks Pro для експертів",
+  "lines": 1304,
+  "sections": 15,
+  "difficulty": "advanced",
+  "readTime": "15-20 minutes",
+  "keywords": [
+    "Dynamic Tags API",
+    "Query Block Pro",
+    "Conditions API",
+    "Custom Selectors",
+    "Container Queries",
+    "Effects",
+    "Animations",
+    "WooCommerce",
+    "Perfmatters",
+    "FSE",
+    "Elements",
+    "Performance Metrics",
+    "Child Theme",
+    "Git Versioning",
+    "REST API",
+    "Headless",
+    "Blog Module",
+    "ACF Repeater"
+  ],
+  "sections_map": {
+    "21": {
+      "title": "Реєстрація власних Dynamic Tags у GenerateBlocks 2.x",
+      "line_start": 37,
+      "criticality": "HIGH",
+      "description": "GenerateBlocks_Register_Dynamic_Tag API для кастомних тегів"
+    },
+    "22": {
+      "title": "Query Block Pro: Post Meta та Options",
+      "line_start": 142,
+      "criticality": "HIGH",
+      "description": "3 типи запитів: Posts, Post Meta (ACF), Options"
+    },
+    "23": {
+      "title": "Conditions API у GenerateBlocks 2.4+",
+      "line_start": 230,
+      "criticality": "MEDIUM",
+      "description": "User, Post, Date/Time, Device, Query String, Custom PHP"
+    },
+    "24": {
+      "title": "Custom Selectors у GenerateBlocks Pro",
+      "line_start": 292,
+      "criticality": "MEDIUM",
+      "description": "Compound, descendant, complex selectors"
+    },
+    "25": {
+      "title": "Container Queries",
+      "line_start": 356,
+      "criticality": "HIGH",
+      "description": "@container для компонентного дизайну"
+    },
+    "26": {
+      "title": "Ефекти та анімації",
+      "line_start": 423,
+      "criticality": "MEDIUM",
+      "description": "Scroll animations, entrance effects, gradient text"
+    },
+    "27": {
+      "title": "Інтеграція з WooCommerce",
+      "line_start": 506,
+      "criticality": "MEDIUM",
+      "description": "Dynamic Tags для товарів, кошика, checkout"
+    },
+    "28": {
+      "title": "Perfmatters + GeneratePress",
+      "line_start": 554,
+      "criticality": "HIGH",
+      "description": "Assets disabling, DNS prefetch, preconnect, lazy loading"
+    },
+    "29": {
+      "title": "FSE vs Elements",
+      "line_start": 606,
+      "criticality": "LOW",
+      "description": "Вибір архітектури для GeneratePress"
+    },
+    "30": {
+      "title": "Performance Metrics для медичних сайтів",
+      "line_start": 641,
+      "criticality": "HIGH",
+      "description": "Core Web Vitals, LCP, FID, CLS targets"
+    },
+    "31": {
+      "title": "Архітектура Child Theme",
+      "line_start": 716,
+      "criticality": "HIGH",
+      "description": "PSR-4, Composer, Autoloading, modularity"
+    },
+    "32": {
+      "title": "Git Versioning + GeneratePress Config",
+      "line_start": 798,
+      "criticality": "MEDIUM",
+      "description": "Git для custom elements, global styles, wp-cli export"
+    },
+    "33": {
+      "title": "REST API & Headless Development",
+      "line_start": 841,
+      "criticality": "LOW",
+      "description": "Custom endpoints, WP REST API, headless setup"
+    },
+    "34": {
+      "title": "Модуль \"Блог\" у GeneratePress",
+      "line_start": 913,
+      "criticality": "CRITICAL",
+      "description": "Експертний гайд: layout, excerpt, pagination, images, SEO",
+      "subsections": [
+        "Активація та базова конфігурація",
+        "Конфігурація Layout і Content",
+        "Налаштування Excerpt Length через PHP",
+        "Query Block для динамічного контролю",
+        "Sticky Posts",
+        "Пагінація: SEO та UX",
+        "Featured Image Optimization",
+        "Категорії та Теги",
+        "Related Posts Section",
+        "Performance: Blog Archive Optimization",
+        "Архівні сторінки: Category, Tag, Author, Search",
+        "Медична специфіка: Privacy & Compliance",
+        "Внутрішнє посилання для SEO",
+        "Checksum: Рекомендована Setup"
+      ]
+    },
+    "35": {
+      "title": "Рекомендований стек для експертів",
+      "line_start": 1284,
+      "criticality": "LOW",
+      "description": "GeneratePress Premium, GenerateBlocks Pro, ACF Pro, WP-CLI"
+    }
+  },
+  "dependencies": {
+    "required_plugins": [
+      "GeneratePress Premium",
+      "GenerateBlocks Pro 2.x",
+      "ACF Pro (optional for section 22)",
+      "Perfmatters (optional for section 28)",
+      "WooCommerce (optional for section 27)"
+    ],
+    "php_version": "7.4+",
+    "wordpress_version": "6.0+"
+  },
+  "related_files": [
+    "CODING-RULES-CORE.md",
+    "CODING-RULES-WORDPRESS.md",
+    "QUICK-REFERENCE.md",
+    "CHECKLIST.md"
+  ],
+  "use_cases": [
+    "Реєстрація Dynamic Tags API",
+    "Query Block з ACF Repeater",
+    "Conditions API налаштування",
+    "Custom Selectors використання",
+    "Container Queries",
+    "WooCommerce інтеграція",
+    "Perfmatters оптимізація",
+    "Performance targets для медичних сайтів",
+    "Blog Module експертна конфігурація",
+    "Git versioning для GeneratePress"
+  ]
+}

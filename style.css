@@ -1,0 +1,53 @@
+/*
+Theme Name: Medici Medical Marketing
+Template: generatepress
+Description: Оптимізовано згідно GeneratePress + GenerateBlocks Documentation
+Version: 2.0.0
+Author: Medici - Medical Marketing Agency
+Text Domain: medici.agency
+*/
+
+/**
+ * MODULAR CSS ARCHITECTURE
+ * ========================
+ *
+ * This theme uses a modular CSS architecture for better maintainability
+ * and performance. All styles are loaded via functions.php using wp_enqueue_style().
+ *
+ * CORE MODULES:
+ * - css/core/variables.css - CSS Custom Properties (Theme + Utopia Fluid Typography)
+ * - css/core/core.css - Core foundation (reset + fonts + base)
+ *
+ * COMPONENTS:
+ * - css/components/buttons.css - Button styles
+ * - css/components/cards.css - Card components
+ * - css/components/sections.css - Section wrappers
+ * - css/components/navigation.css - Navigation & header
+ *
+ * LAYOUT:
+ * - css/layout/layout.css - Layout structures (grid + hero + footer + utilities)
+ *
+ * ADMIN:
+ * - css/admin/admin.css - WordPress admin styles
+ *
+ * CSS CASCADE CONTROL:
+ * Project uses specificity-based cascade control without @layer.
+ * Loading order in functions.php ensures proper CSS cascade.
+ * See STYLE-RULES-CSS-STANDARDS.md for cascade best practices.
+ *
+ * LOADING ORDER:
+ * Files are loaded in functions.php (line ~XXX) in the correct order
+ * to ensure proper CSS cascade and minimize specificity conflicts.
+ *
+ * CSS CONSOLIDATION (v1.0.14):
+ * - Reduced file count from 13 to 7 CSS files (46% reduction)
+ * - Core: reset + fonts + base → core.css (143 lines)
+ * - Layout: grid + hero + footer + utilities → layout.css (595 lines)
+ * - Benefits: Fewer HTTP requests, simpler structure, easier maintenance
+ *
+ * @package Medici
+ * @version 1.0.14
+ * @since 1.0.14 CSS Consolidation - reduced from 13 to 7 files
+ * @see inc/assets.php for asset loading configuration
+ * @see STYLE-RULES-CSS-STANDARDS.md Section 14 for CSS cascade best practices
+ */

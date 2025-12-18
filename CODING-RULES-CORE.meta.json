@@ -1,0 +1,165 @@
+{
+  "file": "CODING-RULES-CORE.md",
+  "version": "3.0.0",
+  "description": "Базові правила GenerateBlocks 2.x для створення patterns та JSON блоків",
+  "lines": 1452,
+  "sections": 20,
+  "difficulty": "intermediate",
+  "readTime": "7-10 minutes",
+  "keywords": [
+    "UniqueId",
+    "CSS Variables",
+    "Responsive",
+    "Ampersand",
+    "Visual Effects",
+    "Global Styles",
+    "Two-Level Section",
+    "Dynamic Content",
+    "Attribute Order",
+    "Local Fonts",
+    "Custom Elements",
+    "WordPress Hooks",
+    "Menus",
+    "Blog",
+    "Forms",
+    "Media",
+    "Overlay",
+    "Query Loop",
+    "Structured Styles"
+  ],
+  "sections_map": {
+    "1": {
+      "title": "UniqueId Format",
+      "line_start": 40,
+      "criticality": "CRITICAL",
+      "description": "8 hex символів (0-9, a-f), lowercase, рівно 8 символів"
+    },
+    "2": {
+      "title": "CSS Variables Escaping",
+      "line_start": 78,
+      "criticality": "CRITICAL",
+      "description": "\\u002d\\u002d в .md файлах, \\u002d\\u002d в XML"
+    },
+    "3": {
+      "title": "Responsive Breakpoints",
+      "line_start": 121,
+      "criticality": "HIGH",
+      "description": "768px mobile, 1024px tablet, завжди додавати @media"
+    },
+    "4": {
+      "title": "Ampersand Escaping",
+      "line_start": 143,
+      "criticality": "HIGH",
+      "description": "\\u0026:is(:hover, :focus) для pseudo-селекторів"
+    },
+    "5": {
+      "title": "GenerateBlocks Patterns",
+      "line_start": 162,
+      "criticality": "MEDIUM",
+      "description": "Reusable Blocks через WordPress Editor"
+    },
+    "6": {
+      "title": "Visual Effects",
+      "line_start": 169,
+      "criticality": "CRITICAL",
+      "description": "Rotate ЗАБОРОНЕНО на section/div/article, тільки на іконках"
+    },
+    "7": {
+      "title": "Global Styles (16 класів)",
+      "line_start": 233,
+      "criticality": "HIGH",
+      "description": "gbp-section, gbp-card, gbp-button - використовуй globalClasses array"
+    },
+    "8": {
+      "title": "Two-Level Section Pattern",
+      "line_start": 390,
+      "criticality": "HIGH",
+      "description": "Outer gbp-section + Inner gbp-section__inner"
+    },
+    "9": {
+      "title": "Dynamic Content Hooks",
+      "line_start": 429,
+      "criticality": "MEDIUM",
+      "description": "{{post_title}}, {{post_excerpt}}, {{featured_image}}"
+    },
+    "10": {
+      "title": "Attribute Order",
+      "line_start": 464,
+      "criticality": "MEDIUM",
+      "description": "uniqueId, tagName, styles, css, globalClasses, metadata"
+    },
+    "11": {
+      "title": "Local Fonts (gp_font)",
+      "line_start": 481,
+      "criticality": "LOW",
+      "description": "Amatic SC, Rubik - var(--gp-font--name)"
+    },
+    "12": {
+      "title": "Custom Elements (gp_elements)",
+      "line_start": 543,
+      "criticality": "MEDIUM",
+      "description": "page-hero, content-template, site-header, hooks"
+    },
+    "13": {
+      "title": "WordPress Hooks та Events",
+      "line_start": 609,
+      "criticality": "HIGH",
+      "description": "Priority rules, conditional loading, AJAX handlers"
+    },
+    "14": {
+      "title": "Меню та Навігація",
+      "line_start": 756,
+      "criticality": "MEDIUM",
+      "description": "register_nav_menus, aria-label, mobile menu toggle"
+    },
+    "15": {
+      "title": "Блог, Статті, Коментарі",
+      "line_start": 841,
+      "criticality": "MEDIUM",
+      "description": "register_post_meta, WP_Query для блогу, comment forms"
+    },
+    "16": {
+      "title": "Форми та Newsletter",
+      "line_start": 943,
+      "criticality": "HIGH",
+      "description": "AJAX forms, nonce verification, sanitization"
+    },
+    "17": {
+      "title": "Медіафайли та Оптимізація",
+      "line_start": 1028,
+      "criticality": "HIGH",
+      "description": "Image sizes, lazy loading, WebP, SVG security"
+    },
+    "18": {
+      "title": "Overlay Panels",
+      "line_start": 1151,
+      "criticality": "MEDIUM",
+      "description": "Gradient overlays, z-index, pointerEvents: none"
+    },
+    "19": {
+      "title": "Dynamic Content - Query & Looper",
+      "line_start": 1258,
+      "criticality": "HIGH",
+      "description": "Query Block, Looper Block, Dynamic Tags"
+    },
+    "20": {
+      "title": "Structured Styles (GB 2.x)",
+      "line_start": 1323,
+      "criticality": "MEDIUM",
+      "description": "sizing, spacing, typography, borders, display, color objects"
+    }
+  },
+  "related_files": ["QUICK-REFERENCE.md", "CHECKLIST.md", "Skill.md", "CLAUDE.md"],
+  "use_cases": [
+    "Створення GenerateBlocks patterns",
+    "Редагування блоків JSON",
+    "UniqueId генерація",
+    "CSS Variables escaping",
+    "Responsive breakpoints",
+    "Global Styles використання",
+    "WordPress hooks integration",
+    "Blog functionality",
+    "Forms та AJAX",
+    "Media optimization"
+  ]
+}

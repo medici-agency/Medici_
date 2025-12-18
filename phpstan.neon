@@ -1,0 +1,112 @@
+# PHPStan Configuration for Medici Theme
+# Version: 1.0.0
+# Documentation: https://phpstan.org/config-reference
+#
+# Usage:
+#   composer phpstan          - Run analysis
+#   composer phpstan:baseline - Generate baseline for existing errors
+
+includes:
+    # WordPress extension auto-loaded by phpstan/extension-installer
+    - phpstan-baseline.neon
+
+parameters:
+    # Analysis level (0-9, where 9 is strictest)
+    # Start with level 5 for WordPress themes (can increase later)
+    level: 5
+
+    # Paths to analyse
+    paths:
+        - inc
+        - functions.php
+        - single-medici_blog.php
+        - archive-medici_blog.php
+
+    # Paths to exclude
+    excludePaths:
+        - vendor
+        - node_modules
+        - assets
+        - css
+        - js
+        - fonts
+        - img
+        - gutenberg
+        - templates
+        - scripts
+
+    # Scan directories for class/function definitions
+    scanDirectories:
+        - inc
+
+    # WordPress stubs auto-loaded by szepeviktor/phpstan-wordpress
+    # No additional bootstrap needed
+
+    # Parallel processing (disabled to reduce memory usage)
+    parallel:
+        maximumNumberOfProcesses: 1
+        processTimeout: 300.0
+
+    # Error handling
+    reportUnmatchedIgnoredErrors: false
+    treatPhpDocTypesAsCertain: false
+
+    # WordPress-specific ignores
+    ignoreErrors:
+        # Ignore missing array typehints (deprecated checkMissingIterableValueType)
+        - identifier: missingType.iterableValue
+        # Ignore missing generic typehints (deprecated checkGenericClassInNonGenericObjectType)
+        - identifier: missingType.generics
+
+        # WordPress global functions that PHPStan may not recognize
+        - '#Function [a-z_]+ not found\.#'
+
+        # WordPress hooks with dynamic names
+        - '#Parameter \#1 \$hook_name of function do_action expects string, .+ given\.#'
+
+        # WordPress $wpdb global
+        - '#Variable \$wpdb might not be defined\.#'
+
+        # WordPress template globals
+        - '#Variable \$post might not be defined\.#'
+        - '#Variable \$wp_query might not be defined\.#'
+
+        # Strict comparison with WordPress functions that may return mixed
+        - '#Strict comparison using [!=]+ between .+ and (false|null) will always evaluate to (true|false)\.#'
+
+        # WordPress hooks accepting callable
+        - '#Parameter \#2 \$callback of function add_action expects callable.+#'
+        - '#Parameter \#2 \$callback of function add_filter expects callable.+#'
+
+        # WordPress REST API
+        - '#Method .+::get_item_schema\(\) has no return type specified\.#'
+
+        # Undefined constants in WordPress context
+        - '#Constant ABSPATH not found\.#'
+        - '#Constant WPINC not found\.#'
+        - '#Constant WP_DEBUG not found\.#'
+
+    # Universal object crates (classes that can have any property)
+    universalObjectCratesClasses:
+        - WP_Post
+        - WP_Term
+        - WP_User
+        - WP_Comment
+        - WP_Query
+        - WP_REST_Request
+        - WP_REST_Response
+        - wpdb
+
+    # Stub files for WordPress classes
+    stubFiles:
+
+    # Dynamic return types
+    dynamicConstantNames:
+        - MEDICI_VERSION
+        - MEDICI_DEBUG
+
+    # Type aliases for complex types
+    typeAliases:
+        PostID: 'int<1, max>'
+        TermID: 'int<1, max>'
+        UserID: 'int<1, max>'

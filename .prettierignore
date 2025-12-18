@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+vendor/
+
+# PHP files (WordPress PHP often incompatible with Prettier)
+*.php
+inc/**/*.php
+functions.php
+single-*.php
+archive-*.php
+
+# Build outputs
+build/
+dist/
+
+# WordPress core
+wp-admin/
+wp-includes/
+
+# Minified files
+*.min.js
+*.min.css
+
+# Assets
+assets/twemoji/
+fonts/
+
+# Logs
+*.log
+
+# Generated files
+composer.lock
+package-lock.json
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+
+# Specific files to ignore
+phpstan-baseline.neon

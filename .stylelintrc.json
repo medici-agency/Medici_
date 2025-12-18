@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json.schemastore.org/stylelintrc",
+  "extends": "stylelint-config-standard",
+  "plugins": ["stylelint-order"],
+  "rules": {
+    "selector-class-pattern": [
+      "^[a-z][a-zA-Z0-9-_]*(__[a-z][a-zA-Z0-9-_]*)?(--[a-z][a-zA-Z0-9-_]*)?$",
+      {
+        "message": "Expected class selector to follow BEM naming convention (block__element--modifier)"
+      }
+    ],
+    "max-nesting-depth": [
+      3,
+      {
+        "message": "Maximum nesting depth is 3 levels (performance best practice)"
+      }
+    ],
+    "selector-max-specificity": [
+      "0,4,0",
+      {
+        "message": "Selector specificity should not exceed 0,4,0 (maintainability)",
+        "ignoreSelectors": [":not", ":has", ":where"]
+      }
+    ],
+    "declaration-block-no-duplicate-properties": [
+      true,
+      {
+        "ignore": ["consecutive-duplicates-with-different-values"]
+      }
+    ],
+    "no-descending-specificity": null,
+    "color-hex-length": "short",
+    "color-named": "never",
+    "font-family-name-quotes": "always-where-recommended",
+    "function-url-quotes": "always",
+    "length-zero-no-unit": true,
+    "unit-allowed-list": ["px", "rem", "em", "%", "vh", "vw", "s", "ms", "deg", "fr"],
+    "shorthand-property-no-redundant-values": true,
+    "property-no-vendor-prefix": null,
+    "value-no-vendor-prefix": null,
+    "selector-no-vendor-prefix": null,
+    "media-feature-name-no-vendor-prefix": true,
+    "at-rule-no-vendor-prefix": true,
+    "comment-empty-line-before": [
+      "always",
+      {
+        "except": ["first-nested"],
+        "ignore": ["stylelint-commands"]
+      }
+    ],
+    "order/properties-alphabetical-order": null,
+    "order/properties-order": [
+      [
+        "content",
+        "position",
+        "top",
+        "right",
+        "bottom",
+        "left",
+        "z-index",
+        "display",
+        "flex",
+        "flex-direction",
+        "flex-wrap",
+        "justify-content",
+        "align-items",
+        "grid",
+        "grid-template",
+        "gap",
+        "width",
+        "height",
+        "margin",
+        "padding",
+        "background",
+        "border",
+        "border-radius",
+        "color",
+        "font",
+        "text-align",
+        "transform",
+        "transition",
+        "opacity"
+      ],
+      {
+        "unspecified": "bottom"
+      }
+    ],
+    "custom-property-pattern": [
+      "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+      {
+        "message": "Expected custom property name to be kebab-case"
+      }
+    ],
+    "block-no-empty": true,
+    "selector-pseudo-class-no-unknown": [
+      true,
+      {
+        "ignorePseudoClasses": ["global"]
+      }
+    ],
+    "selector-id-pattern": null,
+    "keyframes-name-pattern": null
+  },
+  "ignoreFiles": ["**/*.min.css", "node_modules/**", "vendor/**", "css/fontawesome/**"]
+}

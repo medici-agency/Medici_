@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json.schemastore.org/eslintrc",
+  "root": true,
+  "extends": ["plugin:@wordpress/eslint-plugin/recommended"],
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "sourceType": "module"
+  },
+  "globals": {
+    "wp": "readonly",
+    "jQuery": "readonly",
+    "mediciEvents": "writable",
+    "mediciTheme": "writable",
+    "mediciData": "readonly",
+    "mediciWebhook": "readonly",
+    "mediciThemeSettings": "readonly",
+    "gtag": "readonly"
+  },
+  "rules": {
+    "no-console": "warn",
+    "no-debugger": "error",
+    "no-alert": "warn",
+    "no-unused-vars": [
+      "error",
+      {
+        "vars": "all",
+        "args": "after-used",
+        "ignoreRestSiblings": true
+      }
+    ],
+    "prefer-const": "error",
+    "no-var": "error",
+    "eqeqeq": ["error", "always"],
+    "curly": ["error", "all"],
+    "camelcase": [
+      "error",
+      {
+        "properties": "never",
+        "ignoreDestructuring": true,
+        "allow": ["^medici_", "^wp_", "^MEDICI_"]
+      }
+    ],
+    "no-undef": "error",
+    "no-use-before-define": [
+      "error",
+      {
+        "functions": false,
+        "classes": true,
+        "variables": true
+      }
+    ],
+    "complexity": ["warn", 10],
+    "max-depth": ["warn", 4],
+    "max-lines": ["warn", 500],
+    "max-params": ["warn", 5]
+  },
+  "overrides": [
+    {
+      "files": ["js/vendor/**/*.js"],
+      "rules": {
+        "no-console": "off",
+        "no-undef": "off"
+      }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "medici-theme",
+  "version": "1.7.0",
+  "description": "Medici Medical Marketing Theme - WordPress child theme with code quality tools",
+  "author": "Medici Agency",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write \"**/*.{css,js,php,json,md}\"",
+    "format:check": "prettier --check \"**/*.{css,js,php,json,md}\"",
+    "lint:js": "eslint \"js/**/*.js\"",
+    "lint:js:fix": "eslint \"js/**/*.js\" --fix",
+    "lint:css": "stylelint \"css/**/*.css\"",
+    "lint:css:fix": "stylelint \"css/**/*.css\" --fix",
+    "lint": "npm run lint:js && npm run lint:css",
+    "lint:fix": "npm run lint:js:fix && npm run lint:css:fix",
+    "check": "npm run format:check && npm run lint",
+    "fix": "npm run format && npm run lint:fix"
+  },
+  "devDependencies": {
+    "@prettier/plugin-php": "^0.22.4",
+    "@wordpress/eslint-plugin": "^21.3.0",
+    "eslint": "^8.57.1",
+    "prettier": "^3.4.2",
+    "stylelint": "^16.10.0",
+    "stylelint-config-standard": "^36.0.1",
+    "stylelint-order": "^6.0.4"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

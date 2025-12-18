@@ -1,0 +1,63 @@
+# EditorConfig - https://editorconfig.org
+# Medici Theme - Unified Code Style
+
+root = true
+
+# Default settings for all files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = tab
+indent_size = 4
+
+# PHP files - WordPress Coding Standards
+[*.php]
+indent_style = tab
+indent_size = 4
+
+# JavaScript files
+[*.js]
+indent_style = space
+indent_size = 2
+
+# CSS files
+[*.css]
+indent_style = tab
+indent_size = 4
+
+# JSON files
+[*.json]
+indent_style = space
+indent_size = 2
+
+# YAML files
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false
+indent_style = space
+indent_size = 2
+
+# HTML files
+[*.html]
+indent_style = tab
+indent_size = 4
+
+# Package files
+[{package.json,composer.json}]
+indent_style = space
+indent_size = 2
+
+# Git config files
+[.git*]
+indent_style = space
+indent_size = 2
+
+# Makefiles require tabs
+[Makefile]
+indent_style = tab
