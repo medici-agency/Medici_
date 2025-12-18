@@ -914,6 +914,7 @@ medici/
 ```
 
 **OOP Architecture (v2.0.0):**
+
 - `inc/blog/` - Repository + Service
 - `inc/events/` - Event Dispatcher + 4 observers
 - `inc/lead/` - IntegrationManager + 3 adapters
