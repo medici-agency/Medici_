@@ -1,0 +1,186 @@
+/**
+ * Theme Settings Admin Styles
+ *
+ * @package Medici_Agency
+ * @since   1.5.0
+ */
+
+/* Settings Page Layout */
+.medici-theme-settings {
+	max-width: 1000px;
+}
+
+.medici-theme-settings h1 {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.medici-theme-settings h1 .dashicons {
+	width: 30px;
+	height: 30px;
+	font-size: 30px;
+}
+
+/* Navigation Tabs */
+.medici-theme-settings .nav-tab-wrapper {
+	margin-bottom: 20px;
+	border-bottom: 1px solid #c3c4c7;
+}
+
+.medici-theme-settings .nav-tab {
+	padding: 8px 15px;
+	font-size: 14px;
+}
+
+.medici-theme-settings .nav-tab-active {
+	background: #fff;
+	border-bottom: 1px solid #fff;
+}
+
+/* Settings Content */
+.settings-content {
+	padding: 20px 25px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 0 4px 4px;
+	margin-top: -1px;
+}
+
+.settings-content h2 {
+	margin-top: 0;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #eee;
+	font-size: 1.3em;
+}
+
+.settings-content > p.description {
+	color: #646970;
+	margin-top: -10px;
+	margin-bottom: 20px;
+}
+
+/* Form Table */
+.theme-settings-form .form-table th {
+	width: 220px;
+	vertical-align: top;
+	padding-top: 20px;
+}
+
+.theme-settings-form .form-table td {
+	padding: 15px 10px;
+}
+
+.theme-settings-form .form-table input.regular-text,
+.theme-settings-form .form-table textarea {
+	width: 100%;
+	max-width: 400px;
+}
+
+/* Image Upload Field */
+.image-upload-field {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 8px;
+}
+
+.image-upload-field .image-url-input {
+	flex: 1;
+	min-width: 200px;
+}
+
+.image-preview {
+	margin-top: 10px;
+}
+
+.image-preview img {
+	padding: 4px;
+	background: #f9f9f9;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+}
+
+/* Color Picker */
+.wp-picker-container {
+	display: inline-block;
+}
+
+.wp-picker-container .wp-color-result {
+	margin-right: 10px;
+}
+
+/* Color Preview */
+.color-preview {
+	padding: 20px;
+	background: #f6f7f7;
+	border-radius: 4px;
+	margin-top: 30px;
+}
+
+.color-preview h3 {
+	margin: 0 0 15px;
+	color: #1d2327;
+	font-size: 14px;
+}
+
+.preview-container {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 15px;
+}
+
+.preview-block {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 120px;
+	height: 60px;
+	border-radius: 6px;
+	color: #fff;
+	font-weight: 500;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+}
+
+.preview-block.secondary {
+	color: #fff;
+}
+
+/* Notices */
+.settings-content .notice {
+	margin: 20px 0;
+}
+
+/* Submit Button */
+.theme-settings-form .submit {
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: 1px solid #eee;
+}
+
+/* Responsive */
+@media screen and (width <= 782px) {
+	.theme-settings-form .form-table th {
+		width: 100%;
+		padding-bottom: 5px;
+	}
+
+	.image-upload-field {
+		flex-direction: column;
+	}
+
+	.image-upload-field .image-url-input {
+		width: 100%;
+	}
+
+	.preview-container {
+		flex-direction: column;
+	}
+
+	.preview-block {
+		width: 100%;
+	}
+}

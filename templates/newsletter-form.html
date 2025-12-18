@@ -1,0 +1,147 @@
+<!--
+Newsletter Subscription Form Template
+=====================================
+
+Usage: Copy this HTML to GenerateBlocks Container block (Custom HTML).
+
+Requirements:
+- Class 'js-newsletter-form' (preferred) or 'newsletter-form' on form element
+- Input field with name="email"
+- Button with type="submit"
+- Element with class 'newsletter-message' for displaying feedback
+
+Optional:
+- data-source attribute (e.g., "footer", "sidebar", "popup")
+- data-tags attribute (comma-separated, e.g., "blog,marketing")
+-->
+
+<form class="js-newsletter-form newsletter-form" data-source="footer" data-tags="blog,newsletter">
+	<div class="newsletter-form-inner">
+		<!-- Heading (optional) -->
+		<h3 class="newsletter-heading">📧 Підпишіться на розсилку</h3>
+		<p class="newsletter-description">Отримуйте найкращі статті про медичний маркетинг щотижня</p>
+
+		<!-- Email Field -->
+		<div class="newsletter-field">
+			<label for="newsletter-email" class="sr-only">Email адреса</label>
+			<input
+				type="email"
+				id="newsletter-email"
+				name="email"
+				placeholder="Ваш email"
+				required
+				autocomplete="email"
+			/>
+		</div>
+
+		<!-- Submit Button -->
+		<button type="submit" class="btn btn-primary newsletter-submit">Підписатись</button>
+
+		<!-- Message Container -->
+		<div class="js-newsletter-message newsletter-message" role="status" aria-live="polite"></div>
+
+		<!-- Privacy Notice -->
+		<p class="newsletter-privacy">
+			Ми поважаємо вашу конфіденційність та ніколи не передаємо дані третім особам.
+		</p>
+	</div>
+</form>
+
+<!-- Minimal CSS for layout (add to Additional CSS in GenerateBlocks) -->
+<style>
+	.newsletter-form {
+		max-width: 500px;
+		margin: 0 auto;
+	}
+
+	.newsletter-form-inner {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.newsletter-heading {
+		margin: 0;
+		font-size: 1.5rem;
+		font-weight: 700;
+	}
+
+	.newsletter-description {
+		margin: 0;
+		color: var(--gb-color-text-secondary, #666);
+	}
+
+	.newsletter-field input {
+		width: 100%;
+		padding: 0.75rem 1rem;
+		border: 2px solid var(--gb-color-border, #ddd);
+		border-radius: 4px;
+		font-size: 1rem;
+	}
+
+	.newsletter-field input:focus {
+		outline: none;
+		border-color: var(--gb-color-primary, #2563eb);
+	}
+
+	.newsletter-submit {
+		padding: 0.75rem 2rem;
+		background: var(--gb-color-primary, #2563eb);
+		color: white;
+		border: none;
+		border-radius: 4px;
+		font-size: 1rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background 0.2s;
+	}
+
+	.newsletter-submit:hover {
+		background: var(--gb-color-primary-hover, #1d4ed8);
+	}
+
+	.newsletter-submit:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.newsletter-message {
+		padding: 0.75rem;
+		border-radius: 4px;
+		font-size: 0.875rem;
+		display: none;
+	}
+
+	.newsletter-message.success {
+		display: block;
+		background: #d1fae5;
+		color: #065f46;
+		border: 1px solid #10b981;
+	}
+
+	.newsletter-message.error {
+		display: block;
+		background: #fee2e2;
+		color: #991b1b;
+		border: 1px solid #ef4444;
+	}
+
+	.newsletter-privacy {
+		margin: 0;
+		font-size: 0.75rem;
+		color: var(--gb-color-text-secondary, #666);
+		text-align: center;
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border-width: 0;
+	}
+</style>

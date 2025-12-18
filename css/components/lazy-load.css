@@ -1,0 +1,395 @@
+/**
+ * ============================================================================
+ * MEDICI.AGENCY - LAZY LOAD STYLES
+ * File: css/components/lazy-load.css
+ * ============================================================================
+ *
+ * Стилі для lazy loading images з Intersection Observer API.
+ *
+ * Features:
+ * • Fade-in анімація при завантаженні
+ * • Skeleton placeholder під час завантаження
+ * • Error state для невдалих завантажень
+ * • Blur-up effect (опціонально)
+ * • Performance optimizations (GPU acceleration)
+ * • BEM naming convention (v2.0.0)
+ *
+ * @version 2.0.0
+ * @since   1.4.0
+ * @changelog 2.0.0 - Refactored to BEM naming convention with backwards compatibility
+ */
+
+/* ============================================================================
+   BASE STYLES (BEM Naming)
+   ============================================================================ */
+
+/**
+ * Lazy image base class (Block)
+ *
+ * Додається до всіх images що lazy loading
+ * JavaScript hook: .js-lazy-load
+ */
+.lazy-image {
+	transition: opacity 300ms ease-in-out;
+	opacity: 0;
+	will-change: opacity;
+}
+
+/**
+ * Loading state (Modifier)
+ *
+ * Показується під час завантаження image
+ */
+.lazy-image--loading {
+	background: linear-gradient(
+		90deg,
+		var(--color-bg-secondary, #f0f0f0) 25%,
+		var(--color-bg-tertiary, #e0e0e0) 50%,
+		var(--color-bg-secondary, #f0f0f0) 75%
+	);
+	opacity: 0.5;
+	background-size: 200% 100%;
+	animation: skeleton-loading 1.5s infinite ease-in-out;
+}
+
+/**
+ * Loaded state (Modifier)
+ *
+ * Показується після успішного завантаження
+ */
+.lazy-image--loaded {
+	opacity: 1;
+	animation: fade-in 300ms ease-in-out;
+}
+
+/**
+ * Error state (Modifier)
+ *
+ * Показується якщо image не завантажився
+ */
+.lazy-image--error {
+	position: relative;
+	opacity: 0.3;
+	filter: grayscale(100%);
+}
+
+.lazy-image--error::after {
+	content: "⚠️";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	opacity: 0.5;
+	font-size: 2rem;
+}
+
+/* ============================================================================
+   ANIMATIONS
+   ============================================================================ */
+
+/**
+ * Skeleton loading animation
+ */
+@keyframes skeleton-loading {
+	0% {
+		background-position: 200% 0;
+	}
+
+	100% {
+		background-position: -200% 0;
+	}
+}
+
+/**
+ * Fade-in animation
+ */
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+/* ============================================================================
+   BLUR-UP EFFECT (OPTIONAL)
+   ============================================================================ */
+
+/**
+ * Blur-up effect для progressive loading (Modifier)
+ *
+ * Спочатку показує blur preview, потім sharp image
+ */
+.lazy-image--blur-up {
+	transform: scale(1.05);
+	transition:
+		filter 300ms ease-in-out,
+		transform 300ms ease-in-out,
+		opacity 300ms ease-in-out;
+	filter: blur(10px);
+}
+
+.lazy-image--blur-up.lazy-image--loaded {
+	transform: scale(1);
+	filter: blur(0);
+}
+
+/* ============================================================================
+   BACKGROUND IMAGES
+   ============================================================================ */
+
+/**
+ * Background images lazy loading
+ * Uses data-bg attribute for JS hooks
+ */
+[data-bg] {
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+[data-bg].lazy-image--loading {
+	background-image: none !important;
+}
+
+/* ============================================================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================================================ */
+
+/**
+ * GPU acceleration для smooth animations
+ */
+.lazy-image,
+.lazy-image--loading,
+.lazy-image--loaded {
+	transform: translateZ(0);
+	backface-visibility: hidden;
+}
+
+/**
+ * Prevent layout shift (CLS optimization)
+ */
+.lazy-image[width][height] {
+	height: auto;
+	aspect-ratio: attr(width) / attr(height);
+}
+
+/* ============================================================================
+   DARK THEME SUPPORT
+   ============================================================================ */
+
+[data-theme="dark"] .lazy-image--loading {
+	background: linear-gradient(
+		90deg,
+		var(--color-bg-secondary, #1a1a1a) 25%,
+		var(--color-bg-tertiary, #2a2a2a) 50%,
+		var(--color-bg-secondary, #1a1a1a) 75%
+	);
+}
+
+[data-theme="dark"] .lazy-image--error {
+	opacity: 0.2;
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+/**
+ * Mobile optimizations
+ */
+@media (width <= 767px) {
+	/* Швидша анімація на mobile */
+	.lazy-image {
+		transition: opacity 200ms ease-in-out;
+	}
+
+	.lazy-image--loaded {
+		animation: fade-in 200ms ease-in-out;
+	}
+
+	/* Менш інтенсивний blur на mobile (performance) */
+	.lazy-image--blur-up {
+		filter: blur(5px);
+	}
+}
+
+/**
+ * Reduced motion preference
+ */
+@media (prefers-reduced-motion: reduce) {
+	.lazy-image,
+	.lazy-image--loading,
+	.lazy-image--loaded {
+		transition: none !important;
+		animation: none !important;
+	}
+
+	.lazy-image--loaded {
+		opacity: 1;
+	}
+
+	.lazy-image--blur-up {
+		transform: none;
+		filter: none;
+	}
+}
+
+/* ============================================================================
+   PRINT STYLES
+   ============================================================================ */
+
+@media print {
+	.lazy-image,
+	.lazy-image--loading,
+	.lazy-image--loaded {
+		transition: none !important;
+		opacity: 1 !important;
+		animation: none !important;
+	}
+}
+
+/* ============================================================================
+   BACKWARDS COMPATIBILITY
+   ============================================================================ */
+
+/**
+ * Legacy class names support (deprecated)
+ *
+ * Ці класи підтримуються для зворотної сумісності, але використовуйте
+ * нові BEM класи (.lazy-image, .lazy-image--loading, тощо) в новому коді.
+ *
+ * @deprecated Use .lazy-image instead of .lazy-load
+ * @deprecated Use .lazy-image--loading instead of .lazy-loading
+ * @deprecated Use .lazy-image--loaded instead of .lazy-loaded
+ * @deprecated Use .lazy-image--error instead of .lazy-error
+ */
+.lazy-load {
+	transition: opacity 300ms ease-in-out;
+	opacity: 0;
+	will-change: opacity;
+}
+
+.lazy-loading {
+	background: linear-gradient(
+		90deg,
+		var(--color-bg-secondary, #f0f0f0) 25%,
+		var(--color-bg-tertiary, #e0e0e0) 50%,
+		var(--color-bg-secondary, #f0f0f0) 75%
+	);
+	opacity: 0.5;
+	background-size: 200% 100%;
+	animation: skeleton-loading 1.5s infinite ease-in-out;
+}
+
+.lazy-loaded {
+	opacity: 1;
+	animation: fade-in 300ms ease-in-out;
+}
+
+.lazy-error {
+	position: relative;
+	opacity: 0.3;
+	filter: grayscale(100%);
+}
+
+.lazy-error::after {
+	content: "⚠️";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	opacity: 0.5;
+	font-size: 2rem;
+}
+
+.lazy-load.blur-up {
+	transform: scale(1.05);
+	transition:
+		filter 300ms ease-in-out,
+		transform 300ms ease-in-out,
+		opacity 300ms ease-in-out;
+	filter: blur(10px);
+}
+
+.lazy-loaded.blur-up {
+	transform: scale(1);
+	filter: blur(0);
+}
+
+[data-bg].lazy-loading {
+	background-image: none !important;
+}
+
+.lazy-load,
+.lazy-loading,
+.lazy-loaded {
+	transform: translateZ(0);
+	backface-visibility: hidden;
+}
+
+.lazy-load[width][height] {
+	height: auto;
+	aspect-ratio: attr(width) / attr(height);
+}
+
+[data-theme="dark"] .lazy-loading {
+	background: linear-gradient(
+		90deg,
+		var(--color-bg-secondary, #1a1a1a) 25%,
+		var(--color-bg-tertiary, #2a2a2a) 50%,
+		var(--color-bg-secondary, #1a1a1a) 75%
+	);
+}
+
+[data-theme="dark"] .lazy-error {
+	opacity: 0.2;
+}
+
+@media (width <= 767px) {
+	.lazy-load {
+		transition: opacity 200ms ease-in-out;
+	}
+
+	.lazy-loaded {
+		animation: fade-in 200ms ease-in-out;
+	}
+
+	.lazy-load.blur-up {
+		filter: blur(5px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.lazy-load,
+	.lazy-loading,
+	.lazy-loaded {
+		transition: none !important;
+		animation: none !important;
+	}
+
+	.lazy-loaded {
+		opacity: 1;
+	}
+
+	.lazy-load.blur-up {
+		transform: none;
+		filter: none;
+	}
+}
+
+@media print {
+	.lazy-load,
+	.lazy-loading,
+	.lazy-loaded {
+		transition: none !important;
+		opacity: 1 !important;
+		animation: none !important;
+	}
+}
+
+/* ============================================================================
+   END OF LAZY-LOAD.CSS
+   ============================================================================ */

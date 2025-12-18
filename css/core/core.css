@@ -1,0 +1,241 @@
+/**
+ * Core Foundation Styles
+ * Reset + Fonts + Base Elements (consolidated)
+ *
+ * Table of Contents:
+ * 1. CSS RESET ................... Universal box-sizing, body base
+ * 2. LOCAL FONTS ................. Montserrat @font-face (400, 600, 700)
+ * 3. BASE ELEMENTS ............... Images, CLS fixes, performance
+ * 4. SVG EMOJI ICONS ............. Universal styles for SVG emoji replacements
+ *
+ * @package Medici
+ * @version 1.0.17
+ * @since 1.0.14 Consolidated from reset.css + fonts.css + base.css
+ * @since 1.0.15 Removed @layer architecture for better cascade control
+ * @since 1.0.17 Added universal SVG emoji icon styles
+ */
+
+/* ========================================
+   1. CSS RESET
+======================================== */
+
+/* Universal Box Sizing */
+*,
+*::before,
+*::after {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+/* Body Base Styles */
+body {
+	background: var(--bg-primary);
+	color: var(--text-primary);
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+	font-family: var(--font-primary);
+	font-size: 16px;
+	line-height: var(--leading-normal);
+	padding-top: var(--nav-height);
+	text-rendering: optimizelegibility;
+}
+
+/* WordPress Content Normalization */
+.site-content,
+.site-content .entry-content,
+.inside-article {
+	margin: 0;
+	padding: 0;
+	max-width: 100%;
+}
+
+/* Smooth Scrolling */
+html {
+	scroll-behavior: smooth;
+}
+
+/* ========================================
+   2. LOCAL FONTS - Montserrat
+   NOTE: @font-face declarations moved to critical.css
+   for inline loading (FCP optimization)
+======================================== */
+
+/* ========================================
+   3. BASE ELEMENTS
+======================================== */
+
+/* CLS Fixes - Critical Performance */
+img {
+	display: block;
+	height: auto;
+	max-width: 100%;
+}
+
+/* Twemoji emoji fix - prevent stretching */
+img.emoji {
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	margin: 0 0.05em 0 0.1em;
+	vertical-align: -0.1em;
+}
+
+.gb-media:not([width], [height]),
+.gbp-card img:not([width], [height]) {
+	/* object-fit: cover; */
+	width: 100%;
+	height: auto;
+	aspect-ratio: 16 / 9;
+}
+
+img[loading="lazy"] {
+	content-visibility: auto;
+}
+
+.gbp-section,
+.gbp-card,
+.gbp-navigation {
+	contain: layout style;
+}
+
+/* ========================================
+   4. SVG EMOJI ICONS - Universal Styles
+======================================== */
+
+/**
+ * Universal styles for SVG icons used as emoji replacements
+ * Automatically applies to all SVG emoji across the site
+ * Preserves original colors (e.g., red phone, yellow moon)
+ */
+
+/* All SVG icons in img directory (emoji replacements) */
+img[src*="/img/1f"],
+img[src*="emoji"],
+img[src*=".svg"] {
+	display: inline-block;
+	vertical-align: middle;
+	flex-shrink: 0;
+}
+
+/* Specific emoji SVG files with fixed dimensions */
+img[src*="1f4de.svg"] {
+	/* Phone icon - 20x20px */
+	width: 20px;
+	height: 20px;
+}
+
+img[src*="1f319.svg"] {
+	/* Moon icon - 24x24px */
+	width: 24px;
+	height: 24px;
+}
+
+/* Ensure SVG icons don't interfere with text flow */
+span img[src*=".svg"],
+a img[src*=".svg"],
+button img[src*=".svg"] {
+	display: inline-block;
+	margin: 0;
+	vertical-align: middle;
+}
+
+/* ========================================
+   5. GLOBAL LINKS - Navigation Style
+======================================== */
+
+/**
+ * Global link styles with accent color underline on hover
+ * Matches navigation link pattern (.gbp-nav-link)
+ * Applies to: content links, pagination, blog navigation
+ */
+
+/* Navigation-related links (pagination, page numbers, nav links) */
+.blog-pagination a,
+.page-numbers a,
+a.page-numbers,
+.nav-links a {
+	/* Display & Positioning */
+	position: relative;
+
+	/* Colors */
+	color: var(--text-primary);
+
+	/* Transitions */
+	transition: color 0.2s ease;
+	text-decoration: none;
+}
+
+/* Accent underline animation (navigation-related only) */
+.blog-pagination a::after,
+.page-numbers a::after,
+a.page-numbers::after,
+.nav-links a::after {
+	/* Display & Positioning */
+	content: "";
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 0;
+
+	/* Box Model */
+	height: 2px;
+
+	/* Colors */
+	background: var(--accent);
+
+	/* Transitions */
+	transition: width 0.2s ease;
+}
+
+/* Hover state - expand underline to 100% */
+.blog-pagination a:hover::after,
+.page-numbers a:hover::after,
+a.page-numbers:hover::after,
+.nav-links a:hover::after {
+	width: 100%;
+}
+
+/* Hover and focus states - change text color */
+.blog-pagination a:hover,
+.blog-pagination a:focus,
+.page-numbers a:hover,
+.page-numbers a:focus,
+a.page-numbers:hover,
+a.page-numbers:focus,
+.nav-links a:hover,
+.nav-links a:focus {
+	color: var(--accent);
+	outline: none;
+}
+
+/* Dark theme support */
+[data-theme="dark"] .blog-pagination a,
+[data-theme="dark"] .page-numbers a,
+[data-theme="dark"] a.page-numbers,
+[data-theme="dark"] .nav-links a {
+	color: #fff;
+}
+
+[data-theme="dark"] .blog-pagination a:hover,
+[data-theme="dark"] .blog-pagination a:focus,
+[data-theme="dark"] .page-numbers a:hover,
+[data-theme="dark"] .page-numbers a:focus,
+[data-theme="dark"] a.page-numbers:hover,
+[data-theme="dark"] a.page-numbers:focus,
+[data-theme="dark"] .nav-links a:hover,
+[data-theme="dark"] .nav-links a:focus {
+	color: var(--accent);
+}
+
+/* Performance Optimizations */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		scroll-behavior: auto !important;
+		transition-duration: 0.01ms !important;
+	}
+}

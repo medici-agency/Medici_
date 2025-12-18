@@ -1,0 +1,720 @@
+/**
+ * Navigation Component - BEM Architecture
+ * Fixed header, logo, menu, theme toggle, mobile menu
+ *
+ * BEM Structure:
+ * - Block: .gbp-navigation
+ * - Elements: __logo, __menu, __link, __right, __phone, __theme-toggle, __mobile-toggle, __hamburger-line
+ * - Modifiers: --scrolled, --open, --active
+ *
+ * Table of Contents:
+ * 1. MAIN NAVIGATION ............. Fixed header with backdrop-filter
+ * 2. LOGO ........................ Site logo and branding
+ * 3. NAVIGATION MENU ............. Main menu links (center)
+ * 4. NAVIGATION RIGHT ............ Phone number and utilities
+ * 5. THEME TOGGLE ................ Dark/Light mode switcher
+ * 6. MOBILE TOGGLE ............... Hamburger menu button
+ * 7. RESPONSIVE .................. Tablet and Mobile breakpoints
+ * 8. BACKWARDS COMPATIBILITY ..... Legacy class support
+ *
+ * @package Medici
+ * @version 2.0.0
+ * @since 2.0.0 Refactored to BEM naming convention
+ */
+
+/* ========================================
+   1. MAIN NAVIGATION (Block)
+   ======================================== */
+
+.gbp-navigation {
+	position: fixed;
+	top: 0;
+
+	/* Display & Positioning */
+	left: 0;
+	z-index: 1000;
+	width: 100%;
+	height: var(--nav-height);
+	padding: 0.83rem;
+	background: rgb(255 255 255 / 95%);
+
+	/* Stacked Transitions */
+	transition:
+		background-color 0.2s ease,
+		box-shadow 0.25s ease-in-out,
+		padding 0.15s ease,
+		height 0.15s ease;
+
+	/* Box Model */
+	border-bottom: 1px solid var(--border-color);
+
+	/* Colors */
+	-webkit-backdrop-filter: blur(16px) saturate(180%);
+	backdrop-filter: blur(16px) saturate(180%);
+	will-change: transform;
+}
+
+[data-theme="dark"] .gbp-navigation {
+	background: rgb(15 23 42 / 95%);
+}
+
+/* Block Modifier: Scrolled state */
+.gbp-navigation--scrolled {
+	height: 50px;
+	padding: 0.5rem 0.83rem;
+	box-shadow: var(--shadow-lg);
+}
+
+/* ========================================
+   2. LOGO (Element)
+   ======================================== */
+
+.gbp-navigation__logo {
+	display: flex;
+
+	/* Display & Positioning */
+	align-items: center;
+	gap: 0.5rem;
+
+	/* Typography */
+	color: var(--accent);
+	font-size: 1.25rem;
+	font-weight: var(--font-bold);
+	text-decoration: none;
+}
+
+/* Disable hover effects on logo */
+a.gbp-navigation__logo:hover,
+a.gbp-navigation__logo:focus,
+.gbp-navigation__logo:hover,
+.gbp-navigation__logo:focus {
+	background: transparent;
+	color: var(--accent);
+	transform: none;
+	opacity: 1;
+	cursor: pointer;
+	outline: none;
+	text-decoration: none;
+}
+
+/* ========================================
+   3. NAVIGATION MENU (Element)
+   ======================================== */
+
+.gbp-navigation__menu {
+	display: flex;
+
+	/* Display & Positioning */
+	align-items: center;
+	gap: 1.5rem;
+}
+
+/* Navigation Link (Element) */
+.gbp-navigation__link {
+	/* Display & Positioning */
+	position: relative;
+
+	/* Box Model */
+	padding: 0.5rem 0;
+
+	/* Colors */
+	background: transparent;
+	color: var(--text-primary);
+
+	/* Stacked Transitions */
+	transition: color var(--hover-transition);
+
+	/* Typography */
+	font-size: 0.85rem;
+	font-weight: var(--font-medium);
+	text-decoration: none;
+}
+
+/* Underline animation */
+.gbp-navigation__link::after {
+	content: "";
+	position: absolute;
+
+	/* Display & Positioning */
+	bottom: 0;
+	left: 0;
+	width: 0;
+
+	/* Box Model */
+	height: 2px;
+
+	/* Colors */
+	background: var(--accent);
+
+	/* Stacked Transitions */
+	transition: width var(--hover-transition);
+}
+
+.gbp-navigation__link:hover::after {
+	width: 100%;
+}
+
+a.gbp-navigation__link:hover,
+a.gbp-navigation__link:focus,
+.gbp-navigation__link:hover,
+.gbp-navigation__link:focus {
+	background: transparent;
+	color: var(--text-secondary);
+	outline: none;
+}
+
+/* ========================================
+   4. NAVIGATION RIGHT (Element)
+   ======================================== */
+
+.gbp-navigation__right {
+	display: flex;
+
+	/* Display & Positioning */
+	align-items: center;
+	gap: 0.75rem;
+}
+
+/* Phone Link (Element) */
+.gbp-navigation__phone {
+	display: flex;
+
+	/* Display & Positioning */
+	align-items: center;
+	gap: 0.5rem;
+
+	/* Typography */
+	color: var(--text-primary);
+
+	/* Stacked Transitions */
+	transition: color var(--hover-transition);
+	font-size: 0.85rem;
+	font-weight: var(--font-medium);
+	text-decoration: none;
+}
+
+a.gbp-navigation__phone:hover,
+a.gbp-navigation__phone:focus,
+.gbp-navigation__phone:hover,
+.gbp-navigation__phone:focus {
+	background: transparent;
+	color: var(--text-secondary);
+	outline: none;
+}
+
+/* SVG icon styling - preserve red color for phone */
+.gbp-navigation__phone img {
+	display: inline-block;
+	flex-shrink: 0;
+	vertical-align: middle;
+}
+
+/* Dark theme - lighter text for better visibility */
+[data-theme="dark"] .gbp-navigation__link,
+[data-theme="dark"] .gbp-navigation__phone {
+	background: transparent;
+	color: var(--color-white);
+}
+
+[data-theme="dark"] a.gbp-navigation__link:hover,
+[data-theme="dark"] a.gbp-navigation__link:focus,
+[data-theme="dark"] a.gbp-navigation__phone:hover,
+[data-theme="dark"] a.gbp-navigation__phone:focus,
+[data-theme="dark"] .gbp-navigation__link:hover,
+[data-theme="dark"] .gbp-navigation__link:focus,
+[data-theme="dark"] .gbp-navigation__phone:hover,
+[data-theme="dark"] .gbp-navigation__phone:focus {
+	background: transparent;
+	color: var(--slate-400);
+	outline: none;
+}
+
+/* ========================================
+   5. THEME TOGGLE (Element)
+   ======================================== */
+
+.gbp-navigation__theme-toggle,
+#theme-toggle,
+#themeToggle {
+	display: flex;
+	justify-content: center;
+
+	/* Display & Positioning */
+	align-items: center;
+	width: 40px;
+	height: 40px;
+
+	/* Colors */
+	background: transparent;
+
+	/* Box Model */
+	border: none;
+	border-radius: 50%;
+
+	/* Stacked Transitions */
+	transition:
+		background-color 0.2s ease,
+		transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+	cursor: pointer;
+
+	/* Typography */
+	font-size: 1.25rem;
+}
+
+.gbp-navigation__theme-toggle:hover,
+.gbp-navigation__theme-toggle:focus,
+#theme-toggle:hover,
+#themeToggle:hover,
+#theme-toggle:focus,
+#themeToggle:focus {
+	background: transparent;
+	transform: rotate(15deg);
+}
+
+/* SVG icon inside theme toggle button */
+.gbp-navigation__theme-toggle img,
+#theme-toggle img,
+#themeToggle img {
+	display: block;
+	width: 24px;
+	height: 24px;
+	transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ========================================
+   6. MOBILE TOGGLE (Element)
+   ======================================== */
+
+.gbp-navigation__mobile-toggle {
+	display: none;
+	flex-direction: column;
+	justify-content: center;
+
+	/* Display & Positioning */
+	align-items: center;
+	gap: 5px;
+	width: 44px;
+	height: 44px;
+	padding: 8px;
+
+	/* Colors */
+	background: transparent;
+
+	/* Box Model */
+	border: none;
+	cursor: pointer;
+}
+
+/* Hamburger Line (Element) */
+.gbp-navigation__hamburger-line {
+	width: 24px;
+
+	/* Box Model */
+	height: 2px;
+
+	/* Colors */
+	background: var(--text-primary);
+
+	/* Stacked Transitions */
+	transition:
+		transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+		opacity 0.2s ease;
+}
+
+/* Mobile Toggle Active State (Modifier) */
+.gbp-navigation__mobile-toggle--active .gbp-navigation__hamburger-line:nth-child(1) {
+	transform: rotate(45deg) translate(6px, 6px);
+}
+
+.gbp-navigation__mobile-toggle--active .gbp-navigation__hamburger-line:nth-child(2) {
+	opacity: 0;
+}
+
+.gbp-navigation__mobile-toggle--active .gbp-navigation__hamburger-line:nth-child(3) {
+	transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* ========================================
+   7. RESPONSIVE - TABLET
+   ======================================== */
+
+@media (width <= 1024px) {
+	:root {
+		--nav-height: 55px;
+	}
+
+	body {
+		padding-top: 55px;
+	}
+
+	.gbp-navigation {
+		height: 55px;
+		padding: 0.5rem 0.65rem;
+	}
+
+	.gbp-navigation__menu {
+		display: none;
+	}
+
+	.gbp-navigation__mobile-toggle {
+		display: flex;
+	}
+
+	/* Menu Open State (Modifier) */
+	.gbp-navigation .gbp-navigation__menu--open {
+		position: fixed;
+		top: 55px;
+		right: 0;
+		left: 0;
+		z-index: 999;
+		display: flex;
+		flex-direction: column;
+
+		/* Display & Positioning */
+		align-items: center;
+		gap: 0;
+		padding: 1.5rem;
+
+		/* Colors */
+		background: var(--bg-primary);
+		text-align: center;
+
+		/* Box Model */
+		box-shadow: var(--shadow-lg);
+
+		/* Animation */
+		animation: slideDown 0.3s ease;
+	}
+
+	@keyframes slideDown {
+		from {
+			transform: translateY(-20px);
+			opacity: 0;
+		}
+
+		to {
+			transform: translateY(0);
+			opacity: 1;
+		}
+	}
+
+	.gbp-navigation__menu--open .gbp-navigation__link {
+		display: inline-block;
+		padding: 0.85rem 0;
+		text-align: center;
+		font-size: 1rem;
+	}
+
+	/* Hide CTA button in mobile menu */
+	.gbp-navigation__menu--open .gbp-navigation__cta-button {
+		display: none;
+	}
+}
+
+/* ========================================
+   7. RESPONSIVE - MOBILE
+   ======================================== */
+
+@media (width <= 767px) {
+	:root {
+		--nav-height: 50px;
+	}
+
+	body {
+		padding-top: 50px;
+	}
+
+	.gbp-navigation {
+		height: 50px;
+	}
+
+	.gbp-navigation__menu--open {
+		top: 50px;
+	}
+
+	/* Touch Targets Enhancement (min 44x44px для accessibility) */
+	.gbp-navigation__theme-toggle,
+	#theme-toggle,
+	#themeToggle {
+		min-width: 44px;
+		min-height: 44px;
+	}
+
+	.gbp-navigation__link {
+		display: flex;
+		align-items: center;
+		padding: 12px 0;
+		min-height: 44px;
+	}
+
+	.gbp-navigation__phone {
+		padding: 10px 0;
+		min-height: 44px;
+	}
+
+	/* Збільшена touch area для filter tags */
+	.medici-blog-filter-tag {
+		padding: 12px 20px;
+		min-height: 44px;
+	}
+}
+
+/* ========================================
+   8. BACKWARDS COMPATIBILITY
+   Legacy class names for existing HTML templates
+   TODO: Remove after HTML migration
+   ======================================== */
+
+/* Logo - Legacy */
+.gbp-logo {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--accent);
+	font-size: 1.25rem;
+	font-weight: var(--font-bold);
+	text-decoration: none;
+}
+
+a.gbp-logo:hover,
+a.gbp-logo:focus,
+.gbp-logo:hover,
+.gbp-logo:focus {
+	background: transparent;
+	color: var(--accent);
+	transform: none;
+	opacity: 1;
+	cursor: pointer;
+	outline: none;
+	text-decoration: none;
+}
+
+/* Navigation Center - Legacy */
+.gbp-nav-center {
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
+}
+
+/* Navigation Link - Legacy */
+.gbp-nav-link {
+	position: relative;
+	padding: 0.5rem 0;
+	background: transparent;
+	color: var(--text-primary);
+	transition: color var(--hover-transition);
+	font-size: 0.85rem;
+	font-weight: var(--font-medium);
+	text-decoration: none;
+}
+
+.gbp-nav-link::after {
+	content: "";
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 0;
+	height: 2px;
+	background: var(--accent);
+	transition: width var(--hover-transition);
+}
+
+.gbp-nav-link:hover::after {
+	width: 100%;
+}
+
+a.gbp-nav-link:hover,
+a.gbp-nav-link:focus,
+.gbp-nav-link:hover,
+.gbp-nav-link:focus {
+	background: transparent;
+	color: var(--text-secondary);
+	outline: none;
+}
+
+/* Navigation Right - Legacy */
+.gbp-nav-right {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+/* Phone Link - Legacy */
+.gbp-nav-phone {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--text-primary);
+	transition: color var(--hover-transition);
+	font-size: 0.85rem;
+	font-weight: var(--font-medium);
+	text-decoration: none;
+}
+
+a.gbp-nav-phone:hover,
+a.gbp-nav-phone:focus,
+.gbp-nav-phone:hover,
+.gbp-nav-phone:focus {
+	background: transparent;
+	color: var(--text-secondary);
+	outline: none;
+}
+
+.gbp-nav-phone img {
+	display: inline-block;
+	flex-shrink: 0;
+	vertical-align: middle;
+}
+
+/* Dark theme - Legacy classes */
+[data-theme="dark"] .gbp-nav-link,
+[data-theme="dark"] .gbp-nav-phone {
+	background: transparent;
+	color: var(--color-white);
+}
+
+[data-theme="dark"] a.gbp-nav-link:hover,
+[data-theme="dark"] a.gbp-nav-link:focus,
+[data-theme="dark"] a.gbp-nav-phone:hover,
+[data-theme="dark"] a.gbp-nav-phone:focus,
+[data-theme="dark"] .gbp-nav-link:hover,
+[data-theme="dark"] .gbp-nav-link:focus,
+[data-theme="dark"] .gbp-nav-phone:hover,
+[data-theme="dark"] .gbp-nav-phone:focus {
+	background: transparent;
+	color: var(--slate-400);
+	outline: none;
+}
+
+/* Theme Toggle - Legacy */
+.gbp-theme-toggle {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 40px;
+	height: 40px;
+	background: transparent;
+	border: none;
+	border-radius: 50%;
+	transition:
+		background-color 0.2s ease,
+		transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+	cursor: pointer;
+	font-size: 1.25rem;
+}
+
+.gbp-theme-toggle:hover,
+.gbp-theme-toggle:focus {
+	background: transparent;
+	transform: rotate(15deg);
+}
+
+.gbp-theme-toggle img {
+	display: block;
+	width: 24px;
+	height: 24px;
+	transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Mobile Toggle - Legacy */
+.gbp-mobile-toggle {
+	display: none;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 5px;
+	width: 44px;
+	height: 44px;
+	padding: 8px;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+}
+
+/* Hamburger Line - Legacy */
+.hamburger-line {
+	width: 24px;
+	height: 2px;
+	background: var(--text-primary);
+	transition:
+		transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+		opacity 0.2s ease;
+}
+
+.mobile-menu-toggle--active .hamburger-line:nth-child(1) {
+	transform: rotate(45deg) translate(6px, 6px);
+}
+
+.mobile-menu-toggle--active .hamburger-line:nth-child(2) {
+	opacity: 0;
+}
+
+.mobile-menu-toggle--active .hamburger-line:nth-child(3) {
+	transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* Scrolled state - Legacy */
+.gbp-navigation.scrolled {
+	height: 50px;
+	padding: 0.5rem 0.83rem;
+	box-shadow: var(--shadow-lg);
+}
+
+/* Responsive Legacy - Tablet */
+@media (width <= 1024px) {
+	.gbp-nav-center {
+		display: none;
+	}
+
+	.gbp-mobile-toggle {
+		display: flex;
+	}
+
+	/* Mobile menu open state - Legacy */
+	.gbp-navigation .gbp-nav-center.menu--open {
+		position: fixed;
+		top: 55px;
+		right: 0;
+		left: 0;
+		z-index: 999;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0;
+		padding: 1.5rem;
+		background: var(--bg-primary);
+		text-align: center;
+		box-shadow: var(--shadow-lg);
+		animation: slideDown 0.3s ease;
+	}
+
+	.gbp-nav-center.menu--open .gbp-nav-link {
+		display: inline-block;
+		padding: 0.85rem 0;
+		text-align: center;
+		font-size: 1rem;
+	}
+
+	.gbp-nav-center.menu--open .gbp-cta-button {
+		display: none;
+	}
+}
+
+/* Responsive Legacy - Mobile */
+@media (width <= 767px) {
+	.gbp-nav-center.menu--open {
+		top: 50px;
+	}
+
+	.gbp-nav-link {
+		display: flex;
+		align-items: center;
+		padding: 12px 0;
+		min-height: 44px;
+	}
+
+	.gbp-nav-phone {
+		padding: 10px 0;
+		min-height: 44px;
+	}
+}

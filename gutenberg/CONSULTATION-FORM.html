@@ -1,0 +1,110 @@
+<!-- wp:generateblocks/element {"uniqueId":"a1b2c3d4","tagName":"section","globalClasses":["gbp-section"]} -->
+<section class="gbp-section gb-element-a1b2c3d4">
+	<!-- wp:generateblocks/container {"uniqueId":"b2c3d4e5","globalClasses":["gbp-section__inner"]} -->
+	<div class="gb-container gbp-section__inner gb-container-b2c3d4e5">
+		<!-- wp:html -->
+		<form class="js-consultation-form consultation-form">
+			<div class="consultation-form-inner">
+				<!-- Heading -->
+				<h3 class="consultation-heading">📞 Отримати консультацію</h3>
+				<p class="consultation-description">
+					Заповніть форму і наші експерти зв'яжуться з вами протягом 1 години
+				</p>
+
+				<!-- Name Field -->
+				<div class="consultation-field">
+					<label for="consultation-name"> Ім'я <span class="required">*</span> </label>
+					<input
+						type="text"
+						id="consultation-name"
+						name="name"
+						placeholder="Ваше ім'я"
+						required
+						autocomplete="name"
+					/>
+				</div>
+
+				<!-- Email Field -->
+				<div class="consultation-field">
+					<label for="consultation-email"> Email <span class="required">*</span> </label>
+					<input
+						type="email"
+						id="consultation-email"
+						name="email"
+						placeholder="email@example.com"
+						required
+						autocomplete="email"
+					/>
+				</div>
+
+				<!-- Phone Field -->
+				<div class="consultation-field">
+					<label for="consultation-phone"> Телефон <span class="required">*</span> </label>
+					<input
+						type="tel"
+						id="consultation-phone"
+						name="phone"
+						placeholder="+380 XX XXX XX XX"
+						required
+						autocomplete="tel"
+					/>
+				</div>
+
+				<!-- Service Field (Optional) -->
+				<div class="consultation-field">
+					<label for="consultation-service">Послуга (опціонально)</label>
+					<select id="consultation-service" name="service">
+						<option value="">Оберіть послугу</option>
+						<option value="smm">SMM для медичних клінік</option>
+						<option value="seo">SEO оптимізація</option>
+						<option value="advertising">Реклама лікарських засобів</option>
+						<option value="branding">Брендинг медичної клініки</option>
+						<option value="consultation">Маркетингова консультація</option>
+						<option value="other">Інше</option>
+					</select>
+				</div>
+
+				<!-- Message Field (Optional) - Autogrowing Textarea -->
+				<div class="consultation-field">
+					<label for="consultation-message">Повідомлення (опціонально)</label>
+					<div class="textarea-wrapper" data-cloned-val="">
+						<textarea
+							id="consultation-message"
+							name="message"
+							rows="4"
+							placeholder="Розкажіть детальніше про ваш запит..."
+							oninput="this.parentNode.dataset.clonedVal = this.value"
+						></textarea>
+					</div>
+				</div>
+
+				<!-- Consent Checkbox -->
+				<div class="consultation-consent">
+					<label>
+						<input type="checkbox" name="consent" required />
+						<span>
+							Я даю згоду на обробку моїх персональних даних відповідно до
+							<a href="/privacy-policy/" target="_blank" rel="noopener"
+								>Політики конфіденційності</a
+							>
+							<span class="required">*</span>
+						</span>
+					</label>
+				</div>
+
+				<!-- Submit Button -->
+				<button type="submit" class="btn btn-primary consultation-submit">Відправити заявку</button>
+
+				<!-- Message Container -->
+				<div
+					class="js-consultation-message consultation-message"
+					role="status"
+					aria-live="polite"
+				></div>
+			</div>
+		</form>
+		<!-- /wp:html -->
+	</div>
+	<!-- /wp:generateblocks/container -->
+</section>
+<!-- /wp:generateblocks/element -->

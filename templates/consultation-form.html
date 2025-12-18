@@ -1,0 +1,235 @@
+<!--
+Consultation Request Form Template
+==================================
+
+Usage: Copy this HTML to GenerateBlocks Container block (Custom HTML).
+
+Requirements:
+- Class 'js-consultation-form' (preferred) or 'consultation-form' on form element
+- Input fields: name, email, phone
+- Checkbox: consent (required)
+- Button with type="submit"
+- Element with class 'consultation-message' for displaying feedback
+
+Optional:
+- Textarea: message
+- Select/Input: service
+-->
+
+<form class="js-consultation-form consultation-form">
+	<div class="consultation-form-inner">
+		<!-- Heading -->
+		<h3 class="consultation-heading">📞 Отримати консультацію</h3>
+		<p class="consultation-description">
+			Заповніть форму і наші експерти зв'яжуться з вами протягом 24 годин
+		</p>
+
+		<!-- Name Field -->
+		<div class="consultation-field">
+			<label for="consultation-name"> Ім'я <span class="required">*</span> </label>
+			<input
+				type="text"
+				id="consultation-name"
+				name="name"
+				placeholder="Ваше ім'я"
+				required
+				autocomplete="name"
+			/>
+		</div>
+
+		<!-- Email Field -->
+		<div class="consultation-field">
+			<label for="consultation-email"> Email <span class="required">*</span> </label>
+			<input
+				type="email"
+				id="consultation-email"
+				name="email"
+				placeholder="email@example.com"
+				required
+				autocomplete="email"
+			/>
+		</div>
+
+		<!-- Phone Field -->
+		<div class="consultation-field">
+			<label for="consultation-phone"> Телефон <span class="required">*</span> </label>
+			<input
+				type="tel"
+				id="consultation-phone"
+				name="phone"
+				placeholder="+380 XX XXX XX XX"
+				required
+				autocomplete="tel"
+			/>
+		</div>
+
+		<!-- Service Field (Optional) -->
+		<div class="consultation-field">
+			<label for="consultation-service">Послуга (опціонально)</label>
+			<select id="consultation-service" name="service">
+				<option value="">Оберіть послугу</option>
+				<option value="smm">SMM для медичних клінік</option>
+				<option value="seo">SEO оптимізація</option>
+				<option value="advertising">Реклама лікарських засобів</option>
+				<option value="branding">Брендинг медичної клініки</option>
+				<option value="consultation">Маркетингова консультація</option>
+				<option value="other">Інше</option>
+			</select>
+		</div>
+
+		<!-- Message Field (Optional) -->
+		<div class="consultation-field">
+			<label for="consultation-message">Повідомлення (опціонально)</label>
+			<textarea
+				id="consultation-message"
+				name="message"
+				rows="4"
+				placeholder="Розкажіть детальніше про ваш запит..."
+			></textarea>
+		</div>
+
+		<!-- Consent Checkbox -->
+		<div class="consultation-consent">
+			<label>
+				<input type="checkbox" name="consent" required />
+				<span>
+					Я даю згоду на обробку моїх персональних даних відповідно до
+					<a href="/privacy-policy/" target="_blank">Політики конфіденційності</a>
+					<span class="required">*</span>
+				</span>
+			</label>
+		</div>
+
+		<!-- Submit Button -->
+		<button type="submit" class="btn btn-primary consultation-submit">Відправити заявку</button>
+
+		<!-- Message Container -->
+		<div
+			class="js-consultation-message consultation-message"
+			role="status"
+			aria-live="polite"
+		></div>
+	</div>
+</form>
+
+<!-- Minimal CSS for layout (add to Additional CSS in GenerateBlocks) -->
+<style>
+	.consultation-form {
+		max-width: 600px;
+		margin: 0 auto;
+	}
+
+	.consultation-form-inner {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.consultation-heading {
+		margin: 0;
+		font-size: 1.75rem;
+		font-weight: 700;
+	}
+
+	.consultation-description {
+		margin: 0;
+		color: var(--gb-color-text-secondary, #666);
+	}
+
+	.consultation-field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.consultation-field label {
+		font-weight: 600;
+		font-size: 0.875rem;
+	}
+
+	.consultation-field input,
+	.consultation-field select,
+	.consultation-field textarea {
+		padding: 0.75rem 1rem;
+		border: 2px solid var(--gb-color-border, #ddd);
+		border-radius: 4px;
+		font-size: 1rem;
+		font-family: inherit;
+	}
+
+	.consultation-field input:focus,
+	.consultation-field select:focus,
+	.consultation-field textarea:focus {
+		outline: none;
+		border-color: var(--gb-color-primary, #2563eb);
+	}
+
+	.consultation-consent {
+		padding: 1rem;
+		background: #f9fafb;
+		border-radius: 4px;
+	}
+
+	.consultation-consent label {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.75rem;
+		cursor: pointer;
+	}
+
+	.consultation-consent input[type='checkbox'] {
+		margin-top: 0.25rem;
+		flex-shrink: 0;
+	}
+
+	.consultation-consent a {
+		color: var(--gb-color-primary, #2563eb);
+		text-decoration: underline;
+	}
+
+	.required {
+		color: #ef4444;
+	}
+
+	.consultation-submit {
+		padding: 1rem 2rem;
+		background: var(--gb-color-primary, #2563eb);
+		color: white;
+		border: none;
+		border-radius: 4px;
+		font-size: 1.125rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background 0.2s;
+	}
+
+	.consultation-submit:hover {
+		background: var(--gb-color-primary-hover, #1d4ed8);
+	}
+
+	.consultation-submit:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.consultation-message {
+		padding: 1rem;
+		border-radius: 4px;
+		font-size: 0.875rem;
+		display: none;
+	}
+
+	.consultation-message.success {
+		display: block;
+		background: #d1fae5;
+		color: #065f46;
+		border: 1px solid #10b981;
+	}
+
+	.consultation-message.error {
+		display: block;
+		background: #fee2e2;
+		color: #991b1b;
+		border: 1px solid #ef4444;
+	}
+</style>

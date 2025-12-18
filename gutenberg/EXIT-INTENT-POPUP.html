@@ -1,0 +1,148 @@
+<!-- EXIT-INTENT POPUP - HYBRID SOLUTION -->
+<!-- beeker1121/exit-intent-popup + GenerateBlocks Overlay Panel -->
+<!--
+🎯 АРХІТЕКТУРА:
+- bioEp (beeker1121) - exit-intent detection + cookie tracking (30 днів)
+- GenerateBlocks Overlay Panel - дизайн + анімації
+- Events API - form handling + Lead CPT integration
+
+ІНСТРУКЦІЯ ДЛЯ ВИКОРИСТАННЯ:
+
+1. Створіть новий Element у WordPress:
+   GeneratePress > Elements > Add New > Block Element
+   Element Type: Content
+   Name: "Exit-Intent Popup"
+
+2. Додайте блок Overlay Panel:
+   У редакторі додайте блок "Overlay Panel" (GenerateBlocks Pro 2.3+)
+
+3. Налаштуйте Overlay Panel Settings:
+   ⚠️ ВАЖЛИВО - НЕ використовуйте Exit Intent тригер!
+
+   Settings:
+   - Trigger: NONE (manual trigger via JavaScript) ✅
+   - Panel ID: medici-exit-intent-panel ✅ (ОБОВ'ЯЗКОВО!)
+   - Animation: Scale In
+   - Duration: 300ms
+   - Show once per session: DISABLED (bioEp керує cookie)
+
+4. Скопіюйте HTML нижче ВСЕРЕДИНУ Overlay Panel block
+
+5. Display Rules:
+   - Location: Entire Site
+   - Device: Desktop (>1024px)
+
+6. Активуйте Element
+
+7. Перевірте що JavaScript файли завантажились:
+   - bioep.min.js (beeker1121 library)
+   - exit-intent-hybrid.js (adapter script)
+   - exit-intent-overlay.js (form handler)
+
+🔧 КАК ПРАЦЮЄ:
+1. bioEp детектить exit-intent (миша до верхньої частини екрану)
+2. Перевіряє cookie (якщо показано протягом 30 днів - не показує)
+3. Тригерить GenerateBlocks Overlay Panel через data-gb-trigger-panel
+4. Popup відкривається з анімацією Scale In
+5. Форма відправляється через Events API
+6. bioEp зберігає cookie на 30 днів
+-->
+
+<!-- wp:html -->
+<div class="exit-intent-content">
+	<!-- Close Button -->
+	<button class="exit-intent-close" type="button" aria-label="Закрити" data-gb-close-panel>
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path
+				d="M18 6L6 18M6 6L18 18"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+			/>
+		</svg>
+	</button>
+
+	<!-- Emoji Icon -->
+	<div class="exit-intent-icon">👋</div>
+
+	<!-- Heading -->
+	<h2 class="exit-intent-heading">Зачекайте! Не йдіть без подарунка</h2>
+
+	<!-- Subheading -->
+	<p class="exit-intent-subheading">
+		Отримайте <strong>безкоштовну 30-хвилинну консультацію</strong> з медичного маркетингу від наших
+		експертів.
+	</p>
+
+	<!-- Form -->
+	<form class="js-exit-intent-form exit-intent-form">
+		<!-- Name Field -->
+		<div class="exit-intent-field">
+			<label for="exit-name" class="sr-only">Ім'я</label>
+			<input
+				type="text"
+				id="exit-name"
+				name="name"
+				placeholder="Ваше ім'я"
+				required
+				autocomplete="name"
+			/>
+		</div>
+
+		<!-- Email Field -->
+		<div class="exit-intent-field">
+			<label for="exit-email" class="sr-only">Email</label>
+			<input
+				type="email"
+				id="exit-email"
+				name="email"
+				placeholder="email@example.com"
+				required
+				autocomplete="email"
+			/>
+		</div>
+
+		<!-- Phone Field -->
+		<div class="exit-intent-field">
+			<label for="exit-phone" class="sr-only">Телефон</label>
+			<input
+				type="tel"
+				id="exit-phone"
+				name="phone"
+				placeholder="+380 XX XXX XX XX"
+				required
+				autocomplete="tel"
+			/>
+		</div>
+
+		<!-- Consent Checkbox -->
+		<div class="exit-intent-consent">
+			<label>
+				<input type="checkbox" name="consent" required />
+				<span> Я даю згоду на обробку персональних даних <span class="required">*</span> </span>
+			</label>
+		</div>
+
+		<!-- Submit Button -->
+		<button type="submit" class="exit-intent-submit">Отримати консультацію</button>
+
+		<!-- Message Container -->
+		<div class="js-exit-intent-message exit-intent-message" role="status" aria-live="polite"></div>
+	</form>
+
+	<!-- Decline Link -->
+	<a href="#" class="exit-intent-decline" data-gb-close-panel> Ні, дякую, продовжити перегляд </a>
+</div>
+<!-- /wp:html -->
+
+<!--
+ПРИМІТКА:
+- Overlay Panel автоматично додає backdrop з затемненням
+- Exit Intent trigger спрацьовує коли мишка йде до верхньої частини екрану
+- Show once per session зберігає стан у localStorage
+- data-gb-close-panel - GenerateBlocks атрибут для закриття панелі
+- Форма використовує Events API (consultation_request)
+
+CSS СТИЛІ:
+Додайте в style.css або окремий CSS файл (css/components/exit-intent-overlay.css)
+-->

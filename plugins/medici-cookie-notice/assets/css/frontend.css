@@ -1,0 +1,842 @@
+/**
+ * Medici Cookie Notice - Frontend Styles
+ *
+ * @version 1.0.0
+ * @package Medici_Cookie_Notice
+ */
+
+/* ==========================================================================
+   CSS Variables (Defaults)
+   ========================================================================== */
+
+:root {
+	--mcn-bg-color: rgba(30, 41, 59, 0.98);
+	--mcn-text-color: #f8fafc;
+	--mcn-btn-radius: 8px;
+	--mcn-btn-accept-bg: #10b981;
+	--mcn-btn-accept-text: #ffffff;
+	--mcn-btn-reject-bg: #6b7280;
+	--mcn-btn-reject-text: #ffffff;
+	--mcn-btn-settings-bg: transparent;
+	--mcn-btn-settings-text: #f8fafc;
+	--mcn-overlay-bg: rgba(0, 0, 0, 0.5);
+	--mcn-font-family:
+		-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+	--mcn-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+	--mcn-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	--mcn-z-index: 999999;
+}
+
+/* ==========================================================================
+   Banner Base Styles
+   ========================================================================== */
+
+.mcn-banner {
+	position: fixed;
+	left: 0;
+	right: 0;
+	z-index: var(--mcn-z-index);
+	background: var(--mcn-bg-color);
+	color: var(--mcn-text-color);
+	font-family: var(--mcn-font-family);
+	font-size: 14px;
+	line-height: 1.5;
+	box-shadow: var(--mcn-shadow);
+	transition: var(--mcn-transition);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+}
+
+/* Hidden state */
+.mcn-banner--hidden {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+/* ==========================================================================
+   Position Variants
+   ========================================================================== */
+
+.mcn-banner--bottom {
+	bottom: 0;
+	transform: translateY(100%);
+}
+
+.mcn-banner--bottom:not(.mcn-banner--hidden) {
+	transform: translateY(0);
+}
+
+.mcn-banner--top {
+	top: 0;
+	transform: translateY(-100%);
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.mcn-banner--top:not(.mcn-banner--hidden) {
+	transform: translateY(0);
+}
+
+/* Floating variants */
+.mcn-banner--floating-left,
+.mcn-banner--floating-right {
+	top: auto;
+	bottom: 20px;
+	width: 400px;
+	max-width: calc(100% - 40px);
+	border-radius: 16px;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.mcn-banner--floating-left {
+	left: 20px;
+	right: auto;
+	transform: translateX(-120%);
+}
+
+.mcn-banner--floating-left:not(.mcn-banner--hidden) {
+	transform: translateX(0);
+}
+
+.mcn-banner--floating-right {
+	left: auto;
+	right: 20px;
+	transform: translateX(120%);
+}
+
+.mcn-banner--floating-right:not(.mcn-banner--hidden) {
+	transform: translateX(0);
+}
+
+/* ==========================================================================
+   Layout Variants
+   ========================================================================== */
+
+/* Bar layout (default) */
+.mcn-banner--bar .mcn-banner__container {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	padding: 16px 24px;
+	max-width: 1400px;
+	margin: 0 auto;
+}
+
+.mcn-banner--bar .mcn-banner__content {
+	flex: 1;
+}
+
+.mcn-banner--bar .mcn-banner__actions {
+	display: flex;
+	gap: 10px;
+	flex-shrink: 0;
+}
+
+/* Box layout */
+.mcn-banner--box .mcn-banner__container {
+	padding: 24px;
+}
+
+.mcn-banner--box .mcn-banner__content {
+	margin-bottom: 20px;
+}
+
+.mcn-banner--box .mcn-banner__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+/* Modal layout */
+.mcn-banner--modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--mcn-overlay-bg);
+	padding: 20px;
+}
+
+.mcn-banner--modal .mcn-banner__container {
+	background: var(--mcn-bg-color);
+	border-radius: 16px;
+	padding: 32px;
+	max-width: 500px;
+	width: 100%;
+	text-align: center;
+}
+
+.mcn-banner--modal .mcn-banner__icon {
+	font-size: 48px;
+	margin-bottom: 16px;
+}
+
+.mcn-banner--modal .mcn-banner__content {
+	margin-bottom: 24px;
+}
+
+.mcn-banner--modal .mcn-banner__actions {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+/* ==========================================================================
+   Banner Elements
+   ========================================================================== */
+
+.mcn-banner__icon {
+	font-size: 32px;
+	line-height: 1;
+	flex-shrink: 0;
+}
+
+.mcn-banner__title {
+	/* Screen reader only */
+}
+
+.mcn-banner__message {
+	margin: 0;
+	font-size: 14px;
+}
+
+.mcn-banner__privacy-link {
+	color: var(--mcn-btn-accept-bg);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+	transition: opacity 0.2s;
+}
+
+.mcn-banner__privacy-link:hover {
+	opacity: 0.8;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.mcn-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 10px 20px;
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.4;
+	text-decoration: none;
+	border: none;
+	border-radius: var(--mcn-btn-radius);
+	cursor: pointer;
+	transition: var(--mcn-transition);
+	white-space: nowrap;
+}
+
+.mcn-btn:focus {
+	outline: 2px solid var(--mcn-btn-accept-bg);
+	outline-offset: 2px;
+}
+
+.mcn-btn--accept {
+	background: var(--mcn-btn-accept-bg);
+	color: var(--mcn-btn-accept-text);
+}
+
+.mcn-btn--accept:hover {
+	filter: brightness(1.1);
+	transform: translateY(-1px);
+}
+
+.mcn-btn--reject {
+	background: var(--mcn-btn-reject-bg);
+	color: var(--mcn-btn-reject-text);
+}
+
+.mcn-btn--reject:hover {
+	filter: brightness(1.1);
+}
+
+.mcn-btn--settings {
+	background: var(--mcn-btn-settings-bg);
+	color: var(--mcn-btn-settings-text);
+	border: 1px solid currentColor;
+}
+
+.mcn-btn--settings:hover {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+.mcn-btn--save {
+	background: var(--mcn-btn-accept-bg);
+	color: var(--mcn-btn-accept-text);
+}
+
+/* ==========================================================================
+   Revoke Button
+   ========================================================================== */
+
+.mcn-revoke-btn {
+	position: fixed;
+	bottom: 20px;
+	z-index: calc(var(--mcn-z-index) - 1);
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 16px;
+	background: var(--mcn-bg-color);
+	color: var(--mcn-text-color);
+	font-family: var(--mcn-font-family);
+	font-size: 13px;
+	font-weight: 500;
+	border: none;
+	border-radius: 50px;
+	cursor: pointer;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+	transition: var(--mcn-transition);
+	backdrop-filter: blur(10px);
+}
+
+.mcn-revoke-btn--left {
+	left: 20px;
+}
+
+.mcn-revoke-btn--right {
+	right: 20px;
+}
+
+.mcn-revoke-btn--hidden {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	transform: translateY(20px);
+}
+
+.mcn-revoke-btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.mcn-revoke-btn__text {
+	display: none;
+}
+
+.mcn-revoke-btn:hover .mcn-revoke-btn__text {
+	display: inline;
+}
+
+/* ==========================================================================
+   Settings Modal
+   ========================================================================== */
+
+.mcn-modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: calc(var(--mcn-z-index) + 1);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	transition: var(--mcn-transition);
+}
+
+.mcn-modal--hidden {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.mcn-modal__overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: var(--mcn-overlay-bg);
+	cursor: pointer;
+}
+
+.mcn-modal__container {
+	position: relative;
+	background: var(--mcn-bg-color);
+	color: var(--mcn-text-color);
+	border-radius: 16px;
+	max-width: 600px;
+	width: 100%;
+	max-height: 90vh;
+	display: flex;
+	flex-direction: column;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+	transform: translateY(20px);
+	transition: var(--mcn-transition);
+}
+
+.mcn-modal:not(.mcn-modal--hidden) .mcn-modal__container {
+	transform: translateY(0);
+}
+
+.mcn-modal__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 20px 24px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mcn-modal__title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 0;
+	font-size: 20px;
+	font-weight: 600;
+}
+
+.mcn-modal__close {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	background: transparent;
+	border: none;
+	border-radius: 50%;
+	color: var(--mcn-text-color);
+	font-size: 18px;
+	cursor: pointer;
+	transition: background 0.2s;
+}
+
+.mcn-modal__close:hover {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+.mcn-modal__content {
+	flex: 1;
+	overflow-y: auto;
+	padding: 24px;
+}
+
+.mcn-modal__description {
+	margin: 0 0 24px;
+	font-size: 14px;
+	opacity: 0.9;
+}
+
+.mcn-modal__footer {
+	display: flex;
+	gap: 10px;
+	padding: 20px 24px;
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mcn-modal__footer .mcn-btn {
+	flex: 1;
+}
+
+/* ==========================================================================
+   Categories
+   ========================================================================== */
+
+.mcn-categories {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.mcn-category {
+	background: rgba(255, 255, 255, 0.05);
+	border-radius: 12px;
+	overflow: hidden;
+	transition: background 0.2s;
+}
+
+.mcn-category:hover {
+	background: rgba(255, 255, 255, 0.08);
+}
+
+.mcn-category__header {
+	display: flex;
+	align-items: center;
+	padding: 16px;
+	gap: 12px;
+}
+
+.mcn-category__label {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex: 1;
+	cursor: pointer;
+}
+
+.mcn-category__checkbox {
+	appearance: none;
+	width: 0;
+	height: 0;
+	position: absolute;
+	opacity: 0;
+}
+
+.mcn-category__toggle {
+	position: relative;
+	width: 44px;
+	height: 24px;
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: 12px;
+	transition: background 0.2s;
+	flex-shrink: 0;
+}
+
+.mcn-category__toggle::after {
+	content: "";
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 20px;
+	height: 20px;
+	background: #fff;
+	border-radius: 50%;
+	transition: transform 0.2s;
+}
+
+.mcn-category__checkbox:checked + .mcn-category__toggle {
+	background: var(--mcn-btn-accept-bg);
+}
+
+.mcn-category__checkbox:checked + .mcn-category__toggle::after {
+	transform: translateX(20px);
+}
+
+.mcn-category__checkbox:disabled + .mcn-category__toggle {
+	opacity: 0.7;
+	cursor: not-allowed;
+}
+
+.mcn-category__checkbox:focus + .mcn-category__toggle {
+	box-shadow: 0 0 0 2px var(--mcn-btn-accept-bg);
+}
+
+.mcn-category__icon {
+	font-size: 20px;
+}
+
+.mcn-category__name {
+	font-weight: 600;
+	font-size: 15px;
+}
+
+.mcn-category__badge {
+	font-size: 11px;
+	font-weight: 500;
+	padding: 3px 8px;
+	border-radius: 4px;
+	text-transform: uppercase;
+}
+
+.mcn-category__badge--required {
+	background: rgba(255, 255, 255, 0.15);
+}
+
+.mcn-category__expand {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	background: transparent;
+	border: none;
+	color: var(--mcn-text-color);
+	cursor: pointer;
+	transition: transform 0.2s;
+	opacity: 0.7;
+}
+
+.mcn-category__expand:hover {
+	opacity: 1;
+}
+
+.mcn-category__expand[aria-expanded="true"] {
+	transform: rotate(180deg);
+}
+
+.mcn-category__details {
+	padding: 0 16px 16px;
+}
+
+.mcn-category__description {
+	margin: 0;
+	font-size: 13px;
+	opacity: 0.8;
+	line-height: 1.6;
+}
+
+/* ==========================================================================
+   Iframe Placeholder
+   ========================================================================== */
+
+.mcn-iframe-placeholder {
+	position: relative;
+}
+
+.mcn-placeholder {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 16px;
+	background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+	color: #f8fafc;
+	text-align: center;
+	padding: 24px;
+}
+
+.mcn-placeholder__icon {
+	font-size: 48px;
+}
+
+.mcn-placeholder__text {
+	margin: 0;
+	font-size: 14px;
+	max-width: 300px;
+	opacity: 0.9;
+}
+
+.mcn-placeholder__btn {
+	margin-top: 8px;
+}
+
+/* ==========================================================================
+   Cookie Declaration (Shortcode)
+   ========================================================================== */
+
+.mcn-declaration {
+	font-family: var(--mcn-font-family);
+	line-height: 1.6;
+}
+
+.mcn-declaration__title {
+	margin: 0 0 24px;
+	font-size: 24px;
+}
+
+.mcn-declaration__category {
+	margin-bottom: 24px;
+	padding: 20px;
+	background: #f8fafc;
+	border-radius: 12px;
+}
+
+[data-theme="dark"] .mcn-declaration__category {
+	background: rgba(255, 255, 255, 0.05);
+}
+
+.mcn-declaration__category-title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 0 0 8px;
+	font-size: 18px;
+}
+
+.mcn-declaration__badge {
+	font-size: 11px;
+	font-weight: 500;
+	padding: 3px 8px;
+	background: rgba(0, 0, 0, 0.1);
+	border-radius: 4px;
+}
+
+.mcn-declaration__category-desc {
+	margin: 0;
+	font-size: 14px;
+	opacity: 0.8;
+}
+
+.mcn-declaration__details {
+	margin-top: 12px;
+}
+
+.mcn-declaration__details summary {
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--mcn-btn-accept-bg);
+}
+
+.mcn-declaration__services {
+	margin: 8px 0 0;
+	padding-left: 20px;
+	font-size: 12px;
+}
+
+.mcn-declaration__services code {
+	background: rgba(0, 0, 0, 0.05);
+	padding: 2px 6px;
+	border-radius: 4px;
+}
+
+.mcn-declaration__revoke {
+	margin-top: 24px;
+	padding-top: 24px;
+	border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================================
+   Twemoji Styles
+   ========================================================================== */
+
+.mcn-emoji img.emoji {
+	height: 1em;
+	width: 1em;
+	margin: 0 0.05em 0 0.1em;
+	vertical-align: -0.1em;
+}
+
+/* ==========================================================================
+   Animations
+   ========================================================================== */
+
+@keyframes mcn-slide-up {
+	from {
+		transform: translateY(100%);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+@keyframes mcn-slide-down {
+	from {
+		transform: translateY(-100%);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+@keyframes mcn-fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+/* ==========================================================================
+   Screen Reader Only
+   ========================================================================== */
+
+.screen-reader-text {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+	word-wrap: normal !important;
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+
+@media (max-width: 768px) {
+	.mcn-banner--bar .mcn-banner__container {
+		flex-direction: column;
+		text-align: center;
+		padding: 20px;
+	}
+
+	.mcn-banner--bar .mcn-banner__icon {
+		margin-bottom: 8px;
+	}
+
+	.mcn-banner--bar .mcn-banner__actions {
+		flex-wrap: wrap;
+		justify-content: center;
+		width: 100%;
+	}
+
+	.mcn-banner--bar .mcn-btn {
+		flex: 1;
+		min-width: 120px;
+	}
+
+	.mcn-banner--floating-left,
+	.mcn-banner--floating-right {
+		left: 10px;
+		right: 10px;
+		bottom: 10px;
+		width: auto;
+	}
+
+	.mcn-modal__container {
+		max-height: 100vh;
+		border-radius: 0;
+	}
+
+	.mcn-modal__footer {
+		flex-direction: column;
+	}
+
+	.mcn-revoke-btn {
+		bottom: 10px;
+	}
+
+	.mcn-revoke-btn--left {
+		left: 10px;
+	}
+
+	.mcn-revoke-btn--right {
+		right: 10px;
+	}
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+
+@media print {
+	.mcn-banner,
+	.mcn-modal,
+	.mcn-revoke-btn {
+		display: none !important;
+	}
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	.mcn-banner,
+	.mcn-modal,
+	.mcn-modal__container,
+	.mcn-btn,
+	.mcn-revoke-btn,
+	.mcn-category__toggle,
+	.mcn-category__toggle::after {
+		transition: none !important;
+	}
+}

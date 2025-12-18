@@ -1,0 +1,159 @@
+/**
+ * Section Components
+ * Global section wrappers, headlines, taglines, text styles
+ *
+ * @package Medici
+ * @version 1.0.14
+ * @since 1.0.15 Removed @layer architecture for better cascade control
+ */
+
+/* ========================================
+   SECTION WRAPPER
+   ======================================== */
+
+.gbp-section {
+	/* Display & Positioning */
+	position: relative;
+	width: 100%;
+
+	/* Stacked Transitions */
+	transition:
+		padding 0.3s ease,
+		min-height 0.3s ease;
+
+	/* Box Model */
+	min-height: 200px;
+}
+
+.gbp-section--alt {
+	/* Stacked Transitions */
+	transition:
+		background-color 0.3s ease,
+		border-radius 0.3s ease;
+
+	/* Colors */
+	background-color: transparent;
+}
+
+[data-theme="dark"] .gbp-section--alt {
+	/* Box Model */
+	border-radius: var(--border-radius-lg);
+
+	/* Colors */
+
+	/* background-color: var(--bg-secondary); */
+}
+
+.gbp-section__inner {
+	/* Box Model */
+	margin: 0 auto;
+	max-width: var(--gb-container-width);
+	padding-left: 2rem;
+	padding-right: 2rem;
+}
+
+/* ========================================
+   SECTION TYPOGRAPHY
+   ======================================== */
+
+.gbp-section-header {
+	/* Display & Positioning */
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	row-gap: 1rem;
+}
+
+.gbp-section__headline {
+	/* Typography */
+	color: var(--text-primary);
+
+	/* Stacked Transitions */
+	transition:
+		color 0.2s ease,
+		font-size 0.3s ease;
+
+	/* Box Model */
+	margin-bottom: 1rem;
+	font-family: var(--font-heading);
+	font-size: clamp(2rem, 5vw, 3.5rem);
+	font-weight: var(--font-bold);
+	line-height: var(--leading-tight);
+}
+
+.gbp-section__tagline {
+	/* Typography */
+	color: var(--text-secondary);
+
+	/* Stacked Transitions */
+	transition:
+		color 0.2s ease,
+		font-size 0.3s ease;
+
+	/* Box Model */
+	margin-bottom: 1.5rem;
+	font-size: 1.25rem;
+	font-weight: var(--font-medium);
+	line-height: var(--leading-medium);
+}
+
+.gbp-section__text {
+	/* Typography */
+	color: var(--text-primary);
+
+	/* Stacked Transitions */
+	transition: color 0.2s ease;
+
+	/* Box Model */
+	margin-bottom: 1.5rem;
+	line-height: var(--leading-normal);
+}
+
+.gbp-section__text--lg {
+	/* Typography */
+	color: var(--text-secondary);
+
+	/* Stacked Transitions */
+	transition:
+		color 0.2s ease,
+		font-size 0.3s ease;
+	font-size: 1.125rem;
+	line-height: 1.7;
+}
+
+.gbp-section__text--sm {
+	/* Typography */
+	color: var(--text-secondary);
+
+	/* Stacked Transitions */
+	transition:
+		color 0.2s ease,
+		font-size 0.3s ease;
+	font-size: 0.875rem;
+	line-height: var(--leading-medium);
+}
+
+/* ========================================
+   RESPONSIVE - TABLET
+   ======================================== */
+
+@media (width <= 1024px) {
+	.gbp-section {
+		padding: 3rem 1.5rem;
+	}
+}
+
+/* ========================================
+   RESPONSIVE - MOBILE
+   ======================================== */
+
+@media (width <= 767px) {
+	.gbp-section {
+		padding: 2rem 1rem;
+	}
+
+	/* Remove border-radius on mobile for full-width sections */
+	[data-theme="dark"] .gbp-section--alt {
+		border-radius: 0;
+	}
+}

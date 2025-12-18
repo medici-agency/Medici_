@@ -1,0 +1,340 @@
+/**
+ * Critical CSS - Above the Fold Styles
+ * Inline styles for immediate rendering (FCP/LCP optimization)
+ *
+ * Contains:
+ * 1. CSS Variables (colors, fonts) - subset of variables.css
+ * 2. Local Fonts (@font-face) - ONLY location for font declarations
+ * 3. Reset & Base - body, html basics
+ * 4. Navigation (fixed header) - critical for CLS
+ * 5. Hero Section - above the fold content
+ * 6. Responsive (mobile) - navigation adjustments
+ *
+ * NOTE: Some styles are intentionally duplicated from other files.
+ * This is for Critical CSS optimization - these styles must be inline
+ * in <head> for fastest First Contentful Paint (FCP).
+ *
+ * Related files:
+ * - css/core/variables.css - Full CSS variables (loaded async)
+ * - css/core/core.css - Extended base styles (loaded async)
+ * - css/components/navigation.css - Full navigation (loaded async)
+ * - css/layout/layout.css - Grid, hero, footer (loaded async)
+ *
+ * @package Medici
+ * @version 1.2.0
+ * @since 1.0.15 Created for Critical CSS optimization
+ * @since 1.1.0 Added font-face declarations, fixed circular CSS variables
+ * @since 1.2.0 Removed grid duplication, added architecture comments
+ */
+
+/* ========================================
+   1. CSS VARIABLES - CRITICAL ONLY
+======================================== */
+
+:root {
+	/* Colors - Light Theme */
+	--base: #1a1a1a;
+	--base-2: #4b5563;
+	--base-3: #fff;
+	--accent: #2563eb;
+	--accent-2: #3b82f6;
+	--accent-3: #60a5fa;
+	--bg-primary: #fff;
+	--bg-secondary: #fff;
+	--text-primary: #1a1a1a;
+	--text-secondary: #4b5563;
+	--border-color: #e5e7eb;
+	--color-accent: #00a693;
+	--color-white: #fff;
+	--color-gray-200: #e5e7eb;
+	--color-gray-600: #4b5563;
+
+	/* Slate Colors */
+	--slate-100: #f1f5f9;
+	--slate-400: #94a3b8;
+	--slate-500: #64748b;
+	--slate-700: #334155;
+	--slate-800: #1e293b;
+	--slate-900: #0f172a;
+
+	/* Blue Scale */
+	--blue-400: #60a5fa;
+	--blue-500: #3b82f6;
+	--blue-600: #2563eb;
+
+	/* Typography */
+	--font-primary: "Montserrat", -apple-system, blinkmacsystemfont, "Segoe UI", roboto, sans-serif;
+	--font-heading: "Montserrat", -apple-system, blinkmacsystemfont, "Segoe UI", sans-serif;
+	--font-normal: 400;
+	--font-medium: 500;
+	--font-semibold: 600;
+	--font-bold: 700;
+
+	/* Line Heights */
+	--leading-tight: 1.2;
+	--leading-medium: 1.5;
+	--leading-normal: 1.6;
+
+	/* Layout */
+	--nav-height: 60px;
+	--gb-container-width: 1200px;
+
+	/* Transitions */
+	--hover-transition: 0.3s ease;
+
+	/* Border Radius */
+	--border-radius-md: 8px;
+	--border-radius-lg: 12px;
+
+	/* Shadows */
+	--shadow-sm: 0 1px 3px rgb(0 0 0 / 10%);
+	--shadow-md: 0 4px 6px rgb(0 0 0 / 10%);
+	--shadow-lg: 0 10px 25px rgb(0 0 0 / 10%);
+}
+
+/* Dark Theme - Critical Variables */
+[data-theme="dark"] {
+	--base: #0f172a;
+	--base-2: #64748b;
+	--base-3: #0f172a;
+	--accent: #3b82f6;
+	--accent-2: #60a5fa;
+	--accent-3: #93c5fd;
+	--bg-primary: #0f172a;
+	--bg-secondary: #1e293b;
+	--text-primary: #f1f5f9;
+	--text-secondary: #94a3b8;
+	--border-color: #334155;
+}
+
+/* ========================================
+   2. LOCAL FONTS - CRITICAL
+======================================== */
+
+/* Montserrat Regular (400) */
+@font-face {
+	font-display: swap;
+	font-family: Montserrat;
+	font-style: normal;
+	font-weight: 400;
+	src:
+		local("Montserrat Regular"),
+		local("Montserrat-Regular"),
+		url("/wp-content/themes/medici/fonts/montserrat-regular.woff2") format("woff2"),
+		url("/wp-content/themes/medici/fonts/montserrat-regular.woff") format("woff");
+}
+
+/* Montserrat SemiBold (600) */
+@font-face {
+	font-display: swap;
+	font-family: Montserrat;
+	font-style: normal;
+	font-weight: 600;
+	src:
+		local("Montserrat SemiBold"),
+		local("Montserrat-SemiBold"),
+		url("/wp-content/themes/medici/fonts/montserrat-600.woff2") format("woff2"),
+		url("/wp-content/themes/medici/fonts/montserrat-600.woff") format("woff");
+}
+
+/* Montserrat Bold (700) */
+@font-face {
+	font-display: swap;
+	font-family: Montserrat;
+	font-style: normal;
+	font-weight: 700;
+	src:
+		local("Montserrat Bold"),
+		local("Montserrat-Bold"),
+		url("/wp-content/themes/medici/fonts/montserrat-700.woff2") format("woff2"),
+		url("/wp-content/themes/medici/fonts/montserrat-700.woff") format("woff");
+}
+
+/* ========================================
+   3. RESET & BASE - CRITICAL ONLY
+======================================== */
+
+*,
+*::before,
+*::after {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	background: var(--color-white);
+	color: var(--text-primary);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-family: var(--font-primary);
+	font-size: 16px;
+	line-height: var(--leading-normal);
+	padding-top: var(--nav-height);
+}
+
+[data-theme="dark"] body {
+	background: var(--bg-primary);
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+/* ========================================
+   4. NAVIGATION - FIXED HEADER
+======================================== */
+
+.gbp-navigation {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+	width: 100%;
+	height: var(--nav-height);
+	padding: 0.83rem;
+	background: rgb(255 255 255 / 95%);
+	transition:
+		background-color 0.2s ease,
+		box-shadow 0.25s ease-in-out;
+	border-bottom: 1px solid var(--border-color);
+	-webkit-backdrop-filter: blur(16px) saturate(180%);
+	backdrop-filter: blur(16px) saturate(180%);
+	will-change: transform;
+}
+
+[data-theme="dark"] .gbp-navigation {
+	background: rgb(15 23 42 / 95%);
+}
+
+.gbp-logo {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--accent);
+	font-size: 1.25rem;
+	font-weight: var(--font-bold);
+	text-decoration: none;
+}
+
+.gbp-nav-center {
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
+}
+
+.gbp-nav-link {
+	position: relative;
+	padding: 0.5rem 0;
+	background: transparent;
+	color: var(--text-primary);
+	transition: color var(--hover-transition);
+	font-size: 0.85rem;
+	font-weight: var(--font-medium);
+	text-decoration: none;
+}
+
+.gbp-nav-right {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.gbp-cta-button {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.65rem 1.25rem;
+	background: var(--accent);
+	border: none;
+	border-radius: var(--border-radius-md);
+	color: white;
+	font-size: 0.85rem;
+	font-weight: var(--font-semibold);
+	text-decoration: none;
+	cursor: pointer;
+}
+
+/* ========================================
+   5. HERO SECTION
+======================================== */
+
+.gbp-hero {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 1.5rem;
+	text-align: center;
+	min-height: 600px;
+	padding-bottom: 4rem;
+	padding-top: 8rem;
+}
+
+.gbp-hero > * {
+	display: block;
+	width: 100%;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 800px;
+}
+
+.gbp-section__headline {
+	color: var(--text-primary);
+	margin-bottom: 1rem;
+	font-family: var(--font-heading);
+	font-size: clamp(2rem, 5vw, 3.5rem);
+	font-weight: var(--font-bold);
+	line-height: var(--leading-tight);
+}
+
+.gbp-section__tagline {
+	color: var(--text-secondary);
+	margin-bottom: 1.5rem;
+	font-size: 1.25rem;
+	font-weight: var(--font-medium);
+	line-height: var(--leading-medium);
+}
+
+/* ========================================
+   6. MOBILE OPTIMIZATIONS
+   NOTE: Grid styles are in layout/layout.css
+======================================== */
+
+@media (width <= 1024px) {
+	:root {
+		--nav-height: 55px;
+	}
+
+	body {
+		padding-top: 55px;
+	}
+
+	.gbp-navigation {
+		height: 55px;
+		padding: 0.5rem 0.65rem;
+	}
+
+	.gbp-nav-center {
+		display: none;
+	}
+}
+
+@media (width <= 767px) {
+	:root {
+		--nav-height: 50px;
+	}
+
+	body {
+		padding-top: 50px;
+	}
+
+	.gbp-navigation {
+		height: 50px;
+	}
+
+	.gbp-hero {
+		padding-bottom: 3rem;
+		padding-top: 6rem;
+	}
+}

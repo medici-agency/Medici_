@@ -1,0 +1,409 @@
+/**
+ * Widget Styles
+ *
+ * Styles for custom Medici widgets, Newsletter & Consultation Forms (Events API)
+ *
+ * @package Medici_Agency
+ * @since   1.4.0
+ * @version 1.1.0
+ */
+
+/* ============================================
+   POPULAR POSTS WIDGET
+============================================ */
+
+.medici-popular-posts-widget {
+	padding: 1.5rem;
+	background: var(--gb-color-bg-secondary, #f9fafb);
+	border-radius: 8px;
+}
+
+.medici-popular-posts-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.medici-popular-post-item {
+	margin: 0;
+	padding: 0;
+}
+
+.medici-popular-post-link {
+	display: flex;
+	gap: 1rem;
+	align-items: flex-start;
+	text-decoration: none;
+	color: inherit;
+	padding: 0.75rem;
+	border-radius: 6px;
+	transition: all 0.2s ease;
+}
+
+.medici-popular-post-link:hover {
+	background: var(--gb-color-bg-hover, rgba(0, 0, 0, 0.05));
+	transform: translateX(4px);
+}
+
+.medici-popular-post-thumbnail {
+	flex-shrink: 0;
+	width: 80px;
+	height: 80px;
+	border-radius: 4px;
+	overflow: hidden;
+	background: var(--gb-color-bg-tertiary, #e5e7eb);
+}
+
+.medici-popular-post-thumbnail img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.medici-popular-post-content {
+	flex: 1;
+	min-width: 0;
+}
+
+.medici-popular-post-title {
+	margin: 0 0 0.5rem;
+	font-size: 0.9375rem;
+	font-weight: 600;
+	line-height: 1.4;
+	color: var(--gb-color-text-primary, #1f2937);
+
+	/* Line clamp for long titles */
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.medici-popular-post-link:hover .medici-popular-post-title {
+	color: var(--gb-color-primary, #2563eb);
+}
+
+.medici-popular-post-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	font-size: 0.8125rem;
+	color: var(--gb-color-text-secondary, #6b7280);
+}
+
+.medici-popular-post-views,
+.medici-popular-post-date {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.medici-no-posts {
+	margin: 0;
+	padding: 1rem;
+	text-align: center;
+	color: var(--gb-color-text-secondary, #6b7280);
+	font-size: 0.875rem;
+}
+
+/* Dark Theme Support */
+[data-theme="dark"] .medici-popular-posts-widget {
+	background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .medici-popular-post-link:hover {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .medici-popular-post-thumbnail {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .medici-popular-post-title {
+	color: #f9fafb;
+}
+
+[data-theme="dark"] .medici-popular-post-link:hover .medici-popular-post-title {
+	color: #60a5fa;
+}
+
+[data-theme="dark"] .medici-popular-post-meta {
+	color: #9ca3af;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+	.medici-popular-posts-widget {
+		padding: 1rem;
+	}
+
+	.medici-popular-post-thumbnail {
+		width: 60px;
+		height: 60px;
+	}
+
+	.medici-popular-post-title {
+		font-size: 0.875rem;
+	}
+
+	.medici-popular-post-meta {
+		font-size: 0.75rem;
+		gap: 0.5rem;
+	}
+}
+
+/* ============================================
+   NEWSLETTER FORM (Events API)
+   CONSULTATION FORM (Events API)
+============================================ */
+
+.consultation-form {
+	max-width: 600px;
+	margin: 0 auto;
+}
+
+.consultation-form-inner {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.consultation-heading {
+	margin: 0;
+	font-size: 1.75rem;
+	font-weight: 700;
+	color: var(--gb-color-text-primary, #111827);
+}
+
+.consultation-description {
+	margin: 0;
+	color: var(--gb-color-text-secondary, #6b7280);
+	font-size: 0.9375rem;
+}
+
+.consultation-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.consultation-field label {
+	font-weight: 600;
+	font-size: 0.875rem;
+	color: var(--gb-color-text-primary, #111827);
+}
+
+.consultation-field .required {
+	color: #ef4444;
+}
+
+/* КРИТИЧНО: Жорсткі стилі для полів форми з !important */
+.consultation-field input,
+.consultation-field select,
+.consultation-field textarea {
+	width: 100% !important;
+	padding: 0.75rem 1rem !important;
+	border-radius: 4px !important;
+	border: 2px solid var(--gb-color-border, #d1d5db) !important;
+	background-color: var(--gb-color-bg-secondary, #f9fafb) !important;
+	color: var(--gb-color-text-primary, #111827) !important;
+	font-size: 1rem !important;
+	font-family: inherit !important;
+	box-sizing: border-box !important;
+	appearance: auto !important;
+	-webkit-appearance: auto !important;
+	-moz-appearance: auto !important;
+}
+
+/* Щоб select працював нормально */
+.consultation-field select {
+	cursor: pointer !important;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23111827' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+	background-repeat: no-repeat !important;
+	background-position: right 0.75rem center !important;
+	background-size: 12px !important;
+	padding-right: 2.5rem !important;
+}
+
+.consultation-field textarea {
+	min-height: 120px !important;
+	resize: vertical !important;
+}
+
+.consultation-field input:focus,
+.consultation-field select:focus,
+.consultation-field textarea:focus {
+	outline: none !important;
+	border-color: var(--gb-color-primary, #2563eb) !important;
+	box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+}
+
+.consultation-consent {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.5rem;
+}
+
+.consultation-consent label {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.5rem;
+	font-size: 0.875rem;
+	line-height: 1.5;
+	cursor: pointer;
+}
+
+.consultation-consent input[type="checkbox"] {
+	width: auto !important;
+	margin-top: 0.25rem;
+	cursor: pointer !important;
+	flex-shrink: 0;
+}
+
+.consultation-consent a {
+	color: var(--gb-color-primary, #2563eb);
+	text-decoration: underline;
+}
+
+.consultation-consent a:hover {
+	color: var(--gb-color-primary-hover, #1d4ed8);
+}
+
+.consultation-submit {
+	padding: 0.75rem 2rem !important;
+	background: var(--gb-color-primary, #2563eb) !important;
+	color: white !important;
+	border: none !important;
+	border-radius: 4px !important;
+	font-size: 1rem !important;
+	font-weight: 600 !important;
+	cursor: pointer !important;
+	transition: all 0.2s ease !important;
+}
+
+.consultation-submit:hover {
+	background: var(--gb-color-primary-hover, #1d4ed8) !important;
+	transform: translateY(-2px) !important;
+}
+
+.consultation-submit:disabled {
+	opacity: 0.6 !important;
+	cursor: not-allowed !important;
+	transform: none !important;
+}
+
+.consultation-message {
+	padding: 0.75rem;
+	border-radius: 4px;
+	font-size: 0.875rem;
+	display: none;
+}
+
+.consultation-message.success {
+	display: block !important;
+	background: #d1fae5 !important;
+	color: #065f46 !important;
+	border: 1px solid #10b981 !important;
+}
+
+.consultation-message.error {
+	display: block !important;
+	background: #fee2e2 !important;
+	color: #991b1b !important;
+	border: 1px solid #ef4444 !important;
+}
+
+/* Dark Theme - Consultation */
+[data-theme="dark"] .consultation-heading {
+	color: #f9fafb;
+}
+
+[data-theme="dark"] .consultation-description {
+	color: #9ca3af;
+}
+
+[data-theme="dark"] .consultation-field label {
+	color: #f9fafb;
+}
+
+[data-theme="dark"] .consultation-field input,
+[data-theme="dark"] .consultation-field select,
+[data-theme="dark"] .consultation-field textarea {
+	background-color: #1f2937 !important;
+	color: #f9fafb !important;
+	border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="dark"] .consultation-field select {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23f9fafb' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+}
+
+[data-theme="dark"] .consultation-field input:focus,
+[data-theme="dark"] .consultation-field select:focus,
+[data-theme="dark"] .consultation-field textarea:focus {
+	border-color: #60a5fa !important;
+	box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2) !important;
+}
+
+[data-theme="dark"] .consultation-consent a {
+	color: #60a5fa;
+}
+
+[data-theme="dark"] .consultation-consent a:hover {
+	color: #93c5fd;
+}
+
+[data-theme="dark"] .consultation-message.success {
+	background: rgba(16, 185, 129, 0.2) !important;
+	color: #6ee7b7 !important;
+	border-color: #10b981 !important;
+}
+
+[data-theme="dark"] .consultation-message.error {
+	background: rgba(239, 68, 68, 0.2) !important;
+	color: #fca5a5 !important;
+	border-color: #ef4444 !important;
+}
+
+/* Responsive - Forms */
+@media (max-width: 767px) {
+	.newsletter-form,
+	.consultation-form {
+		padding: 0 1rem;
+	}
+
+	.newsletter-heading {
+		font-size: 1.25rem;
+	}
+
+	.consultation-heading {
+		font-size: 1.5rem;
+	}
+
+	.consultation-field input,
+	.consultation-field select,
+	.consultation-field textarea {
+		font-size: 16px !important; /* Prevent zoom on iOS */
+	}
+
+	.newsletter-field input {
+		font-size: 16px !important; /* Prevent zoom on iOS */
+	}
+}
+
+/* Accessibility */
+.sr-only {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	padding: 0 !important;
+	margin: -1px !important;
+	overflow: hidden !important;
+	clip: rect(0, 0, 0, 0) !important;
+	white-space: nowrap !important;
+	border-width: 0 !important;
+}

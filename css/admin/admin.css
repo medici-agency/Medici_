@@ -1,0 +1,109 @@
+/**
+ * Admin Panel Styles
+ * Combined: Blog Admin Controller + Role Editor
+ *
+ * ⚠️ WARNING: Цей файл НЕ ЗАВАНТАЖУЄТЬСЯ наразі
+ * Dashboard widgets НЕ реалізовані (станом на 2025-12-08)
+ * Файл збережено для майбутнього функціоналу
+ *
+ * @package Medici
+ * @version 1.0.15
+ * @since 1.0.15 Removed @layer architecture for better cascade control
+ * @since 1.0.16 Додано WARNING про невикористання (2025-12-08)
+ */
+
+/* ============================================
+   BLOG ADMIN DASHBOARD
+============================================ */
+
+/* Dashboard Grid */
+.medici-blog-dashboard-grid {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	margin-bottom: 2rem;
+}
+
+.medici-stat-card {
+	padding: 1.5rem;
+	background: var(--color-white);
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	transition: all 0.2s ease;
+}
+
+.medici-stat-card:hover {
+	border-color: #2271b1;
+	box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+}
+
+.medici-stat-card h3 {
+	margin: 0 0 0.5rem;
+	color: #646970;
+	font-size: 14px;
+	font-weight: var(--font-semibold);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.medici-stat-value {
+	color: #1d2327;
+	font-size: 32px;
+	font-weight: var(--font-bold);
+	line-height: 1;
+}
+
+.medici-stat-meta {
+	color: #646970;
+	margin-top: 0.5rem;
+	font-size: 12px;
+}
+
+/* Section Cards */
+.medici-blog-section {
+	padding: 1.5rem;
+	background: var(--color-white);
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	margin-bottom: 1.5rem;
+}
+
+.medici-blog-section h2 {
+	margin: 0 0 1rem;
+	color: #1d2327;
+	padding-bottom: 0.75rem;
+	border-bottom: 2px solid #2271b1;
+	font-size: 18px;
+	font-weight: var(--font-semibold);
+}
+
+/* Quick Actions */
+.medici-quick-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+/* ============================================
+   ROLE EDITOR TWEAKS
+============================================ */
+
+/* Hide customizer button from editors */
+.wp-admin.nav-menus-php .page-title-action,
+.wp-admin.widgets-php .page-title-action {
+	display: none;
+}
+
+/* ============================================
+   RESPONSIVE
+============================================ */
+
+@media (width <= 782px) {
+	.medici-blog-dashboard-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.medici-stat-value {
+		font-size: 28px;
+	}
+}

@@ -1,0 +1,187 @@
+#!/bin/bash
+#
+# Medici Theme - Pre-commit Hook
+# Runs PHPStan and CSS validation before each commit
+#
+# Installation:
+#   chmod +x scripts/pre-commit
+#   cp scripts/pre-commit .git/hooks/pre-commit
+#   # or
+#   ln -sf ../../scripts/pre-commit .git/hooks/pre-commit
+#
+# To skip hook temporarily: git commit --no-verify
+
+set -e
+
+echo "🔍 Running pre-commit checks..."
+echo ""
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m' # No Color
+
+# Track errors
+ERRORS=0
+
+# =========================================
+# 1. PHPStan Static Analysis
+# =========================================
+echo "📊 Running PHPStan..."
+if [ -f "vendor/bin/phpstan" ]; then
+    if vendor/bin/phpstan analyse --memory-limit=2G --no-progress --error-format=raw 2>/dev/null; then
+        echo -e "${GREEN}✅ PHPStan passed${NC}"
+    else
+        echo -e "${RED}❌ PHPStan found errors${NC}"
+        ERRORS=$((ERRORS + 1))
+    fi
+else
+    echo -e "${YELLOW}⚠️  PHPStan not installed (run: composer install)${NC}"
+fi
+echo ""
+
+# =========================================
+# 2. CSS Bracket Balance Check
+# =========================================
+echo "🎨 Checking CSS bracket balance..."
+CSS_ERRORS=0
+
+for file in css/**/*.css css/*.css; do
+    if [ -f "$file" ]; then
+        open=$(grep -c "{" "$file" 2>/dev/null || echo 0)
+        close=$(grep -c "}" "$file" 2>/dev/null || echo 0)
+        if [ "$open" != "$close" ]; then
+            echo -e "${RED}❌ $file: { = $open, } = $close${NC}"
+            CSS_ERRORS=$((CSS_ERRORS + 1))
+        fi
+    fi
+done
+
+if [ $CSS_ERRORS -gt 0 ]; then
+    echo -e "${RED}❌ Found $CSS_ERRORS CSS files with bracket imbalance!${NC}"
+    ERRORS=$((ERRORS + 1))
+else
+    echo -e "${GREEN}✅ All CSS files have balanced brackets${NC}"
+fi
+echo ""
+
+# =========================================
+# 3. Prettier Format Check
+# =========================================
+echo "✨ Checking code formatting (Prettier)..."
+if [ -f "node_modules/.bin/prettier" ]; then
+    if npm run format:check --silent 2>/dev/null; then
+        echo -e "${GREEN}✅ Prettier formatting passed${NC}"
+    else
+        echo -e "${RED}❌ Code is not formatted properly${NC}"
+        echo -e "${YELLOW}💡 Run: npm run format${NC}"
+        ERRORS=$((ERRORS + 1))
+    fi
+else
+    echo -e "${YELLOW}⚠️  Prettier not installed (run: npm install)${NC}"
+fi
+echo ""
+
+# =========================================
+# 4. ESLint JavaScript Check
+# =========================================
+echo "🔍 Linting JavaScript (ESLint)..."
+STAGED_JS=$(git diff --cached --name-only --diff-filter=ACM | grep -E 'js/.*\.js$' | grep -v '\.min\.js$' || true)
+
+if [ -n "$STAGED_JS" ] && [ -f "node_modules/.bin/eslint" ]; then
+    ESLINT_ERRORS=0
+    for file in $STAGED_JS; do
+        if [ -f "$file" ]; then
+            if ! node_modules/.bin/eslint "$file" --quiet 2>/dev/null; then
+                ESLINT_ERRORS=$((ESLINT_ERRORS + 1))
+            fi
+        fi
+    done
+
+    if [ $ESLINT_ERRORS -gt 0 ]; then
+        echo -e "${YELLOW}⚠️  ESLint found issues in $ESLINT_ERRORS files${NC}"
+        echo -e "${YELLOW}💡 Run: npm run lint:js:fix${NC}"
+    else
+        echo -e "${GREEN}✅ ESLint passed${NC}"
+    fi
+elif [ -n "$STAGED_JS" ]; then
+    echo -e "${YELLOW}⚠️  ESLint not installed (run: npm install)${NC}"
+else
+    echo -e "${GREEN}✅ No JavaScript files to check${NC}"
+fi
+echo ""
+
+# =========================================
+# 5. StyleLint CSS Check
+# =========================================
+echo "🎨 Linting CSS (StyleLint)..."
+STAGED_CSS=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.css$' | grep -v '\.min\.css$' || true)
+
+if [ -n "$STAGED_CSS" ] && [ -f "node_modules/.bin/stylelint" ]; then
+    STYLELINT_ERRORS=0
+    for file in $STAGED_CSS; do
+        if [ -f "$file" ]; then
+            if ! node_modules/.bin/stylelint "$file" --quiet 2>/dev/null; then
+                STYLELINT_ERRORS=$((STYLELINT_ERRORS + 1))
+            fi
+        fi
+    done
+
+    if [ $STYLELINT_ERRORS -gt 0 ]; then
+        echo -e "${YELLOW}⚠️  StyleLint found issues in $STYLELINT_ERRORS files${NC}"
+        echo -e "${YELLOW}💡 Run: npm run lint:css:fix${NC}"
+    else
+        echo -e "${GREEN}✅ StyleLint passed${NC}"
+    fi
+elif [ -n "$STAGED_CSS" ]; then
+    echo -e "${YELLOW}⚠️  StyleLint not installed (run: npm install)${NC}"
+else
+    echo -e "${GREEN}✅ No CSS files to check${NC}"
+fi
+echo ""
+
+# =========================================
+# 6. Check for debug statements
+# =========================================
+echo "🐛 Checking for debug statements..."
+
+# Check staged PHP files for debug statements
+STAGED_PHP=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.php$' || true)
+DEBUG_FOUND=0
+
+if [ -n "$STAGED_PHP" ]; then
+    for file in $STAGED_PHP; do
+        if [ -f "$file" ]; then
+            # Check for common debug statements
+            if grep -n -E "(var_dump|print_r|die\(|exit\(|dd\(|error_log\()" "$file" 2>/dev/null | grep -v "// @codingStandardsIgnoreLine" | grep -v "// phpcs:ignore"; then
+                echo -e "${YELLOW}⚠️  Debug statement found in: $file${NC}"
+                DEBUG_FOUND=$((DEBUG_FOUND + 1))
+            fi
+        fi
+    done
+fi
+
+if [ $DEBUG_FOUND -gt 0 ]; then
+    echo -e "${YELLOW}⚠️  Found $DEBUG_FOUND files with debug statements (review before committing)${NC}"
+else
+    echo -e "${GREEN}✅ No debug statements found${NC}"
+fi
+echo ""
+
+# =========================================
+# Final result
+# =========================================
+if [ $ERRORS -gt 0 ]; then
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${RED}❌ Pre-commit check FAILED ($ERRORS errors)${NC}"
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo "Fix the errors above and try again."
+    echo "To skip this check: git commit --no-verify"
+    exit 1
+else
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${GREEN}✅ Pre-commit check PASSED${NC}"
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+fi

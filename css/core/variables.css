@@ -1,0 +1,241 @@
+/**
+ * CSS Custom Properties (Variables)
+ * Combined: Theme variables + Utopia Fluid Typography
+ *
+ * @package Medici
+ * @version 1.0.14
+ * @since 1.0.15 Removed @layer architecture for better cascade control
+ */
+
+:root {
+	/* ========================================
+	   UTOPIA FLUID TYPOGRAPHY
+	   https://utopia.fyi/type/calculator
+	======================================== */
+
+	/* Font sizes */
+	--step--2: clamp(0.7813rem, 0.7617rem + 0.0979vw, 0.84rem);
+	--step--1: clamp(0.9375rem, 0.9rem + 0.1875vw, 1.05rem);
+	--step-0: clamp(1.125rem, 1.0625rem + 0.3125vw, 1.3125rem);
+	--step-1: clamp(1.35rem, 1.2531rem + 0.4844vw, 1.6406rem);
+	--step-2: clamp(1.62rem, 1.4764rem + 0.718vw, 2.0508rem);
+	--step-3: clamp(1.944rem, 1.7375rem + 1.0325vw, 2.5635rem);
+	--step-4: clamp(2.3328rem, 2.0423rem + 1.4526vw, 3.2043rem);
+	--step-5: clamp(2.7994rem, 2.3973rem + 2.0101vw, 4.0054rem);
+	--step-6: clamp(3.3592rem, 2.81rem + 2.7459vw, 5.0068rem);
+	--step-7: clamp(4.0311rem, 3.2886rem + 3.7123vw, 6.2585rem);
+	--step-8: clamp(4.8373rem, 3.842rem + 4.9764vw, 7.8231rem);
+
+	/* Spacing */
+	--space-3xs: clamp(0.3125rem, 0.3125rem + 0vw, 0.3125rem);
+	--space-2xs: clamp(0.5625rem, 0.5208rem + 0.2083vw, 0.6875rem);
+	--space-xs: clamp(0.875rem, 0.8333rem + 0.2083vw, 1rem);
+	--space-s: clamp(1.125rem, 1.0625rem + 0.3125vw, 1.3125rem);
+	--space-m: clamp(1.6875rem, 1.5833rem + 0.5208vw, 2rem);
+	--space-l: clamp(2.25rem, 2.125rem + 0.625vw, 2.625rem);
+	--space-xl: clamp(3.375rem, 3.1875rem + 0.9375vw, 3.9375rem);
+	--space-2xl: clamp(4.5rem, 4.25rem + 1.25vw, 5.25rem);
+	--space-3xl: clamp(6.75rem, 6.375rem + 1.875vw, 7.875rem);
+
+	/* One-up pairs */
+	--space-3xs-2xs: clamp(0.3125rem, 0.1875rem + 0.625vw, 0.6875rem);
+	--space-2xs-xs: clamp(0.5625rem, 0.4167rem + 0.7292vw, 1rem);
+	--space-xs-s: clamp(0.875rem, 0.7292rem + 0.7292vw, 1.3125rem);
+	--space-s-m: clamp(1.125rem, 0.8333rem + 1.4583vw, 2rem);
+	--space-m-l: clamp(1.6875rem, 1.375rem + 1.5625vw, 2.625rem);
+	--space-l-xl: clamp(2.25rem, 1.6875rem + 2.8125vw, 3.9375rem);
+	--space-xl-2xl: clamp(3.375rem, 2.75rem + 3.125vw, 5.25rem);
+	--space-2xl-3xl: clamp(4.5rem, 3.375rem + 5.625vw, 7.875rem);
+
+	/* Custom pairs */
+	--space-s-l: clamp(1.125rem, 0.625rem + 2.5vw, 2.625rem);
+
+	/* Grid settings */
+	--grid-max-width: 81.38rem;
+	--grid-gutter: var(--space-s-l, clamp(1.125rem, 0.6362rem + 2.444vw, 2.625rem));
+
+	/* ========================================
+	   THEME COLOR PALETTE
+	======================================== */
+
+	/* Base Colors */
+	--base: #1a1a1a;
+	--base-2: #4b5563;
+	--base-3: #fff;
+
+	/* Accent Colors */
+	--accent: #2563eb;
+	--accent-2: #3b82f6;
+	--accent-3: #60a5fa;
+
+	/* Background */
+	--bg-primary: #fff;
+	--bg-secondary: #fff;
+	--bg-card: #fff;
+
+	/* Text */
+	--text-primary: #1a1a1a;
+	--text-secondary: #4b5563;
+
+	/* Borders & Shadows */
+	--border-color: #e5e7eb;
+	--shadow-sm: 0 1px 3px rgb(0 0 0 / 10%);
+	--shadow-md: 0 4px 6px rgb(0 0 0 / 10%);
+	--shadow-lg: 0 10px 25px rgb(0 0 0 / 10%);
+	--shadow-xl: 0 20px 40px rgb(0 0 0 / 15%);
+
+	/* Container */
+	--gb-container-width: 1200px;
+
+	/* Transitions */
+	--transition-base: all 0.3s ease;
+	--transition-fast: all 0.15s ease;
+	--transition-slow: all 0.5s ease;
+	--hover-transition: 0.3s ease;
+
+	/* Border Radius */
+	--border-radius-sm: 4px;
+	--border-radius-md: 8px;
+	--border-radius-lg: 12px;
+	--border-radius-xl: 16px;
+
+	/* Typography */
+	--font-primary:
+		"Montserrat", -apple-system, blinkmacsystemfont, "Segoe UI", roboto, oxygen, ubuntu, cantarell,
+		sans-serif;
+	--font-heading: "Montserrat", -apple-system, blinkmacsystemfont, "Segoe UI", sans-serif;
+
+	/* Font Weights */
+	--font-light: 300;
+	--font-normal: 400;
+	--font-medium: 500;
+	--font-semibold: 600;
+	--font-bold: 700;
+	--font-extrabold: 800;
+
+	/* Line Heights */
+	--leading-none: 1;
+	--leading-tight: 1.2;
+	--leading-snug: 1.4;
+	--leading-medium: 1.5;
+	--leading-normal: 1.6;
+	--leading-relaxed: 1.8;
+	--leading-loose: 2;
+
+	/* Text Sizes */
+	--text-xs: 0.75rem;
+	--text-sm: 0.875rem;
+	--text-base: 1rem;
+	--text-lg: 1.125rem;
+	--text-xl: 1.25rem;
+	--text-2xl: 1.5rem;
+	--text-3xl: 2rem;
+	--text-4xl: 2.5rem;
+	--text-5xl: 3rem;
+
+	/* Spacing Scale */
+	--spacing-xs: 0.5rem;
+	--spacing-sm: 1rem;
+	--spacing-md: 1.5rem;
+	--spacing-lg: 2rem;
+	--spacing-xl: 3rem;
+	--spacing-2xl: 4rem;
+	--spacing-3xl: 6rem;
+
+	/* Breakpoints (documentation only) */
+	--bp-mobile: 767px;
+	--bp-tablet: 1024px;
+	--bp-desktop: 1400px;
+
+	/* Footer Colors - LIGHT THEME */
+	--footer-bg: #f8f9fa;
+	--footer-text: #4b5563;
+
+	/* Navigation Height - CLS FIX */
+	--nav-height: 60px;
+
+	/* New Brand Colors - Medici Medical */
+	--color-accent: #00a693;
+	--color-warning: #f59e0b;
+	--color-success: #10b981;
+	--color-white: #fff;
+	--color-gray-50: #f9fafb;
+	--color-gray-100: #f3f4f6;
+	--color-gray-200: #e5e7eb;
+	--color-gray-600: #4b5563;
+	--color-gray-900: #111827;
+
+	/* Extended Color Palette */
+
+	/* Slate Colors (UI elements, backgrounds, borders) */
+	--slate-100: #f1f5f9;
+	--slate-200: #e2e8f0;
+	--slate-300: #cbd5e1;
+	--slate-400: #94a3b8;
+	--slate-500: #64748b;
+	--slate-600: #475569;
+	--slate-700: #334155;
+	--slate-800: #1e293b;
+	--slate-900: #0f172a;
+
+	/* Gray Scale (text, borders) */
+	--gray-300: #d1d5db;
+	--gray-400: #9ca3af;
+	--gray-500: #6b7280;
+	--gray-700: #374151;
+	--gray-800: #1f2937;
+
+	/* Blue Scale (accents, links) */
+	--blue-400: #60a5fa;
+	--blue-500: #3b82f6;
+	--blue-600: #2563eb;
+	--blue-700: #1d4ed8;
+
+	/* Semantic Colors */
+	--color-error: #ef4444;
+	--color-danger: #dc2626;
+	--color-info: #3b82f6;
+	--color-green: #16a34a;
+	--color-amber: #ffc107;
+}
+
+/* ========================================
+   DARK THEME
+======================================== */
+
+[data-theme="dark"] {
+	/* Base Colors */
+	--base: #0f172a;
+	--base-2: #64748b;
+	--base-3: #0f172a;
+
+	/* Accent Colors - залишаємо світлі для контрасту */
+	--accent: #3b82f6;
+	--accent-2: #60a5fa;
+	--accent-3: #93c5fd;
+
+	/* Background */
+	--bg-primary: #0f172a;
+	--bg-secondary: #1e293b;
+	--bg-card: #1e293b;
+
+	/* Text */
+	--text-primary: #f1f5f9;
+	--text-secondary: #94a3b8;
+
+	/* Borders & Shadows */
+	--border-color: #334155;
+	--shadow-sm: 0 1px 3px rgb(0 0 0 / 50%);
+	--shadow-md: 0 4px 6px rgb(0 0 0 / 50%);
+	--shadow-lg: 0 10px 25px rgb(0 0 0 / 60%);
+	--shadow-xl: 0 20px 40px rgb(0 0 0 / 70%);
+
+	/* Footer */
+	--footer-bg: #1e293b;
+	--footer-text: #e2e8f0;
+
+	/* Brand Colors */
+	--color-accent: #00a693;
+}
+
+/* Body styles moved to core.css and critical.css */

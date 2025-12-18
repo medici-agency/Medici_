@@ -1,0 +1,185 @@
+/**
+ * Button Components
+ * Primary, Secondary, Tertiary buttons + CTA styles
+ *
+ * @package Medici
+ * @version 1.0.14
+ * @since 1.0.15 Removed @layer architecture for better cascade control
+ */
+
+/**
+ * Table of Contents
+ *
+ * 1.0 - Primary Button
+ * 2.0 - Secondary Button
+ * 3.0 - Tertiary Button
+ * 4.0 - CTA Button
+ * 5.0 - Responsive
+ */
+
+/* ========================================
+   1.0 - PRIMARY BUTTON
+======================================== */
+
+.gbp-button--primary {
+	display: inline-block;
+	padding: 12px 24px;
+
+	/* Box Model */
+	border: none;
+	border-radius: 4px;
+	color: white;
+
+	/* Stacked Transitions - різні timing для sophistication */
+	transition:
+		background-color 0.2s ease,
+		transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+		box-shadow 0.25s ease-in-out;
+
+	/* Display & Positioning */
+	cursor: pointer;
+
+	/* Colors & Typography */
+	background-color: var(--accent);
+	font-weight: var(--font-semibold);
+	text-decoration: none;
+}
+
+/* GenerateBlocks override - ensure white text is visible */
+.gb-text.gbp-button--primary,
+a.gb-text.gbp-button--primary,
+a.gbp-button--primary {
+	color: white !important;
+}
+
+.gbp-button--primary:hover,
+.gbp-button--primary:focus {
+	transform: translateY(-2px);
+	background-color: var(--accent-2);
+	box-shadow: var(--shadow-md);
+}
+
+/* ========================================
+   2.0 - SECONDARY BUTTON
+======================================== */
+
+.gbp-button--secondary {
+	/* Display & Positioning */
+	display: inline-block;
+	padding: 10px 20px;
+
+	/* Box Model */
+	border: 2px solid var(--accent);
+	border-radius: 4px;
+	color: var(--accent);
+
+	/* Stacked Transitions */
+	transition:
+		background-color 0.25s ease,
+		color 0.25s ease,
+		border-color 0.3s ease,
+		transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+	/* Colors & Typography */
+	background-color: transparent;
+	font-weight: var(--font-semibold);
+	text-decoration: none;
+}
+
+.gbp-button--secondary:hover,
+.gbp-button--secondary:focus {
+	color: white;
+	transform: translateY(-2px);
+	background-color: var(--accent);
+	border-color: var(--accent);
+}
+
+/* ========================================
+   3.0 - TERTIARY BUTTON
+======================================== */
+
+.gbp-button--tertiary {
+	/* Display & Positioning */
+	display: inline-block;
+	padding: 8px 16px;
+
+	/* Box Model */
+	border-radius: 4px;
+	color: white;
+
+	/* Transition */
+	transition: var(--transition-base);
+
+	/* Colors & Typography */
+	background-color: var(--base-3);
+	font-size: 14px;
+	font-weight: var(--font-medium);
+	text-decoration: none;
+}
+
+.gbp-button--tertiary:hover,
+.gbp-button--tertiary:focus {
+	background-color: var(--base-2);
+}
+
+/* ========================================
+   4.0 - CTA BUTTON (Navigation)
+======================================== */
+
+.gbp-cta-button {
+	display: inline-flex;
+
+	/* Display & Positioning */
+	align-items: center;
+	padding: 0.65rem 1.25rem;
+
+	/* Colors & Typography */
+	background: var(--accent);
+
+	/* Box Model */
+	border: none;
+	border-radius: var(--border-radius-md);
+	color: white;
+
+	/* Stacked Transitions */
+	transition:
+		background-color 0.2s ease,
+		transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+		box-shadow 0.25s ease-in-out;
+	cursor: pointer;
+	font-size: 0.85rem;
+	font-weight: var(--font-semibold);
+	text-decoration: none;
+}
+
+/* GenerateBlocks override - ensure white text is visible */
+.gb-text.gbp-cta-button,
+a.gb-text.gbp-cta-button,
+a.gbp-cta-button {
+	color: white !important;
+}
+
+.gbp-cta-button:hover,
+.gbp-cta-button:focus {
+	background: var(--accent-2);
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-md);
+	outline: none;
+}
+
+/* ========================================
+   5.0 - RESPONSIVE
+======================================== */
+
+/* Mobile - hide CTA button */
+@media (width <= 767px) {
+	.gbp-cta-button {
+		display: none;
+	}
+
+	.gbp-button--primary,
+	.gbp-button--secondary {
+		width: 100%;
+		padding: 1rem 2rem;
+	}
+}

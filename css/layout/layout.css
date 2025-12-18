@@ -1,0 +1,974 @@
+/**
+ * Layout Structures - BEM Architecture
+ * Grid + Hero + Footer + Utilities (consolidated)
+ *
+ * BEM Structure:
+ * - Blocks: .gbp-grid, .gbp-hero, .gbp-footer, .gbp-social-icon, .scroll-to-top
+ * - Elements: __content, __title, __description, __actions, __logo, __nav, __link, etc.
+ * - Modifiers: --3, --4 (grid columns), --visible (scroll-to-top)
+ *
+ * Table of Contents:
+ * 1. GRID SYSTEMS ................ 3-column and 4-column responsive grids
+ * 2. HERO SECTION ................ Main hero section styling
+ * 3. FOOTER ...................... Footer sections, links, contacts, bottom bar
+ * 4. UTILITIES ................... Social icons, scroll-to-top button
+ * 5. BACKWARDS COMPATIBILITY ..... Legacy class support
+ *
+ * @package Medici
+ * @version 2.0.0
+ * @since 2.0.0 Refactored to BEM naming convention
+ */
+
+/* ========================================
+   1. GRID SYSTEMS (Utilities)
+   ======================================== */
+
+/* Grid 3 Columns (Services, Testimonials) */
+.gbp-grid-3 {
+	display: grid;
+	gap: 2rem;
+	grid-template-columns: repeat(3, 1fr);
+}
+
+/* TABLET: 2 columns */
+@media (width <= 1024px) {
+	.gbp-grid-3 {
+		gap: 1.5rem;
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+/* MOBILE: 1 column */
+@media (width <= 767px) {
+	.gbp-grid-3 {
+		gap: 1.5rem;
+		grid-template-columns: 1fr;
+	}
+}
+
+/* Grid 4 Columns (Other sections) */
+.gbp-grid-4 {
+	display: grid;
+	gap: 2rem;
+	grid-template-columns: repeat(4, 1fr);
+}
+
+@media (width <= 1024px) {
+	.gbp-grid-4 {
+		gap: 1.5rem;
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (width <= 767px) {
+	.gbp-grid-4 {
+		gap: 1.5rem;
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ========================================
+   2. HERO SECTION (Block)
+   ======================================== */
+
+.gbp-hero {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+
+	/* Display & Positioning */
+	align-items: center;
+	gap: 1.5rem;
+	text-align: center;
+
+	/* Box Model */
+	min-height: 600px;
+	padding-bottom: 4rem;
+	padding-top: 8rem;
+}
+
+/* All direct children of Hero */
+.gbp-hero > * {
+	/* Display & Positioning */
+	display: block;
+	width: 100%;
+	text-align: center;
+
+	/* Box Model */
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 800px;
+}
+
+/* Hero Content (Element) */
+.gbp-hero__content {
+	display: flex;
+	flex-direction: column;
+
+	/* Display & Positioning */
+	align-items: center;
+	gap: 1.5rem;
+
+	/* Box Model */
+	margin: 0 auto;
+	max-width: 800px;
+}
+
+/* Hero Title (Element) */
+.gbp-hero__title {
+	/* Typography */
+	color: var(--text-primary);
+
+	/* Box Model */
+	margin-bottom: 0;
+	font-size: clamp(2.5rem, 6vw, 4rem);
+	font-weight: var(--font-extrabold);
+	line-height: 1.1;
+}
+
+/* Hero Description (Element) */
+.gbp-hero__description {
+	/* Typography */
+	color: var(--text-secondary);
+
+	/* Box Model */
+	margin-bottom: 0;
+	font-size: 1.25rem;
+	line-height: var(--leading-normal);
+}
+
+/* Hero Actions (Element) */
+.gbp-hero__actions {
+	/* Display & Positioning */
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 1rem;
+
+	/* Box Model */
+	width: 100%;
+}
+
+/* Hero Headline (Legacy element via section) */
+.gbp-hero .gbp-section__headline {
+	/* Typography */
+	color: var(--text-primary);
+
+	/* Box Model */
+	margin-bottom: 0.5rem;
+	font-size: clamp(2.5rem, 6vw, 4rem);
+	font-weight: var(--font-extrabold);
+	line-height: 1.1;
+}
+
+/* Hero Tagline (Legacy element via section) */
+.gbp-hero .gbp-section__tagline {
+	/* Typography */
+	color: var(--text-secondary);
+
+	/* Box Model */
+	margin-bottom: 0.5rem;
+	font-size: 1.25rem;
+	line-height: var(--leading-normal);
+}
+
+/* Hero Button (Legacy via button) */
+.gbp-hero .gbp-button--primary {
+	/* Box Model */
+	margin-top: 1rem;
+	max-width: 300px;
+}
+
+/* Hero Responsive - Mobile */
+@media (width <= 767px) {
+	.gbp-hero {
+		padding-bottom: 3rem;
+		padding-top: 6rem;
+	}
+
+	.gbp-hero__actions {
+		flex-direction: column;
+		align-items: center;
+	}
+}
+
+/* ========================================
+   3. FOOTER (Block)
+   ======================================== */
+
+/* 3.1 Footer Main */
+.gbp-footer {
+	/* Box Model */
+	padding: 4rem 2rem 2rem;
+
+	/* Colors */
+	background: var(--footer-bg);
+	color: var(--footer-text);
+}
+
+/* Footer Content (Element) */
+.gbp-footer__content {
+	/* Display & Positioning */
+	display: grid;
+	gap: 4rem;
+	grid-template-columns: 2fr 1fr 1fr;
+
+	/* Box Model */
+	max-width: var(--gb-container-width);
+}
+
+/* 3.2 Footer Company (Element) */
+.gbp-footer__company {
+	max-width: 400px;
+}
+
+/* Footer Logo (Element) */
+.gbp-footer__logo {
+	display: flex;
+
+	/* Display & Positioning */
+	align-items: center;
+	gap: 0.5rem;
+
+	/* Typography */
+	color: var(--accent);
+
+	/* Box Model */
+	margin-bottom: 0.5rem;
+	font-size: 1.75rem;
+	font-weight: var(--font-bold);
+	text-decoration: none;
+}
+
+/* Footer Description (Element) */
+.gbp-footer__description {
+	/* Typography */
+	color: var(--footer-text);
+	opacity: 0.9;
+
+	/* Box Model */
+	max-width: 400px;
+	font-size: 0.95rem;
+	line-height: 1.7;
+}
+
+/* 3.3 Footer Links (Element) */
+.gbp-footer__links h3,
+.gbp-footer__contacts h3 {
+	/* Typography */
+	color: var(--text-primary);
+	font-size: 1.1rem;
+	font-weight: var(--font-bold);
+}
+
+[data-theme="dark"] .gbp-footer__links h3,
+[data-theme="dark"] .gbp-footer__contacts h3 {
+	color: var(--color-white);
+}
+
+/* Footer Nav (Element) */
+.gbp-footer__nav {
+	/* Display & Positioning */
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+/* Footer Link (Element) */
+.gbp-footer__link {
+	position: relative;
+
+	/* Display & Positioning */
+	display: inline-block;
+
+	/* Typography */
+	color: var(--footer-text);
+
+	/* Transition */
+	transition: color var(--hover-transition);
+	opacity: 0.9;
+	font-size: 0.95rem;
+	text-decoration: none;
+}
+
+.gbp-footer__link::after {
+	content: "";
+	position: absolute;
+
+	/* Display & Positioning */
+	bottom: 0;
+	left: 0;
+	width: 0;
+
+	/* Box Model */
+	height: 2px;
+
+	/* Colors */
+	background: var(--accent);
+
+	/* Transitions */
+	transition: width var(--hover-transition);
+}
+
+.gbp-footer__link:hover::after,
+.gbp-footer__link:focus::after {
+	width: 100%;
+}
+
+.gbp-footer__link:hover,
+.gbp-footer__link:focus {
+	color: var(--accent);
+	opacity: 1;
+}
+
+/* 3.4 Footer Social (Element) */
+.gbp-footer__social {
+	display: flex;
+
+	/* Display & Positioning */
+	align-items: center;
+	column-gap: 1rem;
+
+	/* Box Model */
+	margin-top: 0.5rem;
+}
+
+/* 3.5 Footer Contacts (Element) */
+.gbp-footer__contacts {
+	/* No specific styles needed, uses inherited */
+}
+
+/* Footer Contact Item (Element) */
+.gbp-footer__contact-item {
+	display: flex;
+
+	/* Display & Positioning */
+	align-items: flex-start;
+	gap: 0.75rem;
+
+	/* Typography */
+	color: var(--footer-text);
+
+	/* Box Model */
+	margin-bottom: 1rem;
+	font-size: 0.95rem;
+	line-height: var(--leading-normal);
+}
+
+.gbp-footer__contact-item:last-child {
+	margin-bottom: 0;
+}
+
+/* Footer Contact Icon (Element) */
+.gbp-footer__contact-icon {
+	/* Typography */
+	color: var(--accent-2);
+
+	/* Display & Positioning */
+	flex-shrink: 0;
+	font-size: 1.25rem;
+}
+
+.gbp-footer__contact-icon img {
+	display: inline-block;
+	vertical-align: middle;
+	flex-shrink: 0;
+}
+
+/* Footer Contact Link (Element) */
+.gbp-footer__contact-link {
+	/* Typography */
+	color: var(--footer-text);
+
+	/* Transition */
+	transition: color var(--hover-transition);
+	opacity: 0.9;
+	text-decoration: none;
+}
+
+.gbp-footer__contact-link:hover,
+.gbp-footer__contact-link:focus {
+	color: var(--accent);
+	opacity: 1;
+}
+
+/* 3.6 Footer Bottom (Element) */
+.gbp-footer__bottom {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+
+	/* Display & Positioning */
+	align-items: center;
+	gap: 1.5rem;
+
+	/* Box Model */
+	margin: 0 auto;
+	text-align: center;
+	max-width: var(--gb-container-width);
+	padding-top: 2rem;
+}
+
+/* Footer Copyright (Element) */
+.gbp-footer__copyright {
+	/* Typography */
+	color: var(--text-secondary);
+
+	/* Display & Positioning */
+	order: 3;
+	font-size: 0.9rem;
+}
+
+/* Footer Legal (Element) */
+.gbp-footer__legal {
+	/* Display & Positioning */
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 2rem;
+	order: 2;
+}
+
+/* Footer Legal Link (Element) */
+.gbp-footer__legal-link {
+	/* Typography */
+	color: var(--text-secondary);
+
+	/* Transition */
+	transition: color var(--hover-transition);
+	font-size: 0.9rem;
+	text-decoration: none;
+}
+
+.gbp-footer__legal-link:hover,
+.gbp-footer__legal-link:focus {
+	color: var(--accent);
+}
+
+/* Footer Badges (Element) */
+.gbp-footer__badges {
+	/* Display & Positioning */
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 1rem;
+	order: 1;
+}
+
+/* Footer Badge (Element) */
+.gbp-footer__badge {
+	display: inline-flex;
+
+	/* Display & Positioning */
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.4rem 0.8rem;
+
+	/* Typography */
+	background: var(--bg-card);
+
+	/* Box Model */
+	border: 1px solid var(--border-color);
+	border-radius: var(--border-radius-md);
+	color: var(--text-secondary);
+	font-size: 0.85rem;
+}
+
+/* 3.7 Footer Dark Theme */
+[data-theme="dark"] .gbp-footer,
+[data-theme="dark"] .gb-element-d7d5c4eb {
+	background-color: var(--slate-800) !important;
+	border-top-color: var(--slate-700) !important;
+}
+
+[data-theme="dark"] .gbp-footer__content,
+[data-theme="dark"] .gb-element-9e93109e {
+	border-bottom-color: var(--slate-700) !important;
+}
+
+/* 3.8 Footer Responsive - Tablet */
+@media (width <= 1024px) {
+	.gbp-footer__content {
+		gap: 3rem;
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.gbp-footer__company {
+		grid-column: 1 / -1;
+	}
+}
+
+/* 3.9 Footer Responsive - Mobile */
+@media (width <= 767px) {
+	.gbp-footer {
+		padding: 3rem 1rem 1.5rem;
+	}
+
+	.gbp-footer__content {
+		gap: 2.5rem;
+		text-align: center;
+		grid-template-columns: 1fr;
+		justify-items: center;
+	}
+
+	.gbp-footer__company {
+		text-align: center;
+		grid-column: 1;
+		justify-self: center;
+	}
+
+	.gbp-footer__links,
+	.gbp-footer__contacts {
+		text-align: center;
+		justify-self: center;
+	}
+
+	.gbp-footer__nav {
+		align-items: center;
+	}
+
+	.gbp-footer__bottom {
+		flex-direction: column;
+		gap: 1.5rem;
+		text-align: center;
+	}
+
+	.gbp-footer__legal {
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+}
+
+/* ========================================
+   4. UTILITIES
+   ======================================== */
+
+/* 4.1 Social Icons (Block) */
+.gbp-social-icon {
+	display: inline-flex;
+	justify-content: center;
+
+	/* Display & Positioning */
+	align-items: center;
+	width: 40px;
+	height: 40px;
+
+	/* Colors */
+	background: transparent;
+
+	/* Box Model */
+	border-radius: 50%;
+	color: var(--text-primary);
+
+	/* Stacked Transitions */
+	transition:
+		background-color 0.2s ease,
+		color 0.2s ease,
+		transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+	/* Typography */
+	font-size: 1.25rem;
+	text-decoration: none;
+}
+
+.gbp-social-icon:hover,
+.gbp-social-icon:focus {
+	background: var(--accent);
+	color: var(--color-white);
+	transform: translateY(-2px);
+}
+
+/* 4.2 Scroll to Top Button (Block) */
+.scroll-to-top {
+	position: fixed;
+	right: 2rem;
+	bottom: 2rem;
+	z-index: 999;
+	display: flex;
+	justify-content: center;
+
+	/* Display & Positioning */
+	align-items: center;
+
+	/* Box Model */
+	width: 48px;
+	height: 48px;
+
+	/* Colors */
+	background: var(--accent);
+	border: none;
+	border-radius: 50%;
+	color: white;
+	transform: translateY(20px);
+
+	/* Stacked Transitions */
+	transition:
+		opacity 0.3s ease,
+		visibility 0.3s ease,
+		transform 0.3s ease,
+		box-shadow 0.3s ease;
+
+	/* Initial State */
+	opacity: 0;
+	box-shadow: var(--shadow-lg);
+
+	/* Typography */
+	font-size: 1.75rem;
+	font-weight: 900;
+	line-height: 1;
+
+	/* Interaction */
+	cursor: pointer;
+	visibility: hidden;
+}
+
+/* Scroll to Top Modifier: Visible */
+.scroll-to-top--visible {
+	transform: translateY(0);
+	opacity: 1;
+	visibility: visible;
+}
+
+.scroll-to-top:hover,
+.scroll-to-top:focus {
+	transform: translateY(-4px);
+	box-shadow: var(--shadow-xl);
+}
+
+/* 4.3 Helper Classes - HTML5 Boilerplate */
+
+/**
+ * Приховати візуально та з accessibility tree (screen readers)
+ * Використовуй для елементів які не потрібно показувати взагалі
+ */
+.hidden,
+[hidden] {
+	display: none !important;
+}
+
+/**
+ * Приховати візуально, але залишити доступним для screen readers
+ * Використовуй для accessibility (skip links, labels, тощо)
+ *
+ * Source: HTML5 Boilerplate
+ * @link https://github.com/h5bp/html5-boilerplate/blob/main/dist/css/style.css
+ */
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	clip: rect(0, 0, 0, 0);
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+/**
+ * Розширення для .visually-hidden для елементів які стають видимими при фокусі
+ * Корисно для skip navigation links
+ */
+.visually-hidden.focusable:active,
+.visually-hidden.focusable:focus {
+	position: static;
+	width: auto;
+	height: auto;
+	margin: 0;
+	clip: auto;
+	overflow: visible;
+	white-space: inherit;
+}
+
+/**
+ * Приховати елемент але зберегти його розміри (займає місце в layout)
+ * Використовуй коли потрібно приховати елемент але не впливати на розташування інших
+ */
+.invisible {
+	visibility: hidden;
+}
+
+/**
+ * Clearfix для контейнерів з float елементами
+ * Автоматичне очищення float без додаткових елементів
+ *
+ * Source: HTML5 Boilerplate
+ */
+.clearfix::before,
+.clearfix::after {
+	content: "";
+	display: table;
+}
+
+.clearfix::after {
+	clear: both;
+}
+
+/* ========================================
+   5. BACKWARDS COMPATIBILITY
+   Legacy class names for existing HTML templates
+   TODO: Remove after HTML migration
+   ======================================== */
+
+/* Footer Content - Legacy */
+.gbp-footer-content {
+	display: grid;
+	gap: 4rem;
+	grid-template-columns: 2fr 1fr 1fr;
+	max-width: var(--gb-container-width);
+}
+
+/* Footer Company - Legacy */
+.gbp-footer-company {
+	max-width: 400px;
+}
+
+/* Footer Logo - Legacy */
+.gbp-footer-logo {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--accent);
+	margin-bottom: 0.5rem;
+	font-size: 1.75rem;
+	font-weight: var(--font-bold);
+	text-decoration: none;
+}
+
+/* Footer Description - Legacy */
+.gbp-footer-description {
+	color: var(--footer-text);
+	opacity: 0.9;
+	max-width: 400px;
+	font-size: 0.95rem;
+	line-height: 1.7;
+}
+
+/* Footer Links Headers - Legacy */
+.gbp-footer-links h3,
+.gbp-footer-contacts h3 {
+	color: var(--text-primary);
+	font-size: 1.1rem;
+	font-weight: var(--font-bold);
+}
+
+[data-theme="dark"] .gbp-footer-links h3,
+[data-theme="dark"] .gbp-footer-contacts h3 {
+	color: var(--color-white);
+}
+
+/* Footer Nav - Legacy */
+.gbp-footer-nav {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+/* Footer Link - Legacy */
+.gbp-footer-link {
+	position: relative;
+	display: inline-block;
+	color: var(--footer-text);
+	transition: color var(--hover-transition);
+	opacity: 0.9;
+	font-size: 0.95rem;
+	text-decoration: none;
+}
+
+.gbp-footer-link::after {
+	content: "";
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 0;
+	height: 2px;
+	background: var(--accent);
+	transition: width var(--hover-transition);
+}
+
+.gbp-footer-link:hover::after,
+.gbp-footer-link:focus::after {
+	width: 100%;
+}
+
+.gbp-footer-link:hover,
+.gbp-footer-link:focus {
+	color: var(--accent);
+	opacity: 1;
+}
+
+/* Footer Social - Legacy */
+.gbp-footer-social {
+	display: flex;
+	align-items: center;
+	column-gap: 1rem;
+	margin-top: 0.5rem;
+}
+
+/* Footer Contact Item - Legacy */
+.gbp-footer-contact-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+	color: var(--footer-text);
+	margin-bottom: 1rem;
+	font-size: 0.95rem;
+	line-height: var(--leading-normal);
+}
+
+.gbp-footer-contact-item:last-child {
+	margin-bottom: 0;
+}
+
+/* Footer Contact Icon - Legacy */
+.gbp-footer-contact-icon {
+	color: var(--accent-2);
+	flex-shrink: 0;
+	font-size: 1.25rem;
+}
+
+.gbp-footer-contact-icon img,
+.gbp-footer-contacts img {
+	display: inline-block;
+	vertical-align: middle;
+	flex-shrink: 0;
+}
+
+/* Footer Contact Link - Legacy */
+.gbp-footer-contact-link {
+	color: var(--footer-text);
+	transition: color var(--hover-transition);
+	opacity: 0.9;
+	text-decoration: none;
+}
+
+.gbp-footer-contact-link:hover,
+.gbp-footer-contact-link:focus {
+	color: var(--accent);
+	opacity: 1;
+}
+
+/* Footer Bottom - Legacy */
+.gbp-footer-bottom {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 1.5rem;
+	margin: 0 auto;
+	text-align: center;
+	max-width: var(--gb-container-width);
+	padding-top: 2rem;
+}
+
+/* Footer Copyright - Legacy */
+.gbp-footer-copyright {
+	color: var(--text-secondary);
+	order: 3;
+	font-size: 0.9rem;
+}
+
+/* Footer Legal - Legacy */
+.gbp-footer-bottom .gbp-footer-legal {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 2rem;
+	order: 2;
+}
+
+/* Footer Legal Link - Legacy */
+.gbp-footer-legal-link {
+	color: var(--text-secondary);
+	transition: color var(--hover-transition);
+	font-size: 0.9rem;
+	text-decoration: none;
+}
+
+.gbp-footer-legal-link:hover,
+.gbp-footer-legal-link:focus {
+	color: var(--accent);
+}
+
+/* Footer Badges - Legacy */
+.gbp-footer-badges {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 1rem;
+	order: 1;
+}
+
+/* Footer Badge - Legacy */
+.gbp-footer-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.4rem 0.8rem;
+	background: var(--bg-card);
+	border: 1px solid var(--border-color);
+	border-radius: var(--border-radius-md);
+	color: var(--text-secondary);
+	font-size: 0.85rem;
+}
+
+/* Footer Dark Theme - Legacy selectors */
+[data-theme="dark"] .gbp-footer-content {
+	border-bottom-color: var(--slate-700) !important;
+}
+
+/* Footer Responsive - Legacy Tablet */
+@media (width <= 1024px) {
+	.gbp-footer-content {
+		gap: 3rem;
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.gbp-footer-company {
+		grid-column: 1 / -1;
+	}
+}
+
+/* Footer Responsive - Legacy Mobile */
+@media (width <= 767px) {
+	.gbp-footer-content {
+		gap: 2.5rem;
+		text-align: center;
+		grid-template-columns: 1fr;
+		justify-items: center;
+	}
+
+	.gbp-footer-company {
+		text-align: center;
+		grid-column: 1;
+		justify-self: center;
+	}
+
+	.gbp-footer-links,
+	.gbp-footer-contacts {
+		text-align: center;
+		justify-self: center;
+	}
+
+	.gbp-footer-nav {
+		align-items: center;
+	}
+
+	.gbp-footer-bottom {
+		flex-direction: column;
+		gap: 1.5rem;
+		text-align: center;
+	}
+
+	.gbp-footer-legal {
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+}
+
+/* Scroll to Top - Legacy visible class */
+.scroll-to-top.visible {
+	transform: translateY(0);
+	opacity: 1;
+	visibility: visible;
+}

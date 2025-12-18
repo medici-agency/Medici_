@@ -1,0 +1,1044 @@
+/**
+ * Blog Single Post Styles
+ *
+ * Стилі для окремої статті блогу (single-medici_blog.php)
+ * Pixel-perfect конвертація з HTML дизайну
+ *
+ * @package    Medici
+ * @subpackage Blog/Styles
+ * @since      1.0.16
+ * @version    1.0.0
+ */
+
+/* ============================================================================
+   Variables Override (для single post)
+   ========================================================================= */
+
+:root {
+	--article-max-width: 800px;
+	--sidebar-width: 320px;
+	--gap-large: 60px;
+	--gap-medium: 40px;
+	--gap-small: 24px;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+	--border-alpha: rgb(255 255 255 / 10%);
+	--card-bg-alpha: rgb(26 41 55 / 50%);
+}
+
+/* Light Theme */
+[data-theme="light"] {
+	--border-alpha: rgb(0 0 0 / 10%);
+	--card-bg-alpha: rgb(255 255 255 / 95%);
+}
+
+/* ============================================================================
+   Container
+   ========================================================================= */
+
+.medici-single-post-container {
+	margin: 0 auto;
+	padding: 0 24px;
+	max-width: 1600px; /* Збільшено для 3 колонок (280px + контент + 272px + gaps) */
+	overflow-x: clip; /* Prevent horizontal scroll without breaking position: sticky */
+}
+
+/* Розрахунок: 280px (TOC) + 40px (gap) + контент (~78%) + 40px (gap) + 272px (sidebar, -15%) */
+
+@media (width <= 767px) {
+	.medici-single-post-container {
+		padding: 0 16px;
+	}
+}
+
+/* ============================================================================
+   Breadcrumb
+   ========================================================================= */
+
+.medici-breadcrumb {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	padding: 24px 0;
+	color: var(--text-secondary);
+	font-size: 14px;
+}
+
+.medici-breadcrumb a {
+	color: var(--text-secondary);
+	transition: color 0.2s ease;
+	text-decoration: none;
+}
+
+.medici-breadcrumb a:hover {
+	color: var(--accent);
+}
+
+.medici-breadcrumb span:not(.current) {
+	color: var(--text-muted);
+}
+
+.medici-breadcrumb .current {
+	color: var(--text-primary);
+	font-weight: var(--font-medium);
+}
+
+/* ============================================================================
+   Article Layout (3 Columns Grid)
+   ========================================================================= */
+
+.medici-article-layout {
+	display: grid;
+	align-items: start;
+	gap: 40px; /* Мінімальний gap між колонками */
+	padding: 40px 0 80px;
+	grid-template-columns: 280px 1fr 272px; /* TOC (ліво) | Контент (центр) | Sidebar (право, зменшено на 15%) */
+	grid-template-areas: "toc-sidebar main-content right-sidebar";
+}
+
+/* TOC Sidebar (ліворуч) */
+.medici-toc-sidebar {
+	position: sticky;
+	top: 100px;
+	height: fit-content;
+	grid-area: toc-sidebar;
+	max-height: calc(100vh - 120px);
+}
+
+/* Main Content (центр) */
+.medici-article-main {
+	grid-area: main-content;
+}
+
+/* Right Sidebar (праворуч) */
+.medici-right-sidebar {
+	position: sticky;
+	top: 100px;
+	height: fit-content;
+	grid-area: right-sidebar;
+}
+
+/* Tablet: 2 columns (TOC зникає, контент + right sidebar) */
+@media (width <= 1280px) {
+	.medici-article-layout {
+		gap: 40px;
+		grid-template-columns: 1fr 272px; /* Right sidebar зменшено на 15% */
+		grid-template-areas: "main-content right-sidebar";
+	}
+
+	.medici-toc-sidebar {
+		display: none; /* Приховати TOC на tablet */
+	}
+}
+
+/* Mobile: 1 column */
+@media (width <= 1024px) {
+	.medici-article-layout {
+		gap: 40px;
+		grid-template-columns: 1fr;
+		grid-template-areas:
+			"main-content"
+			"right-sidebar";
+	}
+
+	.medici-right-sidebar {
+		position: static; /* Не sticky на mobile */
+	}
+}
+
+/* ============================================================================
+   Article Main
+   ========================================================================= */
+
+.medici-article-main {
+	min-width: 0;
+}
+
+/* Article Header */
+.medici-article-header {
+	margin-bottom: 40px;
+}
+
+.medici-article-category {
+	display: inline-block;
+	padding: 8px 16px;
+	background: rgb(168 85 247 / 15%);
+	border-radius: 20px;
+	color: #a855f7;
+	font-size: 12px;
+	font-weight: var(--font-bold);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: 20px;
+}
+
+.medici-article-title {
+	color: var(--text-primary);
+	font-size: 48px;
+	font-weight: var(--font-extrabold);
+	line-height: var(--leading-tight);
+	margin-bottom: 24px;
+	letter-spacing: -1px;
+}
+
+@media (width <= 767px) {
+	.medici-article-title {
+		font-size: 32px;
+	}
+}
+
+.medici-article-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 32px;
+	padding: 20px 0;
+	color: var(--text-secondary);
+	border-top: 1px solid var(--border-color);
+	border-bottom: 1px solid var(--border-color);
+	font-size: 14px;
+}
+
+.meta-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.meta-item svg {
+	flex-shrink: 0;
+}
+
+/* ============================================================================
+   Key Takeaways
+   ========================================================================= */
+
+.takeaways {
+	margin: 40px 0;
+	padding: 32px;
+	background: var(--bg-card);
+	border: 2px solid var(--accent);
+	border-radius: 16px;
+}
+
+.takeaways h3 {
+	color: var(--accent);
+	font-size: 20px;
+	font-weight: var(--font-bold);
+	margin-bottom: 20px;
+}
+
+.takeaways ul {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.takeaways li {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	margin: 0;
+	color: var(--text-primary);
+	font-size: 15px;
+	line-height: var(--leading-normal);
+}
+
+.takeaways li::before {
+	content: "→";
+	color: var(--accent);
+	font-weight: var(--font-bold);
+	font-size: 18px;
+	flex-shrink: 0;
+}
+
+/* ============================================================================
+   Article Content
+   ========================================================================= */
+
+.medici-article-content {
+	color: var(--text-primary);
+	font-size: 17px;
+	line-height: var(--leading-relaxed);
+}
+
+@media (width <= 767px) {
+	.medici-article-content {
+		font-size: 16px;
+	}
+}
+
+.medici-article-content h2 {
+	margin: 48px 0 24px;
+	color: var(--text-primary);
+	font-size: 32px;
+	font-weight: var(--font-bold);
+	line-height: 1.3;
+}
+
+.medici-article-content h3 {
+	margin: 36px 0 20px;
+	color: var(--text-primary);
+	font-size: 24px;
+	font-weight: var(--font-bold);
+	line-height: 1.3;
+}
+
+@media (width <= 767px) {
+	.medici-article-content h2 {
+		font-size: 24px;
+	}
+
+	.medici-article-content h3 {
+		font-size: 20px;
+	}
+}
+
+.medici-article-content p {
+	margin-bottom: 24px;
+}
+
+.medici-article-content ul,
+.medici-article-content ol {
+	margin: 24px 0;
+	padding-left: 24px;
+}
+
+.medici-article-content li {
+	margin-bottom: 12px;
+}
+
+.medici-article-content blockquote {
+	margin: 32px 0;
+	padding: 20px 24px;
+	background: var(--bg-card);
+	border-radius: 8px;
+	color: var(--text-secondary);
+	border-left: 4px solid var(--accent);
+	font-style: italic;
+}
+
+.medici-article-content a {
+	color: var(--accent);
+	transition: color 0.2s ease;
+	text-decoration: underline;
+}
+
+.medici-article-content a:hover {
+	color: var(--accent-2);
+}
+
+.medici-article-content strong {
+	color: var(--text-primary);
+	font-weight: var(--font-bold);
+}
+
+.medici-article-content code {
+	padding: 2px 8px;
+	background: var(--bg-card);
+	border-radius: 4px;
+	color: var(--accent);
+	font-family: "Courier New", monospace;
+	font-size: 0.9em;
+}
+
+.medici-article-content pre {
+	margin: 24px 0;
+	padding: 20px;
+	background: var(--bg-card);
+	border-radius: 8px;
+	overflow-x: auto;
+}
+
+.medici-article-content pre code {
+	padding: 0;
+	background: none;
+}
+
+/* ============================================================================
+   Warning Box
+   ========================================================================= */
+
+.warning-box {
+	display: flex;
+	align-items: flex-start;
+	gap: 16px;
+	margin: 32px 0;
+	padding: 24px;
+	background: rgb(255 193 7 / 10%);
+	border: 2px solid var(--color-amber);
+	border-radius: 12px;
+}
+
+[data-theme="dark"] .warning-box {
+	background: rgb(255 193 7 / 15%);
+}
+
+.warning-icon {
+	color: var(--color-amber);
+	font-size: 24px;
+	flex-shrink: 0;
+	line-height: 1;
+}
+
+.warning-content h4 {
+	color: var(--color-amber);
+	font-weight: var(--font-bold);
+	margin-bottom: 8px;
+	font-size: 16px;
+}
+
+.warning-content p {
+	margin: 0;
+	color: var(--text-primary);
+	font-size: 14px;
+	line-height: var(--leading-normal);
+}
+
+/* ============================================================================
+   Inline CTA
+   ========================================================================= */
+
+.inline-cta {
+	margin: 48px 0;
+	padding: 40px;
+	background: linear-gradient(135deg, var(--accent), var(--accent-2));
+	border-radius: 16px;
+	color: white;
+	text-align: center;
+}
+
+.inline-cta h3 {
+	color: white;
+	font-size: 24px;
+	font-weight: var(--font-bold);
+	margin-bottom: 12px;
+}
+
+.inline-cta p {
+	color: white;
+	opacity: 0.9;
+	font-size: 16px;
+	margin-bottom: 24px;
+}
+
+.btn-white {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 14px 28px;
+	background: white;
+	border: 2px solid transparent;
+	border-radius: 10px;
+	color: var(--accent);
+	transition: all 0.2s ease;
+	text-decoration: none;
+	font-weight: var(--font-bold);
+	font-size: 16px;
+}
+
+.btn-white:hover {
+	background: white;
+	color: var(--accent);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgb(0 0 0 / 30%);
+}
+
+.btn-white svg {
+	flex-shrink: 0;
+}
+
+/* ============================================================================
+   Article Navigation (Prev/Next)
+   ========================================================================= */
+
+.medici-article-nav {
+	display: grid;
+	gap: 24px;
+	margin: 60px 0 0;
+	grid-template-columns: 1fr 1fr;
+	padding-top: 40px;
+	border-top: 1px solid var(--border-color);
+}
+
+@media (width <= 767px) {
+	.medici-article-nav {
+		grid-template-columns: 1fr;
+	}
+}
+
+.nav-card {
+	display: block;
+	padding: 24px;
+	background: var(--bg-card);
+	border: 1px solid var(--border-color);
+	border-radius: 12px;
+	transition: all 0.3s ease;
+	text-decoration: none;
+}
+
+.nav-card:hover {
+	transform: translateX(4px);
+	border-color: var(--accent);
+	box-shadow: var(--shadow-lg);
+}
+
+.nav-card.prev:hover {
+	transform: translateX(-4px);
+}
+
+.nav-label {
+	color: var(--text-muted);
+	font-size: 12px;
+	font-weight: var(--font-bold);
+	text-transform: uppercase;
+	margin-bottom: 8px;
+	letter-spacing: 0.5px;
+}
+
+.nav-title {
+	color: var(--text-primary);
+	font-size: 18px;
+	font-weight: var(--font-bold);
+	line-height: 1.3;
+}
+
+/* ============================================================================
+   TOC Sidebar (Ліворуч) & Right Sidebar (Праворуч)
+   ========================================================================= */
+
+/* Спільні стилі для sidebar секцій */
+.sidebar-section {
+	width: 100%;
+	padding: 24px;
+	background: var(--bg-card);
+	border: 1px solid var(--border-color);
+	border-radius: 16px;
+	transition: all 0.3s ease;
+	margin-bottom: 24px;
+
+	/* Запобігти виходу контенту за межі */
+	overflow: hidden;
+	box-sizing: border-box;
+}
+
+.sidebar-section h3 {
+	color: var(--text-primary);
+	font-size: 18px;
+	font-weight: var(--font-bold);
+	margin-bottom: 20px;
+}
+
+/* TOC Sidebar - мінімальні падінги зліва */
+.medici-toc-sidebar .sidebar-section {
+	padding: 20px 24px 20px 16px; /* Менше зліва */
+}
+
+/* Table of Contents */
+#medici-toc-container {
+	max-height: 500px; /* Максимальна висота TOC */
+	overflow: hidden auto; /* Додати вертикальну прокрутку */ /* Приховати горизонтальну прокрутку */
+
+	/* Smooth scrolling for TOC */
+	scroll-behavior: smooth;
+
+	/* Приховати scrollbar але зберегти функціональність */
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Приховати scrollbar для WebKit browsers (Chrome, Safari) */
+#medici-toc-container::-webkit-scrollbar {
+	display: none;
+}
+
+.toc-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	box-sizing: border-box;
+}
+
+.toc-list a {
+	display: block;
+	padding: 8px 12px;
+	border-radius: 8px;
+	color: var(--text-secondary);
+	transition: all 0.2s ease;
+	text-decoration: none;
+	font-size: 14px;
+
+	/* Перенос довгих заголовків */
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	hyphens: auto;
+	line-height: 1.5;
+}
+
+.toc-list a:hover {
+	background: var(--bg-secondary);
+	color: var(--accent);
+}
+
+.toc-list a.active {
+	background: var(--bg-secondary);
+	color: var(--accent);
+	font-weight: var(--font-semibold);
+}
+
+/* Relevant Services Widget */
+.services-description {
+	color: var(--text-secondary);
+	font-size: 13px; /* Узгоджено з newsletter-description */
+	margin-bottom: 16px;
+	line-height: var(--leading-medium);
+}
+
+.service-icon {
+	margin-right: 8px;
+	font-size: 18px;
+}
+
+/* Service Cards */
+.service-card {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 16px;
+	background: var(--bg-secondary);
+	border-radius: 12px;
+	transition: all 0.2s ease;
+	margin-bottom: 12px;
+}
+
+.service-card:hover {
+	background: var(--bg-card);
+	box-shadow: var(--shadow-sm);
+}
+
+.service-card h4 {
+	margin: 0;
+	color: var(--text-primary);
+	font-size: 16px;
+	font-weight: var(--font-bold);
+}
+
+.service-card p {
+	margin: 0;
+	color: var(--text-secondary);
+	font-size: 13px;
+	line-height: var(--leading-medium);
+}
+
+.service-card a {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	color: var(--accent);
+	transition: all 0.2s ease;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: var(--font-semibold);
+}
+
+.service-card a:hover {
+	gap: 10px;
+	color: var(--accent-2);
+}
+
+.service-card a svg {
+	transition: transform 0.2s ease;
+	flex-shrink: 0;
+}
+
+.service-card a:hover svg {
+	transform: translateX(2px);
+}
+
+/* Newsletter Form */
+.newsletter-description {
+	color: var(--text-secondary);
+	font-size: 13px; /* Зменшено з 14px */
+	margin-bottom: 12px; /* Зменшено з 16px */
+	line-height: var(--leading-medium);
+}
+
+.newsletter-form {
+	display: flex;
+	flex-direction: column;
+	gap: 10px; /* Зменшено з 12px */
+}
+
+.newsletter-form input {
+	padding: 10px 14px; /* Зменшено з 12px 16px */
+	background: var(--bg-secondary);
+	border: 2px solid var(--border-color);
+	border-radius: 8px;
+	color: var(--text-primary);
+	transition: border-color 0.2s ease;
+	font-size: 13px; /* Зменшено з 14px */
+	font-family: inherit;
+}
+
+.newsletter-form input:focus {
+	outline: none;
+	border-color: var(--accent);
+}
+
+.newsletter-form input::placeholder {
+	color: var(--text-muted);
+	font-size: 13px; /* Додано для консистентності */
+}
+
+.newsletter-form button {
+	padding: 10px 18px; /* Зменшено з 12px 20px */
+	background: var(--accent);
+	border: none;
+	border-radius: 8px;
+	color: white;
+	transition: all 0.2s ease;
+	font-weight: var(--font-semibold);
+	cursor: pointer;
+	font-size: 13px; /* Зменшено з 14px */
+	font-family: inherit;
+}
+
+.newsletter-form button:hover {
+	background: var(--accent-2);
+	transform: translateY(-1px);
+}
+
+.newsletter-note {
+	color: var(--text-muted);
+	font-size: 12px;
+	line-height: var(--leading-medium);
+	margin-top: 8px;
+}
+
+/* Back to Blog Button */
+.btn-back-to-blog {
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	padding: 12px 20px;
+	background: white;
+	border: 2px solid var(--accent);
+	border-radius: 10px;
+	color: var(--accent);
+	transition: all 0.2s ease;
+	text-decoration: none;
+	font-weight: var(--font-bold);
+}
+
+.btn-back-to-blog:hover {
+	background: var(--accent);
+	color: white;
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgb(37 99 235 / 30%);
+}
+
+[data-theme="dark"] .btn-back-to-blog {
+	background: var(--bg-secondary);
+	color: var(--accent);
+}
+
+[data-theme="dark"] .btn-back-to-blog:hover {
+	background: var(--accent);
+	color: white;
+}
+
+/* ============================================================================
+   Related Articles Section
+   ========================================================================= */
+
+.medici-related-section {
+	padding: 60px 0;
+	border-top: 1px solid var(--border-color);
+}
+
+.medici-related-section h2 {
+	color: var(--text-primary);
+	font-size: 32px;
+	font-weight: var(--font-bold);
+	margin-bottom: 32px;
+}
+
+.medici-related-grid {
+	display: grid;
+	gap: 24px;
+	grid-template-columns: repeat(3, 1fr);
+}
+
+@media (width <= 1024px) {
+	.medici-related-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (width <= 767px) {
+	.medici-related-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+.related-card {
+	display: block;
+	padding: 24px;
+	background: var(--bg-card);
+	border: 1px solid var(--border-color);
+	border-radius: 12px;
+	transition: all 0.3s ease;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.related-card:hover {
+	transform: translateY(-4px);
+	box-shadow: var(--shadow-lg);
+	border-color: var(--accent);
+}
+
+.related-category {
+	color: var(--accent);
+	font-size: 11px;
+	font-weight: var(--font-bold);
+	text-transform: uppercase;
+	margin-bottom: 12px;
+	letter-spacing: 0.5px;
+}
+
+.related-title {
+	color: var(--text-primary);
+	font-size: 18px;
+	font-weight: var(--font-bold);
+	line-height: 1.3;
+	margin-bottom: 8px;
+}
+
+.related-meta {
+	color: var(--text-muted);
+	font-size: 13px;
+}
+
+/* ============================================================================
+   Container для related section
+   ========================================================================= */
+
+.medici-related-section .medici-container {
+	margin: 0 auto;
+	padding: 0 24px;
+	max-width: 1280px;
+}
+
+/* ============================================================================
+   Print Styles
+   ========================================================================= */
+
+/* ============================================================================
+   Reading Progress Bar (Mobile Only)
+   ========================================================================= */
+
+.medici-reading-progress-bar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 9999;
+	display: none; /* Hidden on desktop */
+	width: 0%;
+	height: 4px;
+	background: linear-gradient(
+		90deg,
+		var(--blue-500) 0%,
+		#06b6d4 25%,
+		#8b5cf6 50%,
+		#ec4899 75%,
+		var(--color-warning) 100%
+	);
+	transition: width 0.15s ease-out;
+	background-size: 200% 100%;
+	animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+	0% {
+		background-position: 0% 50%;
+	}
+
+	50% {
+		background-position: 100% 50%;
+	}
+
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+/* Show only on mobile (767px and below) */
+@media (width <= 767px) {
+	.medici-reading-progress-bar {
+		display: block;
+	}
+
+	/* TOC на mobile - менша висота */
+	#medici-toc-container {
+		max-height: 300px;
+	}
+}
+
+/* Tablet adjustments */
+@media (width <= 1024px) {
+	/* TOC на tablet - середня висота */
+	#medici-toc-container {
+		max-height: 400px;
+	}
+}
+
+/* ============================================================================
+   Print Styles - HTML5 Boilerplate Enhanced
+   Оптимізовано для друку статей блогу
+   Source: https://github.com/h5bp/html5-boilerplate
+   ========================================================================= */
+
+@media print {
+	/* Приховати навігаційні та декоративні елементи */
+	.medici-breadcrumb,
+	.medici-sidebar,
+	.medici-article-nav,
+	.medici-related-section,
+	.medici-reading-progress-bar,
+	.scroll-to-top,
+	.gbp-navigation,
+	.gbp-footer,
+	nav,
+	aside,
+	.no-print {
+		display: none !important;
+	}
+
+	/* Layout для друку */
+	.medici-article-layout {
+		display: block;
+		width: 100%;
+	}
+
+	/* Typography оптимізація */
+	.medici-article-title {
+		font-size: 32px;
+		page-break-after: avoid;
+	}
+
+	.medici-article-content {
+		color: #000;
+		font-size: 12pt;
+		line-height: 1.6;
+	}
+
+	/* Заголовки - запобігання розривам */
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		page-break-after: avoid;
+		page-break-inside: avoid;
+	}
+
+	/* Параграфи - orphans/widows оптимізація */
+	p {
+		orphans: 3;
+		widows: 3;
+	}
+
+	/* Зображення, таблиці, pre - запобігання розривам */
+	img,
+	figure,
+	table,
+	pre,
+	blockquote {
+		page-break-inside: avoid;
+	}
+
+	/* Списки - запобігання розривам */
+	ul,
+	ol {
+		page-break-before: avoid;
+	}
+
+	/* Видалити backgrounds, box-shadows (економія чорнила) */
+	*,
+	*::before,
+	*::after {
+		background: transparent !important;
+		box-shadow: none !important;
+		text-shadow: none !important;
+	}
+
+	/* Посилання - показати URL після тексту */
+	a[href]::after {
+		content: " (" attr(href) ")";
+		font-size: 90%;
+		word-break: break-all;
+	}
+
+	/* Виключення для внутрішніх якорів та JavaScript псевдопосилань */
+	a[href^="#"]::after,
+	a[href^="javascript:"]::after {
+		content: "";
+	}
+
+	/* Скорочення - показати розшифровку */
+	abbr[title]::after {
+		content: " (" attr(title) ")";
+	}
+
+	/* Блоки коду та pre - border для візуального розділення */
+	pre,
+	code,
+	blockquote {
+		border: 1px solid #999;
+		page-break-inside: avoid;
+	}
+
+	/* Таблиці - header на кожній сторінці */
+	thead {
+		display: table-header-group;
+	}
+
+	tr {
+		page-break-inside: avoid;
+	}
+
+	/* Зображення - max width для друку */
+	img {
+		max-width: 100% !important;
+		page-break-inside: avoid;
+	}
+
+	/* Meta інформація статті */
+	.medici-article-meta {
+		color: #666;
+		font-size: 10pt;
+		margin-bottom: 1rem;
+		border-bottom: 1px solid #ccc;
+		padding-bottom: 0.5rem;
+	}
+
+	/* Категорії - без фонових кольорів */
+	.medici-category {
+		padding: 2px 6px;
+		border: 1px solid #999;
+		font-size: 9pt;
+	}
+}

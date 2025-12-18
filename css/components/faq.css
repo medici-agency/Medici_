@@ -1,0 +1,420 @@
+/**
+ * FAQ Accordion Styles
+ *
+ * Animated accordion with CSS Grid technique
+ * Features:
+ * - Service card styling (matching site design)
+ * - Smooth height transitions (grid-rows)
+ * - Plus/minus icon rotation
+ * - Responsive design
+ * - Dark theme support
+ * - Accessibility focus states
+ * - BEM naming convention (v2.0.0)
+ *
+ * Architecture:
+ * - BEM classes for styling (.faq-accordion__item, etc.)
+ * - data-* attributes for JavaScript hooks
+ * - Separation of concerns (styling vs behavior)
+ *
+ * @package Medici
+ * @version 2.0.0
+ * @since 1.3.4
+ * @changelog 2.0.0 - Added BEM classes alongside data-attributes
+ */
+
+/* ==========================================================================
+   Accordion Item Base Styles (Service Card Style)
+   ========================================================================== */
+
+/**
+ * Accordion item container (Block)
+ * Matches .gbp-service-card styling
+ *
+ * BEM Class: .faq-accordion__item
+ * JS Hook: [data-accordion-item="true"]
+ */
+.faq-accordion__item,
+[data-accordion-item="true"] {
+	/* Colors */
+	background: linear-gradient(135deg, rgb(249 250 251 / 95%) 0%, rgb(243 244 246 / 95%) 100%);
+
+	/* Box Model */
+	border: 1px solid var(--slate-200);
+	border-radius: var(--border-radius-md);
+
+	/* Transitions */
+	transition:
+		background-color 0.2s ease,
+		border-color 0.2s ease,
+		transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+		box-shadow 0.3s ease-in-out;
+	overflow: hidden;
+	box-shadow: var(--shadow-sm);
+}
+
+/**
+ * Accordion item hover state
+ * Lift effect like service cards (translateY)
+ * Shadow increase for depth
+ */
+.faq-accordion__item:hover,
+[data-accordion-item="true"]:hover {
+	transform: translateY(-8px);
+	box-shadow: var(--shadow-lg);
+	will-change: transform;
+}
+
+/**
+ * Accordion button base styles (Element)
+ * NO HOVER - user requirement!
+ * Light theme: --text-primary color for better readability
+ *
+ * BEM Class: .faq-accordion__button
+ * JS Hook: [data-accordion-button="true"]
+ */
+.faq-accordion__button,
+button[data-accordion-button="true"] {
+	/* Layout - position for pseudo-element icon */
+	position: relative;
+	display: block;
+	width: 100%;
+	border: none;
+
+	/* Typography */
+	color: var(--text-primary);
+	text-align: left;
+
+	/* Transition for smooth state changes */
+	transition: color 0.2s ease;
+
+	/* Reset default button styles */
+	background-color: transparent;
+	cursor: pointer;
+
+	/* Spacing for icon */
+	padding-right: 3rem !important;
+	font-weight: 600;
+}
+
+/**
+ * CSS Plus Icon (+) - Ukrainian flag colors 🇺🇦
+ * No SVG needed - pure CSS solution
+ * Closed state (+) - BOTH lines Yellow (#FFD700)
+ * Open state (-) - Horizontal line Blue (#0057B7)
+ */
+.faq-accordion__button::after,
+button[data-accordion-button="true"]::after {
+	/* Positioning */
+	content: "";
+	position: absolute;
+	top: 50%;
+	right: 1.5rem;
+
+	/* Icon size */
+	width: 20px;
+	height: 20px;
+
+	/* Plus icon - BOTH lines YELLOW:
+     Vertical line (|) - Yellow (#FFD700)
+     Horizontal line (-) - Yellow (#FFD700) */
+	background:
+		linear-gradient(#ffd700, #ffd700) center/2px 100% no-repeat,
+		/* vertical - yellow */ linear-gradient(#ffd700, #ffd700) center/100% 2px no-repeat; /* horizontal - yellow */
+
+	transform: translateY(-50%);
+
+	/* Smooth rotation animation like mobile menu */
+	transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/**
+ * Minus Icon (-) when expanded (Modifier)
+ * Only horizontal line remains - BLUE (#0057B7)
+ */
+.faq-accordion__button--active::after,
+button[data-accordion-button="true"].accordion-active::after {
+	background: linear-gradient(#0057b7, #0057b7) center/100% 2px no-repeat; /* horizontal - blue */
+	transform: translateY(-50%) rotate(90deg);
+}
+
+/**
+ * Override global button:hover styles from parent theme
+ * FAQ accordion buttons should NOT have hover background color
+ * User requirement: NO background-color on hover!
+ */
+.faq-accordion__button:hover,
+.faq-accordion__button:focus,
+button[data-accordion-button="true"]:hover,
+button[data-accordion-button="true"]:focus {
+	background-color: transparent !important;
+}
+
+/* ==========================================================================
+   CSS-based Plus/Minus Icon (No SVG)
+   ========================================================================== */
+
+/**
+ * Hide SVG icons from HTML (if present)
+ * We use CSS pseudo-elements instead
+ */
+.faq-icon {
+	display: none !important;
+}
+
+/* ==========================================================================
+   Accordion Item States
+   ========================================================================== */
+
+/**
+ * Accordion item active state (when expanded)
+ * Highlight with accent border (like service card hover)
+ */
+.faq-accordion__item--active,
+.faq-accordion__item:has(.faq-accordion__button--active),
+[data-accordion-item="true"]:has(button.accordion-active) {
+	border-color: var(--color-accent);
+	box-shadow: var(--shadow-md);
+}
+
+/**
+ * Accordion button active state - accent color when expanded (Modifier)
+ */
+.faq-accordion__button--active,
+button[data-accordion-button="true"].accordion-active {
+	color: var(--color-accent);
+}
+
+/**
+ * Accordion panel (Element)
+ * Override inline styles from JavaScript
+ *
+ * BEM Class: .faq-accordion__panel
+ * JS Hook: [data-accordion-panel="true"]
+ */
+.faq-accordion__panel,
+[data-accordion-panel="true"] {
+	opacity: 0;
+
+	/* Default: collapsed */
+	grid-template-rows: 0fr;
+}
+
+.faq-accordion__panel--expanded,
+[data-accordion-panel="true"][aria-hidden="false"] {
+	opacity: 1;
+
+	/* Expanded */
+	grid-template-rows: 1fr;
+}
+
+/* ==========================================================================
+   Focus States (Accessibility)
+   ========================================================================== */
+
+/**
+ * Keyboard focus outline - контрастний accent color
+ */
+.faq-accordion__button:focus-visible,
+button[data-accordion-button="true"]:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 2px;
+}
+
+/* Also highlight parent item on button focus */
+.faq-accordion__item:focus-within,
+[data-accordion-item="true"]:focus-within {
+	border-color: var(--color-accent);
+	box-shadow: var(--shadow-md);
+}
+
+/* Remove outline for mouse clicks */
+.faq-accordion__button:focus:not(:focus-visible),
+button[data-accordion-button="true"]:focus:not(:focus-visible) {
+	outline: none;
+}
+
+/* ==========================================================================
+   Responsive Styles
+   ========================================================================== */
+
+/**
+ * Tablet (max-width: 1024px)
+ */
+@media (width <= 1024px) {
+	.faq-accordion__button::after,
+	button[data-accordion-button="true"]::after {
+		right: 1.25rem;
+		width: 18px;
+		height: 18px;
+	}
+}
+
+/**
+ * Mobile (max-width: 767px)
+ */
+@media (width <= 767px) {
+	.faq-accordion__button::after,
+	button[data-accordion-button="true"]::after {
+		right: 1rem;
+		width: 16px;
+		height: 16px;
+	}
+
+	/* Reduce gap between items on mobile */
+	.faq-accordion,
+	[data-accordion="true"] {
+		row-gap: 0.75rem !important;
+	}
+}
+
+/* ==========================================================================
+   Dark Theme Support
+   ========================================================================== */
+
+/**
+ * Dark theme accordion items
+ * Matches [data-theme="dark"] .gbp-card styling
+ */
+[data-theme="dark"] .faq-accordion__item,
+[data-theme="dark"] [data-accordion-item="true"] {
+	/* Background gradient (matches dark theme cards) */
+	background: linear-gradient(135deg, rgb(30 41 59 / 95%) 0%, rgb(51 65 85 / 95%) 100%);
+	color: var(--text-primary);
+	border-color: transparent;
+}
+
+/**
+ * Dark theme hover state
+ * Lift effect with shadow increase
+ */
+[data-theme="dark"] .faq-accordion__item:hover,
+[data-theme="dark"] [data-accordion-item="true"]:hover {
+	transform: translateY(-8px);
+	box-shadow: var(--shadow-lg);
+	will-change: transform;
+}
+
+/**
+ * Dark theme button text color
+ */
+[data-theme="dark"] .faq-accordion__button,
+[data-theme="dark"] button[data-accordion-button="true"] {
+	color: var(--text-primary);
+}
+
+/**
+ * Dark theme icon colors - Ukrainian flag 🇺🇦
+ * Same colors as light theme for consistency
+ * Closed (+) - Yellow, Open (-) - Blue
+ */
+[data-theme="dark"] .faq-accordion__button::after,
+[data-theme="dark"] button[data-accordion-button="true"]::after {
+	background:
+		linear-gradient(#ffd700, #ffd700) center/2px 100% no-repeat,
+		/* vertical - yellow */ linear-gradient(#ffd700, #ffd700) center/100% 2px no-repeat; /* horizontal - yellow */
+}
+
+[data-theme="dark"] .faq-accordion__button--active::after,
+[data-theme="dark"] button[data-accordion-button="true"].accordion-active::after {
+	background: linear-gradient(#0057b7, #0057b7) center/100% 2px no-repeat; /* horizontal - blue */
+}
+
+/**
+ * Dark theme active item (expanded)
+ * Highlight with accent border
+ */
+[data-theme="dark"] .faq-accordion__item--active,
+[data-theme="dark"] .faq-accordion__item:has(.faq-accordion__button--active),
+[data-theme="dark"] [data-accordion-item="true"]:has(button.accordion-active) {
+	border-color: var(--color-accent);
+	box-shadow: var(--shadow-md);
+}
+
+/**
+ * Dark theme active button
+ */
+[data-theme="dark"] .faq-accordion__button--active,
+[data-theme="dark"] button[data-accordion-button="true"].accordion-active {
+	color: var(--color-accent);
+}
+
+/**
+ * Dark theme focus state
+ */
+[data-theme="dark"] .faq-accordion__button:focus-visible,
+[data-theme="dark"] button[data-accordion-button="true"]:focus-visible {
+	outline-color: var(--color-accent);
+}
+
+[data-theme="dark"] .faq-accordion__item:focus-within,
+[data-theme="dark"] [data-accordion-item="true"]:focus-within {
+	border-color: var(--color-accent);
+	box-shadow: var(--shadow-md);
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+
+/**
+ * Show all answers when printing
+ */
+@media print {
+	.faq-accordion__panel,
+	[data-accordion-panel="true"] {
+		opacity: 1 !important;
+		grid-template-rows: 1fr !important;
+	}
+
+	.faq-accordion__button::after,
+	button[data-accordion-button="true"]::after {
+		display: none;
+	}
+
+	.faq-accordion__button,
+	button[data-accordion-button="true"] {
+		cursor: default;
+	}
+}
+
+/* ==========================================================================
+   Animation Performance
+   ========================================================================== */
+
+/**
+ * Use GPU acceleration for smooth animations
+ */
+.faq-accordion__button::after,
+.faq-accordion__panel,
+button[data-accordion-button="true"]::after,
+[data-accordion-panel="true"] {
+	will-change: transform, opacity, grid-template-rows;
+}
+
+/**
+ * Remove will-change after animation completes (handled by JS)
+ * Or use CSS containment for better performance
+ */
+.faq-accordion__item,
+[data-accordion-item="true"] {
+	contain: layout style;
+}
+
+/* ==========================================================================
+   Reduced Motion (Accessibility)
+   ========================================================================== */
+
+/**
+ * Respect user's motion preferences
+ */
+@media (prefers-reduced-motion: reduce) {
+	.faq-accordion__button::after,
+	.faq-accordion__panel,
+	.faq-accordion__button,
+	button[data-accordion-button="true"]::after,
+	[data-accordion-panel="true"],
+	button[data-accordion-button="true"] {
+		transition: none !important;
+		animation: none !important;
+	}
+}
