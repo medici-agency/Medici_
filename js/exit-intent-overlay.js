@@ -64,7 +64,8 @@
 				e.preventDefault();
 				e.stopPropagation();
 
-				closeViaBackdrop();
+				// Use closeOverlayPanel instead of closeViaBackdrop (backdrop doesn't exist)
+				closeOverlayPanel();
 			},
 			true
 		);
