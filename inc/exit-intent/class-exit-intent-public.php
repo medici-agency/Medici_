@@ -38,7 +38,7 @@ class Exit_Intent_Public {
 	 */
 	public function __construct() {
 		$this->config = array(
-			'panel_id'   => 'gb-overlay-424',
+			'panel_id'   => 'medici-exit-intent-panel', // Default fallback
 			'cookie_exp' => 30, // Days
 			'delay'      => 2,  // Seconds
 			'debug'      => defined( 'WP_DEBUG' ) && WP_DEBUG,
@@ -249,7 +249,7 @@ class Exit_Intent_Public {
 				<div class="js-exit-intent-message exit-intent-message" role="status" aria-live="polite"></div>
 			</form>
 
-			<a href="#" class="exit-intent-decline" data-gb-close-panel="<?php echo esc_attr( $this->config['panel_id'] ); ?>">Ні, дякую, продовжити перегляд</a>
+			<button type="button" class="exit-intent-decline" data-gb-close-panel="<?php echo esc_attr( $this->config['panel_id'] ); ?>">Ні, дякую, продовжити перегляд</button>
 		</div>
 		<?php
 		return (string) ob_get_clean();

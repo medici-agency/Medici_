@@ -191,6 +191,14 @@ function medici_init_exit_intent(): void {
 
 		// Initialize and run
 		$exit_intent = new Exit_Intent();
+
+		// Configure panel ID (avoid hardcoding in class constructor)
+		$exit_intent->get_public()->set_config(
+			array(
+				'panel_id' => 'gb-overlay-424', // Data Attribute from GenerateBlocks Overlay Panel
+			)
+		);
+
 		$exit_intent->run();
 	}
 }
