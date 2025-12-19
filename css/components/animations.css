@@ -140,10 +140,10 @@
    DARK THEME (no changes needed, but explicit)
    ===================================================== */
 
-[data-theme='dark'] .fade-in,
-[data-theme='dark'] .fade-in-up,
-[data-theme='dark'] .fade-in-left,
-[data-theme='dark'] .fade-in-right,
-[data-theme='dark'] .fade-in-scale {
+[data-theme="dark"] .fade-in,
+[data-theme="dark"] .fade-in-up,
+[data-theme="dark"] .fade-in-left,
+[data-theme="dark"] .fade-in-right,
+[data-theme="dark"] .fade-in-scale {
 	/* Анімації працюють однаково в темній темі */
 }
