@@ -158,7 +158,7 @@ final class Cookie_Notice {
 	 * @return void
 	 */
 	private function define_core_hooks(): void {
-		$this->loader->add_action( 'plugins_loaded', $this, 'load_textdomain' );
+		$this->loader->add_action( 'init', $this, 'load_textdomain', 1 ); // WordPress 6.7+ requires init
 		$this->loader->add_action( 'init', $this, 'init' );
 		$this->loader->add_action( 'rest_api_init', $this, 'register_rest_routes' );
 	}
