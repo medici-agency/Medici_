@@ -51,11 +51,12 @@
 
 8. Перевірте що JavaScript файли завантажились:
    - bioep.min.js (beeker1121 library - window.bioEp object)
-   - exit-intent-overlay.js (повний хендлер v2.1.0)
+   - exit-intent-overlay.js (повний хендлер v2.1.2)
 
 9. Debug (якщо WP_DEBUG = true):
    Консоль браузера покаже:
    - [Medici Exit-Intent] Initialized
+   - [Medici Exit-Intent] bioEp.loadEvents() overridden (exit-intent only)
    - [Medici Exit-Intent] bioEp.showPopup() intercepted
    - [Medici Exit-Intent] bioEp configured (window.bioEp.init)
    - [Medici Exit-Intent] Form handler attached
@@ -69,9 +70,18 @@
    - typeof window.mediciExitIntentConfig → 'object'
 
 🔧 ЯК ПРАЦЮЄ:
-1. exit-intent-overlay.js перехоплює bioEp.addPopup() та bioEp.addCSS() (no-op)
-2. bioEp.init() запускається БЕЗ створення зайвого DOM/CSS
-3. bioEp детектить exit-intent (миша до верхньої частини екрану)
+1. exit-intent-overlay.js перехоплює 3 методи bioEp (ПЕРЕД init):
+   - bioEp.addCSS() → no-op (без CSS інʼєкції)
+   - bioEp.addPopup() → no-op (без DOM popup)
+   - bioEp.loadEvents() → exit-intent detector only (без closeBtnEl/resize)
+
+2. bioEp.init() запускається БЕЗ створення зайвого DOM/CSS/подій
+3. bioEp детектить exit-intent через переписаний mouseout handler:
+   - Ігнорує форми (input/select/textarea)
+   - Ігнорує праву частину екрану (scrollbar, 50px)
+   - Перевіряє clientY < 50 (рух до верху)
+   - Перевіряє relatedTarget = null (вихід з viewport)
+
 4. bioEp перевіряє cookie (якщо показано протягом 30 днів - не показує)
 5. bioEp викликає window.bioEp.showPopup() при exit-intent
 6. exit-intent-overlay.js перехоплює showPopup() та тригерить GenerateBlocks Overlay
@@ -80,11 +90,14 @@
 9. Форма відправляється через Events API
 10. Закриття через data-gb-close-panel (кнопка X або "Ні, дякую")
 
-⚡ ОПТИМІЗАЦІЯ:
-- bioEp НЕ створює власний DOM popup (addPopup() перехоплено)
-- bioEp НЕ впроваджує власні стилі (addCSS() перехоплено)
-- Використовуємо ТІЛЬКИ exit-intent detector + cookie manager
-- Результат: мінімальний overhead, максимальна продуктивність
+⚡ ОПТИМІЗАЦІЯ (v2.1.2):
+- bioEp НЕ створює власний DOM popup (addPopup перехоплено)
+- bioEp НЕ впроваджує власні стилі (addCSS перехоплено)
+- bioEp НЕ прив'язує події до неіснуючих DOM елементів (loadEvents перехоплено)
+- Використовуємо ТІЛЬКИ:
+  • Exit-intent detector (mouseout → top viewport)
+  • Cookie manager (bioep_shown, 30 днів)
+- Результат: мінімальний overhead, максимальна продуктивність, без помилок
 -->
 
 <!-- wp:html -->
