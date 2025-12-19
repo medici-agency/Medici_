@@ -667,51 +667,130 @@ final class Theme_Settings {
 		$gtm_id   = self::get( 'analytics_gtm_id' );
 		$fb_pixel = self::get( 'analytics_fb_pixel' );
 
-		// Google Tag Manager.
-		if ( $gtm_id && preg_match( '/^GTM-[A-Z0-9]+$/', $gtm_id ) ) {
-			?>
-			<!-- Google Tag Manager -->
-			<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-			new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-			j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-			'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-			})(window,document,'script','dataLayer','<?php echo esc_js( $gtm_id ); ?>');</script>
-			<!-- End Google Tag Manager -->
-			<?php
-		}
+		// Check if Google Site Kit is active (to avoid duplicate GTM loading).
+		// Site Kit manages GTM/GA4 itself, so we skip our deferred loading.
+		$site_kit_active = defined( 'GOOGLESITEKIT_VERSION' ) || class_exists( 'Google\\Site_Kit\\Plugin' );
 
-		// Google Analytics 4 (only if GTM is not used).
-		if ( $ga4_id && preg_match( '/^G-[A-Z0-9]+$/', $ga4_id ) && ! $gtm_id ) {
+		// Google Tag Manager - DEFERRED loading for better performance.
+		// GTM loads after user interaction (scroll, click, keypress) or after 3 seconds.
+		// This improves FCP/LCP by not blocking initial render with heavy third-party scripts.
+		// Skip if Site Kit is active (Site Kit handles GTM/GA4 itself).
+		if ( $gtm_id && preg_match( '/^GTM-[A-Z0-9]+$/', $gtm_id ) && ! $site_kit_active ) {
 			?>
-			<!-- Google Analytics 4 -->
-			<script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo esc_attr( $ga4_id ); ?>"></script>
+			<!-- Google Tag Manager (Deferred) -->
 			<script>
-				window.dataLayer = window.dataLayer || [];
-				function gtag(){dataLayer.push(arguments);}
-				gtag('js', new Date());
-				gtag('config', '<?php echo esc_js( $ga4_id ); ?>');
+			(function() {
+				var gtmLoaded = false;
+				var gtmId = '<?php echo esc_js( $gtm_id ); ?>';
+
+				function loadGTM() {
+					if (gtmLoaded) return;
+					gtmLoaded = true;
+
+					// Initialize dataLayer
+					window.dataLayer = window.dataLayer || [];
+					window.dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
+
+					// Load GTM script
+					var f = document.getElementsByTagName('script')[0];
+					var j = document.createElement('script');
+					j.async = true;
+					j.src = 'https://www.googletagmanager.com/gtm.js?id=' + gtmId;
+					f.parentNode.insertBefore(j, f);
+				}
+
+				// Load on user interaction (click, scroll, keypress, touch)
+				var interactionEvents = ['scroll', 'click', 'keypress', 'touchstart', 'mousemove'];
+				interactionEvents.forEach(function(event) {
+					window.addEventListener(event, loadGTM, {once: true, passive: true});
+				});
+
+				// Fallback: load after 3 seconds if no interaction
+				setTimeout(loadGTM, 3000);
+			})();
 			</script>
-			<!-- End Google Analytics 4 -->
+			<!-- End Google Tag Manager (Deferred) -->
 			<?php
 		}
 
-		// Facebook Pixel (only if GTM is not used).
+		// Google Analytics 4 (only if GTM is not used) - also deferred.
+		// Skip if Site Kit is active (Site Kit handles GA4 itself).
+		if ( $ga4_id && preg_match( '/^G-[A-Z0-9]+$/', $ga4_id ) && ! $gtm_id && ! $site_kit_active ) {
+			?>
+			<!-- Google Analytics 4 (Deferred) -->
+			<script>
+			(function() {
+				var ga4Loaded = false;
+				var ga4Id = '<?php echo esc_js( $ga4_id ); ?>';
+
+				function loadGA4() {
+					if (ga4Loaded) return;
+					ga4Loaded = true;
+
+					// Initialize dataLayer and gtag
+					window.dataLayer = window.dataLayer || [];
+					function gtag(){dataLayer.push(arguments);}
+					window.gtag = gtag;
+					gtag('js', new Date());
+					gtag('config', ga4Id);
+
+					// Load gtag.js script
+					var s = document.createElement('script');
+					s.async = true;
+					s.src = 'https://www.googletagmanager.com/gtag/js?id=' + ga4Id;
+					document.head.appendChild(s);
+				}
+
+				// Load on user interaction
+				var interactionEvents = ['scroll', 'click', 'keypress', 'touchstart', 'mousemove'];
+				interactionEvents.forEach(function(event) {
+					window.addEventListener(event, loadGA4, {once: true, passive: true});
+				});
+
+				// Fallback: load after 3 seconds
+				setTimeout(loadGA4, 3000);
+			})();
+			</script>
+			<!-- End Google Analytics 4 (Deferred) -->
+			<?php
+		}
+
+		// Facebook Pixel (only if GTM is not used) - also deferred.
 		if ( $fb_pixel && preg_match( '/^[0-9]+$/', $fb_pixel ) && ! $gtm_id ) {
 			?>
-			<!-- Facebook Pixel -->
+			<!-- Facebook Pixel (Deferred) -->
 			<script>
-				!function(f,b,e,v,n,t,s)
-				{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-				n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-				if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-				n.queue=[];t=b.createElement(e);t.async=!0;
-				t.src=v;s=b.getElementsByTagName(e)[0];
-				s.parentNode.insertBefore(t,s)}(window, document,'script',
-				'https://connect.facebook.net/en_US/fbevents.js');
-				fbq('init', '<?php echo esc_js( $fb_pixel ); ?>');
-				fbq('track', 'PageView');
+			(function() {
+				var fbLoaded = false;
+				var fbPixelId = '<?php echo esc_js( $fb_pixel ); ?>';
+
+				function loadFBPixel() {
+					if (fbLoaded) return;
+					fbLoaded = true;
+
+					!function(f,b,e,v,n,t,s)
+					{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+					n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+					if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+					n.queue=[];t=b.createElement(e);t.async=!0;
+					t.src=v;s=b.getElementsByTagName(e)[0];
+					s.parentNode.insertBefore(t,s)}(window, document,'script',
+					'https://connect.facebook.net/en_US/fbevents.js');
+					fbq('init', fbPixelId);
+					fbq('track', 'PageView');
+				}
+
+				// Load on user interaction
+				var interactionEvents = ['scroll', 'click', 'keypress', 'touchstart', 'mousemove'];
+				interactionEvents.forEach(function(event) {
+					window.addEventListener(event, loadFBPixel, {once: true, passive: true});
+				});
+
+				// Fallback: load after 3 seconds
+				setTimeout(loadFBPixel, 3000);
+			})();
 			</script>
-			<!-- End Facebook Pixel -->
+			<!-- End Facebook Pixel (Deferred) -->
 			<?php
 		}
 	}
