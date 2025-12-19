@@ -1,10 +1,11 @@
 /**
  * Exit-Intent Overlay Popup - Complete Handler
  *
- * Version: 2.1.2
+ * Version: 2.1.3
  * Features:
  * - bioEp (beeker1121) exit-intent detection via window.bioEp.init()
  * - Custom loadEvents() - exit-intent detector only (no DOM dependencies)
+ * - Double-patching protection via window.mediciBioEpPatched flag
  * - GenerateBlocks Pro 2.3+ Overlay Panel trigger
  * - Events API: consultation_request
  *
@@ -88,6 +89,13 @@
 			warn('bioEp library not loaded (window.bioEp missing)');
 			return;
 		}
+
+		// Prevent double patching (SPA navigation, script re-execution)
+		if (window.mediciBioEpPatched) {
+			log('bioEp already patched, skipping');
+			return;
+		}
+		window.mediciBioEpPatched = true;
 
 		// Prevent bioEp from adding unnecessary DOM/CSS/Events
 		// We only need exit-intent detection + cookie management
