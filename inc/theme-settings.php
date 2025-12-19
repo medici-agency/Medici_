@@ -667,10 +667,15 @@ final class Theme_Settings {
 		$gtm_id   = self::get( 'analytics_gtm_id' );
 		$fb_pixel = self::get( 'analytics_fb_pixel' );
 
+		// Check if Google Site Kit is active (to avoid duplicate GTM loading).
+		// Site Kit manages GTM/GA4 itself, so we skip our deferred loading.
+		$site_kit_active = defined( 'GOOGLESITEKIT_VERSION' ) || class_exists( 'Google\\Site_Kit\\Plugin' );
+
 		// Google Tag Manager - DEFERRED loading for better performance.
 		// GTM loads after user interaction (scroll, click, keypress) or after 3 seconds.
 		// This improves FCP/LCP by not blocking initial render with heavy third-party scripts.
-		if ( $gtm_id && preg_match( '/^GTM-[A-Z0-9]+$/', $gtm_id ) ) {
+		// Skip if Site Kit is active (Site Kit handles GTM/GA4 itself).
+		if ( $gtm_id && preg_match( '/^GTM-[A-Z0-9]+$/', $gtm_id ) && ! $site_kit_active ) {
 			?>
 			<!-- Google Tag Manager (Deferred) -->
 			<script>
@@ -709,7 +714,8 @@ final class Theme_Settings {
 		}
 
 		// Google Analytics 4 (only if GTM is not used) - also deferred.
-		if ( $ga4_id && preg_match( '/^G-[A-Z0-9]+$/', $ga4_id ) && ! $gtm_id ) {
+		// Skip if Site Kit is active (Site Kit handles GA4 itself).
+		if ( $ga4_id && preg_match( '/^G-[A-Z0-9]+$/', $ga4_id ) && ! $gtm_id && ! $site_kit_active ) {
 			?>
 			<!-- Google Analytics 4 (Deferred) -->
 			<script>
