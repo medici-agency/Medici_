@@ -14,7 +14,7 @@ declare(strict_types=1);
  *
  * @package    Medici
  * @subpackage Exit_Intent
- * @version    1.0.0
+ * @version    1.1.0
  * @link       https://github.com/beeker1121/exit-intent-popup
  */
 
@@ -56,7 +56,7 @@ class Exit_Intent {
 	 *
 	 * @var string
 	 */
-	private string $version = '1.0.0';
+	private string $version = '1.1.0';
 
 	/**
 	 * Constructor
@@ -91,6 +91,14 @@ class Exit_Intent {
 	 * Define hooks using Loader pattern
 	 */
 	private function define_hooks(): void {
+		// Register shortcode (init)
+		$this->loader->add_action(
+			'init',
+			$this->public,
+			'register_shortcodes',
+			10
+		);
+
 		// Fix overlay panel attributes (early in wp_head)
 		$this->loader->add_action(
 			'wp_head',

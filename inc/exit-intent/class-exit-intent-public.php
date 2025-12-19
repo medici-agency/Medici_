@@ -8,7 +8,7 @@ declare(strict_types=1);
  *
  * @package    Medici
  * @subpackage Exit_Intent
- * @version    1.0.0
+ * @version    1.1.0
  */
 
 // Prevent direct access
@@ -166,5 +166,92 @@ class Exit_Intent_Public {
 		echo '<!-- Delay: ' . esc_html( (string) $this->config['delay'] ) . ' seconds -->' . "\n";
 		echo '<!-- bioEp loaded: ' . ( wp_script_is( 'medici-bioep', 'enqueued' ) ? 'YES' : 'NO' ) . ' -->' . "\n";
 		echo '<!-- Overlay loaded: ' . ( wp_script_is( 'medici-exit-intent-overlay', 'enqueued' ) ? 'YES' : 'NO' ) . ' -->' . "\n";
+	}
+
+	/**
+	 * Register shortcodes
+	 */
+	public function register_shortcodes(): void {
+		add_shortcode( 'medici_exit_intent_popup', array( $this, 'render_popup_shortcode' ) );
+	}
+
+	/**
+	 * Shortcode renderer
+	 *
+	 * Usage:
+	 * [medici_exit_intent_popup title="..." subtitle="..." button_text="..."]
+	 *
+	 * @param array<string, mixed> $atts Shortcode attributes
+	 * @return string
+	 */
+	public function render_popup_shortcode( array $atts = array() ): string {
+		$atts = shortcode_atts(
+			array(
+				'title'       => 'Зачекайте! Не йдіть без подарунка',
+				'subtitle'    => 'Отримайте <strong>безкоштовну 30-хвилинну консультацію</strong> з медичного маркетингу від наших експертів.',
+				'button_text' => 'Отримати консультацію',
+			),
+			$atts,
+			'medici_exit_intent_popup'
+		);
+
+		$title       = sanitize_text_field( (string) $atts['title'] );
+		$button_text = sanitize_text_field( (string) $atts['button_text'] );
+
+		// Дозволяємо тільки базову розмітку в підзаголовку (щоб працював <strong>).
+		$subtitle = wp_kses(
+			(string) $atts['subtitle'],
+			array(
+				'strong' => array(),
+				'em'     => array(),
+				'br'     => array(),
+			)
+		);
+
+		ob_start();
+		?>
+		<div class="exit-intent-content">
+			<button class="exit-intent-close" type="button" aria-label="Закрити" data-gb-close-panel>
+				<span aria-hidden="true">×</span>
+			</button>
+
+			<div class="exit-intent-icon">👋</div>
+
+			<h2 class="exit-intent-heading"><?php echo esc_html( $title ); ?></h2>
+
+			<p class="exit-intent-subheading"><?php echo $subtitle; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+
+			<form class="exit-intent-form js-exit-intent-form">
+				<div class="exit-intent-field">
+					<label for="exit-name" class="sr-only">Ім'я</label>
+					<input id="exit-name" name="name" type="text" placeholder="Ваше ім'я" required autocomplete="name">
+				</div>
+
+				<div class="exit-intent-field">
+					<label for="exit-email" class="sr-only">Email</label>
+					<input id="exit-email" name="email" type="email" placeholder="email@example.com" required autocomplete="email">
+				</div>
+
+				<div class="exit-intent-field">
+					<label for="exit-phone" class="sr-only">Телефон</label>
+					<input id="exit-phone" name="phone" type="tel" placeholder="+380 XX XXX XX XX" autocomplete="tel">
+				</div>
+
+				<div class="exit-intent-consent">
+					<label>
+						<input type="checkbox" name="consent" value="1" required>
+						<span>Я даю згоду на обробку персональних даних <span class="required">*</span></span>
+					</label>
+				</div>
+
+				<button type="submit" class="exit-intent-submit"><?php echo esc_html( $button_text ); ?></button>
+
+				<div class="js-exit-intent-message exit-intent-message" role="status" aria-live="polite"></div>
+			</form>
+
+			<a href="#" class="exit-intent-decline" data-gb-close-panel>Ні, дякую, продовжити перегляд</a>
+		</div>
+		<?php
+		return (string) ob_get_clean();
 	}
 }
