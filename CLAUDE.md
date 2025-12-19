@@ -327,6 +327,273 @@ Shortcode block → для форм, інпутів, SVG, інтерактивн
 
 ---
 
+## 🎯 GENERATEBLOCKS OVERLAY PANEL + EXIT-INTENT - ТЕХНІЧНІ ПРАВИЛА
+
+### ⚠️ КРИТИЧНІ МОМЕНТИ ІНТЕГРАЦІЇ
+
+**Для LLM-розробників при роботі з GenerateBlocks Pro Overlay Panel + Exit-Intent**
+
+#### 1. ID Overlay Panel
+
+**Проблема:** У GB Pro Overlay Panel може **НЕ бути** поля "Panel ID".
+
+**Рішення:** Беріть значення з **Overlay Panel Options → Data Attribute**
+
+**Приклад:** `gb-overlay-424`
+
+**Має збігатися в 2 місцях:**
+
+```javascript
+// 1. Конфіг (PHP → JavaScript)
+window.mediciExitIntentConfig.overlayPanelId = "gb-overlay-424"
+
+// 2. Тригер-кнопка (data-gb-overlay атрибут)
+<button data-gb-overlay="gb-overlay-424" ...>
+```
+
+**Перевірка збігу:**
+
+```javascript
+// Консоль браузера
+window.mediciExitIntentConfig.overlayPanelId;
+document.querySelector('[data-gb-overlay="gb-overlay-424"]');
+```
+
+---
+
+#### 2. Тригер і закриття
+
+**Прихований тригер (ОБОВ'ЯЗКОВИЙ):**
+
+- Має бути у `wp_footer` (GeneratePress Hook Element)
+- `exit-intent-overlay.js` відкриває панель через `.click()` по елементу з `data-gb-overlay`
+
+**Приклад:**
+
+```html
+<!-- GeneratePress Hook: wp_footer, Priority: 999 -->
+<button
+	class="exit-intent-trigger"
+	data-gb-overlay="gb-overlay-424"
+	aria-hidden="true"
+	style="display: none !important;"
+></button>
+```
+
+**Закриття (ОБОВ'ЯЗКОВИЙ атрибут):**
+
+- У контенті popup потрібен елемент з `data-gb-close-panel`
+- `closeOverlayPanel()` шукає `.exit-intent-content [data-gb-close-panel]` і клікає його
+
+**Приклад:**
+
+```html
+<!-- Кнопка закриття -->
+<button data-gb-close-panel>×</button>
+
+<!-- Або лінк -->
+<a href="#" data-gb-close-panel>Ні, дякую</a>
+```
+
+**Перевірка:**
+
+```javascript
+document.querySelector('.exit-intent-content [data-gb-close-panel]');
+```
+
+---
+
+#### 3. Конфіг і порядок підключення
+
+**Конфіг має бути ПЕРЕД скриптом:**
+
+```php
+// inc/exit-intent/class-exit-intent-public.php
+wp_add_inline_script(
+	'medici-exit-intent-overlay',
+	'window.mediciExitIntentConfig = {...};',
+	'before' // КРИТИЧНО!
+);
+```
+
+**Мінімальний конфіг:**
+
+```javascript
+window.mediciExitIntentConfig = {
+	overlayPanelId: 'gb-overlay-424', // Data Attribute з Overlay Panel
+	cookieExp: 30, // days
+	delay: 2, // seconds
+	debug: false, // WP_DEBUG value
+};
+```
+
+**Якщо конфіг ПІСЛЯ скрипта → використовуються дефолтні значення!**
+
+---
+
+#### 4. CSS: критичний кейс `<noscript>`
+
+**ПРОБЛЕМА:**
+
+Оптимізація/тема "defer CSS" переносить `<link rel="stylesheet">` у `<noscript>`:
+
+```html
+<!-- ❌ CSS НЕ працює при увімкненому JS -->
+<noscript>
+	<link rel="stylesheet" href=".../exit-intent-overlay.css" />
+</noscript>
+```
+
+**Наслідки:**
+
+- `document.styleSheets` НЕ містить файл
+- Стилі не застосовуються
+- Popup виглядає "голим"
+
+**РІШЕННЯ - Inline CSS:**
+
+```php
+// inc/exit-intent/class-exit-intent-assets.php
+$handle = 'medici-exit-intent-overlay-inline';
+
+// Register empty handle
+wp_register_style($handle, false, [], filemtime($css_path));
+wp_enqueue_style($handle);
+
+// Add inline CSS from file
+$css = file_get_contents($css_path);
+wp_add_inline_style($handle, $css);
+```
+
+**Результат:**
+
+```html
+<!-- ✅ CSS ЗАВЖДИ працює -->
+<style id="medici-exit-intent-overlay-inline-inline-css">
+	/* CSS content */
+</style>
+```
+
+**Переваги:**
+
+- ✅ Inline CSS НЕ може бути переміщений у `<noscript>`
+- ✅ Працює з будь-яким оптимізатором
+- ✅ Не потрібні excludes
+
+---
+
+#### 5. Швидкі діагностичні команди
+
+**У консолі браузера (F12):**
+
+```javascript
+// 1. Перевірка збігу ID
+window.mediciExitIntentConfig.overlayPanelId
+// → "gb-overlay-424"
+
+document.querySelector('[data-gb-overlay="gb-overlay-424"]')
+// → <button> або null (якщо не збігається)
+
+// 2. Перевірка кнопки закриття
+document.querySelector('.exit-intent-content [data-gb-close-panel]')
+// → <button> або <a> або null
+
+// 3. Перевірка CSS (має бути НЕ transparent)
+getComputedStyle(document.querySelector('.exit-intent-content')).backgroundColor
+// → "rgb(255, 255, 255)" ✅ або "rgba(0, 0, 0, 0)" ❌
+
+// 4. Перевірка inline CSS
+document.querySelector('style#medici-exit-intent-overlay-inline-inline-css')
+// → <style> ✅ або null ❌
+
+// 5. Перевірка стилів у document.styleSheets (для external CSS)
+[...document.styleSheets].some(s =>
+  (s.href || '').includes('exit-intent-overlay.css')
+)
+// → false (якщо CSS у <noscript>) ❌
+```
+
+---
+
+#### 6. Типові помилки
+
+**❌ Помилка #1:** ID не збігається
+
+```javascript
+// Конфіг
+overlayPanelId: "medici-exit-intent-panel"
+
+// Тригер
+data-gb-overlay="gb-overlay-424"
+
+// Результат: popup НЕ відкривається
+```
+
+**✅ Рішення:** Синхронізуйте обидва значення
+
+---
+
+**❌ Помилка #2:** Відсутній тригер
+
+```html
+<!-- НЕ МАЄ прихованої кнопки з data-gb-overlay -->
+```
+
+**✅ Рішення:** Додайте Hook Element у `wp_footer`
+
+---
+
+**❌ Помилка #3:** Відсутній `data-gb-close-panel`
+
+```html
+<!-- Кнопка закриття БЕЗ атрибута -->
+<button class="exit-intent-close">×</button>
+```
+
+**✅ Рішення:** Додайте `data-gb-close-panel`
+
+```html
+<button class="exit-intent-close" data-gb-close-panel>×</button>
+```
+
+---
+
+**❌ Помилка #4:** CSS у `<noscript>`
+
+```javascript
+// Перевірка
+getComputedStyle(document.querySelector('.exit-intent-content')).backgroundColor;
+// → "rgba(0, 0, 0, 0)" ❌ (transparent = стилі не застосовані)
+```
+
+**✅ Рішення:** Використовуйте inline CSS через `wp_add_inline_style()`
+
+---
+
+#### 7. Файли-приклади
+
+**PHP реалізація:**
+
+- `inc/exit-intent/class-exit-intent.php` - головний клас (v1.1.0)
+- `inc/exit-intent/class-exit-intent-loader.php` - Loader pattern
+- `inc/exit-intent/class-exit-intent-assets.php` - CSS/JS enqueue (v1.1.0)
+- `inc/exit-intent/class-exit-intent-public.php` - shortcode + конфіг (v1.1.0)
+
+**JavaScript:**
+
+- `js/exit-intent-overlay.js` - handler (v2.1.3)
+- `js/vendor/bioep.min.js` - exit-intent detection
+
+**CSS:**
+
+- `css/components/exit-intent-overlay.css` - стилі (~6.8KB)
+
+**Документація:**
+
+- `gutenberg/EXIT-INTENT-POPUP.html` - інструкції використання
+
+---
+
 ## 🔴 КРИТИЧНО! ОБОВ'ЯЗКОВІ ПРАВИЛА ЧИТАННЯ CODING-RULES
 
 ### ⚡ НОВА СТРУКТУРА (3 ФАЙЛИ)
@@ -1159,6 +1426,58 @@ medici/
 
 ## 📋 CLAUDE.md Change Log
 
+### v7.3 (2025-12-19) - GenerateBlocks Overlay Panel + Exit-Intent
+
+**Зміни:**
+
+1. **Додано новий розділ "GENERATEBLOCKS OVERLAY PANEL + EXIT-INTENT - ТЕХНІЧНІ ПРАВИЛА"**
+   - Розташування: після "WORDPRESS HTML САНІТИЗАЦІЯ", перед "CODING-RULES"
+   - 265 рядків технічної документації
+   - Критичні моменти інтеграції для LLM-розробників
+
+2. **Структура розділу (7 підрозділів):**
+   - **1. ID Overlay Panel** - Data Attribute, синхронізація ID
+   - **2. Тригер і закриття** - прихований тригер, data-gb-close-panel
+   - **3. Конфіг і порядок** - wp_add_inline_script, 'before' parameter
+   - **4. CSS `<noscript>` проблема** - inline CSS рішення
+   - **5. Діагностичні команди** - 5 перевірок у консолі
+   - **6. Типові помилки** - 4 найчастіші помилки + рішення
+   - **7. Файли-приклади** - посилання на PHP/JS/CSS
+
+3. **Ключові технічні деталі:**
+   - Overlay Panel ID береться з Data Attribute (gb-overlay-424)
+   - Має збігатися в конфігу та тригері (2 місця)
+   - Прихований тригер ОБОВ'ЯЗКОВИЙ у wp_footer
+   - Закриття через data-gb-close-panel атрибут
+   - Inline CSS обходить <noscript> проблему
+
+4. **Діагностичні команди (5 штук):**
+   - Перевірка збігу ID (overlayPanelId vs data-gb-overlay)
+   - Перевірка кнопки закриття (data-gb-close-panel)
+   - Перевірка CSS застосування (backgroundColor)
+   - Перевірка inline CSS (<style> тег)
+   - Перевірка external CSS (document.styleSheets)
+
+5. **Типові помилки (4 помилки):**
+   - #1: ID не збігається → popup не відкривається
+   - #2: Відсутній тригер → popup не відкривається
+   - #3: Відсутній data-gb-close-panel → не закривається
+   - #4: CSS у <noscript> → стилі не працюють
+
+6. **Файли-приклади:**
+   - PHP: inc/exit-intent/\*.php (4 класи, v1.1.0)
+   - JS: js/exit-intent-overlay.js (v2.1.3)
+   - CSS: css/components/exit-intent-overlay.css (~6.8KB)
+   - Docs: gutenberg/EXIT-INTENT-POPUP.html
+
+**Файли:**
+
+- CLAUDE.md (+265 рядків)
+
+**Мета:** Надати LLM технічну пам'ятку для роботи з GenerateBlocks Overlay Panel + Exit-Intent, включаючи критичні моменти інтеграції та швидку діагностику проблем.
+
+---
+
 ### v7.2 (2025-12-19) - WordPress HTML Санітизація
 
 **Зміни:**
@@ -1236,4 +1555,4 @@ medici/
 
 **Last Updated:** 2025-12-19
 **Theme Version:** 2.0.0
-**Documentation Version:** 7.2
+**Documentation Version:** 7.3
