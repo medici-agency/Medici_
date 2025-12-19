@@ -46,6 +46,32 @@
 		}
 	}
 
+	function closeViaBackdrop() {
+		const backdrop = document.querySelector('.gb-overlay-backdrop');
+		if (backdrop) {
+			backdrop.click();
+			log('Overlay closed via backdrop');
+		}
+	}
+
+	function bindManualClose() {
+		document.addEventListener(
+			'click',
+			function (e) {
+				const btn = e.target.closest('.exit-intent-close, .exit-intent-decline');
+				if (!btn) return;
+
+				e.preventDefault();
+				e.stopPropagation();
+
+				closeViaBackdrop();
+			},
+			true
+		);
+
+		log('Manual close handlers bound');
+	}
+
 	function initBioEp() {
 		if (!isDesktop()) {
 			log('Skipped (not desktop)');
@@ -213,6 +239,7 @@
 	function init() {
 		initBioEp();
 		initFormHandler();
+		bindManualClose();
 		log('Initialized', config);
 	}
 
