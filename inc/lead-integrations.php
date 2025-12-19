@@ -1,6 +1,6 @@
 <?php
 /**
- * Lead Integrations
+ * Lead Integrations (LEGACY - Deprecated)
  *
  * Handles integrations for lead notifications:
  * - Email notifications to admin
@@ -10,7 +10,13 @@
  * @package    Medici_Agency
  * @subpackage Leads
  * @since      1.4.0
- * @version    1.0.0
+ * @version    2.0.0
+ *
+ * @deprecated 2.0.0 Use \Medici\Lead\IntegrationManager instead.
+ * @see        \Medici\Lead\IntegrationManager
+ *
+ * This class is kept for backwards compatibility only.
+ * New code should use the OOP IntegrationManager from inc/lead/.
  */
 
 declare(strict_types=1);
@@ -23,9 +29,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Lead Integrations Handler Class
+ * Lead Integrations Handler Class (LEGACY)
  *
- * @since 1.4.0
+ * @since      1.4.0
+ * @deprecated 2.0.0 Use \Medici\Lead\IntegrationManager instead.
  */
 final class Lead_Integrations {
 
@@ -50,19 +57,23 @@ final class Lead_Integrations {
 	/**
 	 * Send all integrations for a new lead
 	 *
-	 * @since 1.4.0
+	 * @since      1.4.0
+	 * @deprecated 2.0.0 Use \Medici\Lead\IntegrationManager::getInstance()->sendAll() instead.
+	 *
 	 * @param array<string, mixed> $data Lead data
 	 * @param int                  $lead_id Lead post ID
 	 * @return void
 	 */
 	public static function send_all( array $data, int $lead_id ): void {
-		// Send email notification
+		// Delegate to OOP IntegrationManager if available (v2.0.0)
+		if ( class_exists( 'Medici\Lead\IntegrationManager' ) ) {
+			\Medici\Lead\IntegrationManager::getInstance()->sendAll( $data, $lead_id );
+			return;
+		}
+
+		// Fallback to legacy implementation (backwards compatibility)
 		self::send_email_notification( $data, $lead_id );
-
-		// Send to Telegram
 		self::send_to_telegram( $data, $lead_id );
-
-		// Send to Google Sheets
 		self::send_to_google_sheets( $data, $lead_id );
 	}
 

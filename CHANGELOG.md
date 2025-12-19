@@ -9,6 +9,55 @@
 
 ## [Unreleased]
 
+### Changed
+
+#### 🔄 Phase 6: Legacy → OOP Migration (v2.1.0)
+
+**Дата:** 2025-12-19
+
+**Мета:** Інтеграція OOP Event System з Legacy код для уникнення дублювання.
+
+**Архітектурні зміни:**
+
+1. **EventDispatcher інтегровано в Legacy Events API**
+   - `class-events.php` тепер dispatch'ить OOP події через `EventDispatcher`
+   - Метод `dispatch_oop_event()` створює та dispatch'ить `ConsultationRequestEvent` / `NewsletterSubscribeEvent`
+   - Lead ID передається з legacy handler в OOP event для уникнення дублювання
+   - `@see inc/class-events.php:706-746`
+
+2. **Lead_Integrations deprecated**
+   - Клас позначено як `@deprecated 2.0.0`
+   - `send_all()` делегує виклик на OOP `IntegrationManager::getInstance()->sendAll()`
+   - Fallback на legacy реалізацію якщо OOP недоступний
+   - `@see inc/lead-integrations.php`
+
+3. **LeadCreationObserver оновлено**
+   - Перевіряє чи `lead_id` вже встановлено на події
+   - Пропускає створення ліда якщо legacy handler вже створив його
+   - Запобігає дублюванню лідів
+   - `@see inc/events/observers/LeadCreationObserver.php:72-79`
+
+4. **Інтеграції через OOP IntegrationObserver**
+   - Legacy код більше не викликає інтеграції напряму
+   - `IntegrationObserver` відповідає за Email, Telegram, Google Sheets
+   - Одна точка відповідальності для всіх інтеграцій
+
+**Файли змінено:**
+
+- `inc/class-events.php` — v2.0.0 (+50 рядків)
+- `inc/lead-integrations.php` — deprecated wrapper
+- `inc/events/observers/LeadCreationObserver.php` — v1.1.0
+
+**Результат:**
+
+- ✅ OOP EventDispatcher тепер викликається для кожної події
+- ✅ OOP Observers отримують події та обробляють їх
+- ✅ Немає дублювання лідів (legacy + OOP)
+- ✅ Немає дублювання інтеграцій (тільки OOP)
+- ✅ Backwards compatibility збережено
+
+---
+
 ### Fixed
 
 #### 🐛 Critical Sitemap Error Fix (v2.0.2)

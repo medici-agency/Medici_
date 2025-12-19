@@ -106,13 +106,8 @@
 					e = e || window.event;
 
 					// Ignore if interacting with form elements
-					const targetTag =
-						e.target && e.target.tagName ? e.target.tagName.toLowerCase() : '';
-					if (
-						targetTag === 'input' ||
-						targetTag === 'select' ||
-						targetTag === 'textarea'
-					) {
+					const targetTag = e.target && e.target.tagName ? e.target.tagName.toLowerCase() : '';
+					if (targetTag === 'input' || targetTag === 'select' || targetTag === 'textarea') {
 						return;
 					}
 
@@ -212,11 +207,7 @@
 			};
 
 			if (data.consent !== '1') {
-				showMessage(
-					messageContainer,
-					'❌ Необхідна згода на обробку персональних даних',
-					'error'
-				);
+				showMessage(messageContainer, '❌ Необхідна згода на обробку персональних даних', 'error');
 				return;
 			}
 
