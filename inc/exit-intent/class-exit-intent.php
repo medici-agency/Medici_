@@ -91,6 +91,14 @@ class Exit_Intent {
 	 * Define hooks using Loader pattern
 	 */
 	private function define_hooks(): void {
+		// Fix overlay panel attributes (early in wp_head)
+		$this->loader->add_action(
+			'wp_head',
+			$this->public,
+			'fix_overlay_panel_attributes',
+			1 // Priority 1 - execute early
+		);
+
 		// Enqueue styles
 		$this->loader->add_action(
 			'wp_enqueue_scripts',

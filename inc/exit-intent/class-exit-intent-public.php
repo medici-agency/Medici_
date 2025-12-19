@@ -51,26 +51,74 @@ class Exit_Intent_Public {
 	 * Passes PHP configuration to JavaScript
 	 */
 	public function add_inline_config(): void {
-		// Check if hybrid script is enqueued
-		if ( ! wp_script_is( 'medici-exit-intent-hybrid', 'enqueued' ) ) {
+		// Check if overlay script is enqueued
+		if ( ! wp_script_is( 'medici-exit-intent-overlay', 'enqueued' ) ) {
 			return;
 		}
 
 		// Pass configuration to JavaScript
 		$config_js = sprintf(
-			'if (typeof window.MediciExitIntent !== "undefined") {
-				window.MediciExitIntent.config.overlayPanelId = %s;
-				window.MediciExitIntent.config.cookieExp = %d;
-				window.MediciExitIntent.config.delay = %d;
-				window.MediciExitIntent.config.debug = %s;
-			}',
+			'window.mediciExitIntentConfig = {
+				overlayPanelId: %s,
+				cookieExp: %d,
+				delay: %d,
+				debug: %s
+			};',
 			wp_json_encode( $this->config['panel_id'] ),
 			$this->config['cookie_exp'],
 			$this->config['delay'],
 			$this->config['debug'] ? 'true' : 'false'
 		);
 
-		wp_add_inline_script( 'medici-exit-intent-hybrid', $config_js, 'after' );
+		wp_add_inline_script( 'medici-exit-intent-overlay', $config_js, 'before' );
+	}
+
+	/**
+	 * Fix GenerateBlocks Overlay Panel data-gb-overlay attribute
+	 *
+	 * Removes empty data-gb-overlay="" from overlay containers
+	 * to prevent "Empty string passed to getElementById()" errors
+	 *
+	 * @since 1.0.1
+	 */
+	public function fix_overlay_panel_attributes(): void {
+		?>
+		<script id="medici-overlay-panel-fix">
+		(function() {
+			'use strict';
+
+			// Run early to fix before GenerateBlocks overlay.js initializes
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', fixOverlayAttributes);
+			} else {
+				fixOverlayAttributes();
+			}
+
+			function fixOverlayAttributes() {
+				// Find all elements with empty data-gb-overlay attribute
+				const elements = document.querySelectorAll('[data-gb-overlay]');
+
+				elements.forEach(function(el) {
+					const overlayValue = el.getAttribute('data-gb-overlay');
+
+					// Remove ONLY empty data-gb-overlay="" from overlay containers
+					// Keep non-empty values (triggers like data-gb-overlay="gb-overlay-424")
+					if (overlayValue === '') {
+						// Check if it's the overlay container itself (has id starting with gb-overlay-)
+						const elId = el.getAttribute('id');
+						if (elId && elId.indexOf('gb-overlay-') === 0) {
+							el.removeAttribute('data-gb-overlay');
+
+							if (<?php echo $this->config['debug'] ? 'true' : 'false'; ?>) {
+								console.log('[Medici] Fixed empty data-gb-overlay on:', elId);
+							}
+						}
+					}
+				});
+			}
+		})();
+		</script>
+		<?php
 	}
 
 	/**
@@ -117,7 +165,6 @@ class Exit_Intent_Public {
 		echo '<!-- Cookie Exp: ' . esc_html( (string) $this->config['cookie_exp'] ) . ' days -->' . "\n";
 		echo '<!-- Delay: ' . esc_html( (string) $this->config['delay'] ) . ' seconds -->' . "\n";
 		echo '<!-- bioEp loaded: ' . ( wp_script_is( 'medici-bioep', 'enqueued' ) ? 'YES' : 'NO' ) . ' -->' . "\n";
-		echo '<!-- Hybrid loaded: ' . ( wp_script_is( 'medici-exit-intent-hybrid', 'enqueued' ) ? 'YES' : 'NO' ) . ' -->' . "\n";
-		echo '<!-- Form loaded: ' . ( wp_script_is( 'medici-exit-intent-form', 'enqueued' ) ? 'YES' : 'NO' ) . ' -->' . "\n";
+		echo '<!-- Overlay loaded: ' . ( wp_script_is( 'medici-exit-intent-overlay', 'enqueued' ) ? 'YES' : 'NO' ) . ' -->' . "\n";
 	}
 }

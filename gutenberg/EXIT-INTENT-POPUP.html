@@ -5,6 +5,7 @@
 - bioEp (beeker1121) - exit-intent detection + cookie tracking (30 днів)
 - GenerateBlocks Overlay Panel - дизайн + анімації
 - Events API - form handling + Lead CPT integration
+- exit-intent-overlay.js - повний хендлер (v2.0.0)
 
 ІНСТРУКЦІЯ ДЛЯ ВИКОРИСТАННЯ:
 
@@ -32,20 +33,34 @@
    - Location: Entire Site
    - Device: Desktop (>1024px)
 
-6. Активуйте Element
+6. Додайте прихований тригер через GeneratePress Hook:
+   GeneratePress > Elements > Add New > Hook Element
+   Name: "Exit-Intent Trigger"
+   Hook: wp_footer
+   Priority: 999
 
-7. Перевірте що JavaScript файли завантажились:
+   Content:
+   <button
+     class="exit-intent-trigger"
+     data-gb-overlay="medici-exit-intent-panel"
+     aria-hidden="true"
+     style="display: none !important; visibility: hidden !important; position: absolute !important; left: -9999px !important;">
+   </button>
+
+7. Активуйте обидва Elements
+
+8. Перевірте що JavaScript файли завантажились:
    - bioep.min.js (beeker1121 library)
-   - exit-intent-hybrid.js (adapter script)
-   - exit-intent-overlay.js (form handler)
+   - exit-intent-overlay.js (повний хендлер v2.0.0)
 
-🔧 КАК ПРАЦЮЄ:
+🔧 ЯК ПРАЦЮЄ:
 1. bioEp детектить exit-intent (миша до верхньої частини екрану)
 2. Перевіряє cookie (якщо показано протягом 30 днів - не показує)
-3. Тригерить GenerateBlocks Overlay Panel через data-gb-trigger-panel
+3. exit-intent-overlay.js тригерить GenerateBlocks Overlay Panel через прихований тригер
 4. Popup відкривається з анімацією Scale In
 5. Форма відправляється через Events API
 6. bioEp зберігає cookie на 30 днів
+7. Закриття через data-gb-close-panel (кнопка X або "Ні, дякую")
 -->
 
 <!-- wp:html -->

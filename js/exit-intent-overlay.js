@@ -1,154 +1,222 @@
 /**
- * ============================================================================
- * MEDICI.AGENCY - EXIT-INTENT (GenerateBlocks Overlay Panel + 30d cookie)
- * File: js/exit-intent.js
- * ============================================================================
+ * Exit-Intent Overlay Popup - Complete Handler
  *
- * Логіка:
- * - Desktop-only (>= 1024px)
- * - Активація через 5 секунд
- * - Exit-intent: курсор виходить за межі вікна зверху (clientY <= 20)
- * - Показ 1 раз на 30 днів (cookie)
- * - Відкриває Overlay Panel через клік по елементу з data-gb-overlay="gb-overlay-424"
+ * Version: 2.0.0
+ * Features:
+ * - bioEp (beeker1121) exit-intent detection
+ * - GenerateBlocks Pro 2.3+ Overlay Panel trigger
+ * - Events API: consultation_request
+ *
+ * @package
  */
 
 (function () {
 	'use strict';
 
-	const CONFIG = {
-		TRIGGER_SELECTOR: '[data-gb-overlay="gb-overlay-424"]',
-		COOKIE_NAME: 'medici_exit_popup_shown',
-		COOKIE_DAYS: 30,
-
-		ACTIVATION_DELAY: 5000,
-		SENSITIVITY: 20,
-		MIN_WIDTH: 1024,
-
-		DEBUG: false,
+	// Configuration from PHP (window.mediciExitIntentConfig)
+	const config = window.mediciExitIntentConfig || {
+		overlayPanelId: 'medici-exit-intent-panel',
+		cookieExp: 30,
+		delay: 2,
+		debug: false,
 	};
 
-	let isActivated = false;
-	let isShown = false;
-
-	function log(...args) {
-		if (!CONFIG.DEBUG) return;
-		// eslint-disable-next-line no-console
-		console.log('[ExitIntent]', ...args);
-	}
-
-	function getCookie(name) {
-		const value = `; ${document.cookie}`;
-		const parts = value.split(`; ${name}=`);
-		if (parts.length !== 2) return null;
-		return parts.pop().split(';').shift() || null;
-	}
-
-	function setCookie(name, val, days) {
-		const date = new Date();
-		date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-
-		const isHttps = window.location.protocol === 'https:';
-		const secure = isHttps ? '; Secure' : '';
-
-		document.cookie =
-			`${name}=${encodeURIComponent(val)}` +
-			`; expires=${date.toUTCString()}` +
-			'; path=/' +
-			'; SameSite=Lax' +
-			secure;
-	}
-
-	function deleteCookie(name) {
-		const isHttps = window.location.protocol === 'https:';
-		const secure = isHttps ? '; Secure' : '';
-
-		document.cookie =
-			`${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT` +
-			'; path=/' +
-			'; SameSite=Lax' +
-			secure;
-	}
-
-	function wasShown() {
-		return getCookie(CONFIG.COOKIE_NAME) === 'true';
-	}
-
-	function markAsShown() {
-		setCookie(CONFIG.COOKIE_NAME, 'true', CONFIG.COOKIE_DAYS);
-	}
-
-	function isMobile() {
-		return window.innerWidth < CONFIG.MIN_WIDTH;
-	}
-
-	function openOverlayPanel() {
-		const trigger = document.querySelector(CONFIG.TRIGGER_SELECTOR);
-		if (!trigger) {
-			log('Trigger not found:', CONFIG.TRIGGER_SELECTOR);
-			return false;
-		}
-
-		trigger.click();
-		return true;
-	}
-
-	function onExitIntent(e) {
-		if (!isActivated) return;
-		if (isShown) return;
-
-		// Має бути "вихід" курсора за межі вікна (relatedTarget = null)
-		const to = e.relatedTarget || e.toElement;
-		if (to) return;
-
-		// Exit-intent тільки зверху
-		if (typeof e.clientY === 'number' && e.clientY > CONFIG.SENSITIVITY) return;
-
-		isShown = true;
-		markAsShown();
-		openOverlayPanel();
-
-		document.documentElement.removeEventListener('mouseout', onExitIntent);
-		log('Exit-intent fired');
-	}
-
-	function activate() {
-		if (isActivated) return;
-		if (wasShown()) {
-			log('Already shown (cookie)');
-			return;
-		}
-		if (isMobile()) {
-			log('Mobile/tablet detected, skipping');
-			return;
-		}
-
-		document.documentElement.addEventListener('mouseout', onExitIntent);
-		isActivated = true;
-		log('Activated');
-	}
-
+	/**
+	 * Initialize Exit-Intent Handler
+	 */
 	function init() {
-		if (wasShown() || isMobile()) return;
+		// 1. Initialize bioEp exit-intent detection
+		initBioEp();
 
-		window.setTimeout(activate, CONFIG.ACTIVATION_DELAY);
-		log('Initialized, activation in ms:', CONFIG.ACTIVATION_DELAY);
+		// 2. Initialize form handler
+		initFormHandler();
+
+		if (config.debug) {
+			console.log('[Medici Exit-Intent] Initialized', config);
+		}
 	}
 
-	// Public API (для дебагу/тесту)
-	window.MediciExitIntent = {
-		init,
-		trigger() {
-			isShown = true;
-			markAsShown();
-			openOverlayPanel();
-		},
-		reset() {
-			isShown = false;
-			deleteCookie(CONFIG.COOKIE_NAME);
-		},
-		config: CONFIG,
-	};
+	/**
+	 * Initialize bioEp Exit-Intent Detection
+	 */
+	function initBioEp() {
+		// Check if bioEp is loaded
+		if (typeof bioEp !== 'function') {
+			if (config.debug) {
+				console.warn('[Medici Exit-Intent] bioEp library not loaded');
+			}
+			return;
+		}
 
+		// Configure bioEp
+		bioEp({
+			// Cookie expiration (days)
+			cookieExp: config.cookieExp,
+
+			// Delay before showing (seconds)
+			delay: config.delay,
+
+			// Show only on desktop (>1024px)
+			showOnDelay: false,
+			showOnScroll: false,
+
+			// Callback when exit-intent detected
+			onExit: function () {
+				openOverlayPanel();
+			},
+		});
+
+		if (config.debug) {
+			console.log('[Medici Exit-Intent] bioEp configured');
+		}
+	}
+
+	/**
+	 * Open GenerateBlocks Overlay Panel
+	 */
+	function openOverlayPanel() {
+		// Find overlay trigger element
+		const trigger = document.querySelector(`[data-gb-overlay="${config.overlayPanelId}"]`);
+
+		if (!trigger) {
+			if (config.debug) {
+				console.error('[Medici Exit-Intent] Overlay trigger not found:', config.overlayPanelId);
+			}
+			return;
+		}
+
+		// Trigger click to open overlay
+		trigger.click();
+
+		if (config.debug) {
+			console.log('[Medici Exit-Intent] Overlay opened:', config.overlayPanelId);
+		}
+	}
+
+	/**
+	 * Initialize Form Handler
+	 */
+	function initFormHandler() {
+		const form = document.querySelector('.js-exit-intent-form');
+		if (!form) {
+			if (config.debug) {
+				console.warn('[Medici Exit-Intent] Form not found');
+			}
+			return;
+		}
+
+		form.addEventListener('submit', handleFormSubmit);
+
+		if (config.debug) {
+			console.log('[Medici Exit-Intent] Form handler attached');
+		}
+	}
+
+	/**
+	 * Handle Form Submission
+	 *
+	 * @param {Event} e - Submit event
+	 */
+	async function handleFormSubmit(e) {
+		e.preventDefault();
+
+		const form = e.target;
+		const messageContainer = form.querySelector('.js-exit-intent-message');
+		const submitButton = form.querySelector('.exit-intent-submit');
+
+		// Get form data
+		const formData = new FormData(form);
+		const data = {
+			event_type: 'consultation_request',
+			name: formData.get('name'),
+			email: formData.get('email'),
+			phone: formData.get('phone'),
+			service: 'exit_intent_popup', // Special marker
+			message: 'Lead captured via Exit-Intent Popup',
+			consent: formData.get('consent') ? '1' : '0',
+			page_url: window.location.href,
+		};
+
+		// Validate consent
+		if (data.consent !== '1') {
+			showMessage(messageContainer, '❌ Необхідна згода на обробку персональних даних', 'error');
+			return;
+		}
+
+		// Disable button
+		submitButton.disabled = true;
+		submitButton.textContent = 'Відправка...';
+
+		try {
+			// Use Events API
+			if (typeof window.mediciEvents === 'undefined') {
+				throw new Error('Events API не доступний');
+			}
+
+			const result = await window.mediciEvents.send('consultation_request', data);
+
+			if (result.success) {
+				showMessage(
+					messageContainer,
+					"✅ Дякуємо! Ми зв'яжемось з вами найближчим часом.",
+					'success'
+				);
+				form.reset();
+
+				// Close popup after 3 seconds
+				setTimeout(() => {
+					closeOverlayPanel();
+				}, 3000);
+			} else {
+				throw new Error(result.message || 'Помилка відправки форми');
+			}
+		} catch (error) {
+			console.error('Exit-Intent Form Error:', error);
+			showMessage(messageContainer, `❌ Помилка: ${error.message}`, 'error');
+		} finally {
+			// Re-enable button
+			submitButton.disabled = false;
+			submitButton.textContent = 'Отримати консультацію';
+		}
+	}
+
+	/**
+	 * Show Message
+	 *
+	 * @param {HTMLElement} container - Message container
+	 * @param {string}      message   - Message text
+	 * @param {string}      type      - Message type (success/error)
+	 */
+	function showMessage(container, message, type) {
+		if (!container) {
+			return;
+		}
+
+		container.textContent = message;
+		container.className = `exit-intent-message ${type}`;
+		container.setAttribute('role', 'alert');
+
+		// Clear after 5 seconds for errors
+		if (type === 'error') {
+			setTimeout(() => {
+				container.textContent = '';
+				container.className = 'exit-intent-message';
+			}, 5000);
+		}
+	}
+
+	/**
+	 * Close Overlay Panel
+	 * GenerateBlocks Pro method
+	 */
+	function closeOverlayPanel() {
+		const closeButton = document.querySelector('[data-gb-close-panel]');
+		if (closeButton) {
+			closeButton.click();
+		}
+	}
+
+	// Initialize on DOM ready
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', init);
 	} else {

@@ -71,11 +71,8 @@ class Exit_Intent_Assets {
 		// 1. bioEp library (beeker1121) - exit-intent detection
 		$this->enqueue_bioep();
 
-		// 2. Hybrid adapter - connects bioEp with GenerateBlocks Overlay Panel
-		$this->enqueue_hybrid_adapter();
-
-		// 3. Form handler - Events API integration
-		$this->enqueue_form_handler();
+		// 2. Overlay handler - form handling + overlay trigger + Events API
+		$this->enqueue_overlay_handler();
 	}
 
 	/**
@@ -98,39 +95,22 @@ class Exit_Intent_Assets {
 	}
 
 	/**
-	 * Enqueue hybrid adapter script
+	 * Enqueue overlay handler script
+	 *
+	 * Handles form submission, overlay trigger, and Events API integration
 	 */
-	private function enqueue_hybrid_adapter(): void {
-		$hybrid_path = $this->theme_dir . '/js/exit-intent-hybrid.js';
+	private function enqueue_overlay_handler(): void {
+		$overlay_path = $this->theme_dir . '/js/exit-intent-overlay.js';
 
-		if ( ! file_exists( $hybrid_path ) ) {
+		if ( ! file_exists( $overlay_path ) ) {
 			return;
 		}
 
 		wp_enqueue_script(
-			'medici-exit-intent-hybrid',
-			$this->theme_uri . '/js/exit-intent-hybrid.js',
-			array( 'medici-bioep' ), // Depends on bioEp
-			(string) filemtime( $hybrid_path ),
-			true // Load in footer
-		);
-	}
-
-	/**
-	 * Enqueue form handler script
-	 */
-	private function enqueue_form_handler(): void {
-		$form_path = $this->theme_dir . '/js/exit-intent-overlay.js';
-
-		if ( ! file_exists( $form_path ) ) {
-			return;
-		}
-
-		wp_enqueue_script(
-			'medici-exit-intent-form',
+			'medici-exit-intent-overlay',
 			$this->theme_uri . '/js/exit-intent-overlay.js',
-			array( 'medici-events' ), // Depends on Events API
-			(string) filemtime( $form_path ),
+			array( 'medici-bioep', 'medici-events' ), // Depends on bioEp + Events API
+			(string) filemtime( $overlay_path ),
 			true // Load in footer
 		);
 	}
