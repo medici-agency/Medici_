@@ -8,7 +8,7 @@ declare(strict_types=1);
  *
  * @package    Medici
  * @subpackage Exit_Intent
- * @version    1.0.0
+ * @version    1.1.0
  */
 
 // Prevent direct access
@@ -47,6 +47,10 @@ class Exit_Intent_Assets {
 
 	/**
 	 * Enqueue styles
+	 *
+	 * Uses inline CSS to bypass optimization plugins that defer external stylesheets.
+	 * This ensures exit-intent styles are always loaded, even when CSS optimizers
+	 * move external <link> tags into <noscript> blocks.
 	 */
 	public function enqueue_styles(): void {
 		$css_path = $this->theme_dir . '/css/components/exit-intent-overlay.css';
@@ -55,28 +59,17 @@ class Exit_Intent_Assets {
 			return;
 		}
 
-		wp_enqueue_style(
-			'medici-exit-intent-overlay',
-			$this->theme_uri . '/css/components/exit-intent-overlay.css',
-			array(), // No dependencies
-			(string) filemtime( $css_path ),
-			'all'
-		);
+		$handle = 'medici-exit-intent-overlay-inline';
 
-		// Prevent optimization plugins from deferring this CSS
-		// Perfmatters, Autoptimize, WP Rocket, LiteSpeed honor this
-		add_filter(
-			'style_loader_tag',
-			function ( string $tag, string $handle ): string {
-				if ( 'medici-exit-intent-overlay' === $handle ) {
-					// Add data-no-optimize attribute
-					$tag = str_replace( "media='all'", "media='all' data-no-optimize='1'", $tag );
-				}
-				return $tag;
-			},
-			10,
-			2
-		);
+		// Register empty style handle
+		wp_register_style( $handle, false, array(), (string) filemtime( $css_path ) );
+		wp_enqueue_style( $handle );
+
+		// Add inline CSS from file
+		$css = file_get_contents( $css_path );
+		if ( is_string( $css ) && '' !== $css ) {
+			wp_add_inline_style( $handle, $css );
+		}
 	}
 
 	/**
