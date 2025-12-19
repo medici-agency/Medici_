@@ -1,9 +1,11 @@
 /**
  * Exit-Intent Overlay Popup - Complete Handler
  *
- * Version: 2.1.0
+ * Version: 2.1.3
  * Features:
  * - bioEp (beeker1121) exit-intent detection via window.bioEp.init()
+ * - Custom loadEvents() - exit-intent detector only (no DOM dependencies)
+ * - Double-patching protection via window.mediciBioEpPatched flag
  * - GenerateBlocks Pro 2.3+ Overlay Panel trigger
  * - Events API: consultation_request
  *
@@ -82,9 +84,76 @@
 		}
 
 		// Check if bioEp is loaded (it's an object, not a function!)
+		// Correct check: typeof window.bioEp === 'object'
 		if (!window.bioEp || typeof window.bioEp.init !== 'function') {
 			warn('bioEp library not loaded (window.bioEp missing)');
 			return;
+		}
+
+		// Prevent double patching (SPA navigation, script re-execution)
+		if (window.mediciBioEpPatched) {
+			log('bioEp already patched, skipping');
+			return;
+		}
+		window.mediciBioEpPatched = true;
+
+		// Prevent bioEp from adding unnecessary DOM/CSS/Events
+		// We only need exit-intent detection + cookie management
+
+		// 1. No CSS injection
+		if (typeof window.bioEp.addCSS === 'function') {
+			window.bioEp.addCSS = function () {
+				// No-op: prevent bioEp's CSS injection
+			};
+		}
+
+		// 2. No DOM popup creation
+		if (typeof window.bioEp.addPopup === 'function') {
+			window.bioEp.addPopup = function () {
+				// No-op: prevent bioEp's DOM popup creation
+			};
+		}
+
+		// 3. Custom loadEvents: keep ONLY exit-intent detector
+		// Remove: closeBtnEl click, window resize, other DOM dependencies
+		if (typeof window.bioEp.loadEvents === 'function') {
+			window.bioEp.loadEvents = function () {
+				// Exit-intent detector (mouseout to top of viewport)
+				this.addEvent(document, 'mouseout', function (e) {
+					e = e || window.event;
+
+					// Ignore if interacting with form elements
+					const targetTag = e.target && e.target.tagName ? e.target.tagName.toLowerCase() : '';
+					if (targetTag === 'input' || targetTag === 'select' || targetTag === 'textarea') {
+						return;
+					}
+
+					// Ignore if mouse is near right edge (scrollbar area)
+					const viewportWidth = Math.max(
+						document.documentElement.clientWidth,
+						window.innerWidth || 0
+					);
+					const threshold = viewportWidth - 50;
+					if (e.clientX > threshold) {
+						return;
+					}
+
+					// Check if mouse is moving to top (exit-intent)
+					if (e.clientY >= 50) {
+						return;
+					}
+
+					// Ensure it's actually leaving viewport (relatedTarget = null)
+					if (e.relatedTarget || e.toElement) {
+						return;
+					}
+
+					// Trigger popup (intercepted by our showPopup override)
+					window.bioEp.showPopup();
+				});
+			};
+
+			log('bioEp.loadEvents() overridden (exit-intent only)');
 		}
 
 		// Intercept showPopup() - this is what bioEp calls on exit-intent
