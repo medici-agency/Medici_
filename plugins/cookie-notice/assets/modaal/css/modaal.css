@@ -516,8 +516,8 @@
 .modaal-loading-spinner > div:nth-of-type(2) > div {
 	-webkit-animation: modaal-loading-spinner 1s linear infinite;
 	animation: modaal-loading-spinner 1s linear infinite;
-	-webkit-animation-delay: .12s;
-	animation-delay: .12s;
+	-webkit-animation-delay: 0.12s;
+	animation-delay: 0.12s;
 }
 
 .modaal-loading-spinner > div:nth-of-type(2) {
@@ -529,8 +529,8 @@
 .modaal-loading-spinner > div:nth-of-type(3) > div {
 	-webkit-animation: modaal-loading-spinner 1s linear infinite;
 	animation: modaal-loading-spinner 1s linear infinite;
-	-webkit-animation-delay: .25s;
-	animation-delay: .25s;
+	-webkit-animation-delay: 0.25s;
+	animation-delay: 0.25s;
 }
 
 .modaal-loading-spinner > div:nth-of-type(4) > div,
@@ -550,8 +550,8 @@
 .modaal-loading-spinner > div:nth-of-type(4) > div {
 	-webkit-animation: modaal-loading-spinner 1s linear infinite;
 	animation: modaal-loading-spinner 1s linear infinite;
-	-webkit-animation-delay: .37s;
-	animation-delay: .37s;
+	-webkit-animation-delay: 0.37s;
+	animation-delay: 0.37s;
 }
 
 .modaal-loading-spinner > div:nth-of-type(4) {
@@ -563,8 +563,8 @@
 .modaal-loading-spinner > div:nth-of-type(5) > div {
 	-webkit-animation: modaal-loading-spinner 1s linear infinite;
 	animation: modaal-loading-spinner 1s linear infinite;
-	-webkit-animation-delay: .5s;
-	animation-delay: .5s;
+	-webkit-animation-delay: 0.5s;
+	animation-delay: 0.5s;
 }
 
 .modaal-loading-spinner > div:nth-of-type(6) > div,
@@ -584,8 +584,8 @@
 .modaal-loading-spinner > div:nth-of-type(6) > div {
 	-webkit-animation: modaal-loading-spinner 1s linear infinite;
 	animation: modaal-loading-spinner 1s linear infinite;
-	-webkit-animation-delay: .62s;
-	animation-delay: .62s;
+	-webkit-animation-delay: 0.62s;
+	animation-delay: 0.62s;
 }
 
 .modaal-loading-spinner > div:nth-of-type(6) {
@@ -597,8 +597,8 @@
 .modaal-loading-spinner > div:nth-of-type(7) > div {
 	-webkit-animation: modaal-loading-spinner 1s linear infinite;
 	animation: modaal-loading-spinner 1s linear infinite;
-	-webkit-animation-delay: .75s;
-	animation-delay: .75s;
+	-webkit-animation-delay: 0.75s;
+	animation-delay: 0.75s;
 }
 
 .modaal-loading-spinner > div:nth-of-type(7) {
@@ -610,8 +610,8 @@
 .modaal-loading-spinner > div:nth-of-type(8) > div {
 	-webkit-animation: modaal-loading-spinner 1s linear infinite;
 	animation: modaal-loading-spinner 1s linear infinite;
-	-webkit-animation-delay: .87s;
-	animation-delay: .87s;
+	-webkit-animation-delay: 0.87s;
+	animation-delay: 0.87s;
 }
 
 .modaal-loading-spinner > div:nth-of-type(8) {
@@ -621,162 +621,137 @@
 }
 
 @media only screen and (min-width: 1400px) {
-
-.modaal-video-container {
-	padding-bottom: 0;
-	height: 731px;
-}
-
+	.modaal-video-container {
+		padding-bottom: 0;
+		height: 731px;
+	}
 }
 
 @media only screen and (max-width: 1140px) {
+	.modaal-image .modaal-inner-wrapper {
+		padding-left: 25px;
+		padding-right: 25px;
+	}
 
-.modaal-image .modaal-inner-wrapper {
-	padding-left: 25px;
-	padding-right: 25px;
-}
+	.modaal-gallery-control {
+		top: auto;
+		bottom: 20px;
+		-webkit-transform: none;
+		-ms-transform: none;
+		transform: none;
+		background: rgba(0, 0, 0, 0.7);
+	}
 
-.modaal-gallery-control {
-	top: auto;
-	bottom: 20px;
-	-webkit-transform: none;
-	-ms-transform: none;
-	transform: none;
-	background: rgba(0, 0, 0, 0.7);
-}
+	.modaal-gallery-control:before,
+	.modaal-gallery-control:after {
+		background: #fff;
+	}
 
-.modaal-gallery-control:before,
-.modaal-gallery-control:after {
-	background: #fff;
-}
+	.modaal-gallery-next {
+		left: auto;
+		right: 20px;
+	}
 
-.modaal-gallery-next {
-	left: auto;
-	right: 20px;
-}
-
-.modaal-gallery-prev {
-	left: 20px;
-	right: auto;
-}
-
+	.modaal-gallery-prev {
+		left: 20px;
+		right: auto;
+	}
 }
 
 @media screen and (max-width: 900px) {
-
-.modaal-instagram iframe {
-	width: 500px !important;
-}
-
+	.modaal-instagram iframe {
+		width: 500px !important;
+	}
 }
 
 @media only screen and (max-width: 600px) {
-
-.modaal-instagram iframe {
-	width: 280px !important;
-}
-
+	.modaal-instagram iframe {
+		width: 280px !important;
+	}
 }
 
 @media screen and (max-height: 1100px) {
-
-.modaal-instagram iframe {
-	width: 700px !important;
-}
-
+	.modaal-instagram iframe {
+		width: 700px !important;
+	}
 }
 
 @media screen and (max-height: 1000px) {
+	.modaal-inner-wrapper {
+		padding-top: 60px;
+		padding-bottom: 60px;
+	}
 
-.modaal-inner-wrapper {
-	padding-top: 60px;
-	padding-bottom: 60px;
-}
-
-.modaal-instagram iframe {
-	width: 600px !important;
-}
-
+	.modaal-instagram iframe {
+		width: 600px !important;
+	}
 }
 
 @media screen and (max-height: 900px) {
+	.modaal-instagram iframe {
+		width: 500px !important;
+	}
 
-.modaal-instagram iframe {
-	width: 500px !important;
-}
-
-.modaal-video-container {
-	max-width: 900px;
-	max-height: 510px;
-}
-
+	.modaal-video-container {
+		max-width: 900px;
+		max-height: 510px;
+	}
 }
 
 @media only screen and (max-height: 820px) {
-
-.modaal-gallery-label {
-	display: none;
-}
-
+	.modaal-gallery-label {
+		display: none;
+	}
 }
 
 @keyframes instaReveal {
+	0% {
+		opacity: 0;
+	}
 
-0% {
-	opacity: 0;
-}
-
-100% {
-	opacity: 1;
-}
-
+	100% {
+		opacity: 1;
+	}
 }
 
 @-webkit-keyframes instaReveal {
+	0% {
+		opacity: 0;
+	}
 
-0% {
-	opacity: 0;
-}
-
-100% {
-	opacity: 1;
-}
-
+	100% {
+		opacity: 1;
+	}
 }
 
 @-webkit-keyframes modaal-loading-spinner {
+	0% {
+		opacity: 1;
+		-ms-transform: scale(1.5);
+		-webkit-transform: scale(1.5);
+		transform: scale(1.5);
+	}
 
-0% {
-	opacity: 1;
-	-ms-transform: scale(1.5);
-	-webkit-transform: scale(1.5);
-	transform: scale(1.5);
-}
-
-100% {
-	opacity: .1;
-	-ms-transform: scale(1);
-	-webkit-transform: scale(1);
-	transform: scale(1);
-}
-
+	100% {
+		opacity: 0.1;
+		-ms-transform: scale(1);
+		-webkit-transform: scale(1);
+		transform: scale(1);
+	}
 }
 
 @keyframes modaal-loading-spinner {
+	0% {
+		opacity: 1;
+		-ms-transform: scale(1.5);
+		-webkit-transform: scale(1.5);
+		transform: scale(1.5);
+	}
 
-0% {
-	opacity: 1;
-	-ms-transform: scale(1.5);
-	-webkit-transform: scale(1.5);
-	transform: scale(1.5);
+	100% {
+		opacity: 0.1;
+		-ms-transform: scale(1);
+		-webkit-transform: scale(1);
+		transform: scale(1);
+	}
 }
-
-100% {
-	opacity: .1;
-	-ms-transform: scale(1);
-	-webkit-transform: scale(1);
-	transform: scale(1);
-}
-
-}
-
