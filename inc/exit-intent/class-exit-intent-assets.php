@@ -62,6 +62,21 @@ class Exit_Intent_Assets {
 			(string) filemtime( $css_path ),
 			'all'
 		);
+
+		// Prevent optimization plugins from deferring this CSS
+		// Perfmatters, Autoptimize, WP Rocket, LiteSpeed honor this
+		add_filter(
+			'style_loader_tag',
+			function ( string $tag, string $handle ): string {
+				if ( 'medici-exit-intent-overlay' === $handle ) {
+					// Add data-no-optimize attribute
+					$tag = str_replace( "media='all'", "media='all' data-no-optimize='1'", $tag );
+				}
+				return $tag;
+			},
+			10,
+			2
+		);
 	}
 
 	/**
