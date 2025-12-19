@@ -115,111 +115,119 @@
 		}
 	}
 
-	/**
-	 * Handle Form Submission
-	 *
-	 * @param {Event} e - Submit event
-	 */
-	async function handleFormSubmit(e) {
-		e.preventDefault();
+	function getCookie(name) {
+		const value = `; ${document.cookie}`;
+		const parts = value.split(`; ${name}=`);
+		if (parts.length !== 2) return null;
+		return parts.pop().split(';').shift() || null;
+	}
 
-		const form = e.target;
-		const messageContainer = form.querySelector('.js-exit-intent-message');
-		const submitButton = form.querySelector('.exit-intent-submit');
+	function setCookie(name, val, days) {
+		const date = new Date();
+		date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
 
-		// Get form data
-		const formData = new FormData(form);
-		const data = {
-			event_type: 'consultation_request',
-			name: formData.get('name'),
-			email: formData.get('email'),
-			phone: formData.get('phone'),
-			service: 'exit_intent_popup', // Special marker
-			message: 'Lead captured via Exit-Intent Popup',
-			consent: formData.get('consent') ? '1' : '0',
-			page_url: window.location.href,
-		};
+		const isHttps = window.location.protocol === 'https:';
+		const secure = isHttps ? '; Secure' : '';
 
-		// Validate consent
-		if (data.consent !== '1') {
-			showMessage(messageContainer, '❌ Необхідна згода на обробку персональних даних', 'error');
+		document.cookie =
+			`${name}=${encodeURIComponent(val)}` +
+			`; expires=${date.toUTCString()}` +
+			'; path=/' +
+			'; SameSite=Lax' +
+			secure;
+	}
+
+	function deleteCookie(name) {
+		const isHttps = window.location.protocol === 'https:';
+		const secure = isHttps ? '; Secure' : '';
+
+		document.cookie =
+			`${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT` +
+			'; path=/' +
+			'; SameSite=Lax' +
+			secure;
+	}
+
+	function wasShown() {
+		return getCookie(CONFIG.COOKIE_NAME) === 'true';
+	}
+
+	function markAsShown() {
+		setCookie(CONFIG.COOKIE_NAME, 'true', CONFIG.COOKIE_DAYS);
+	}
+
+	function isMobile() {
+		return window.innerWidth < CONFIG.MIN_WIDTH;
+	}
+
+	function openOverlayPanel() {
+		const trigger = document.querySelector(CONFIG.TRIGGER_SELECTOR);
+		if (!trigger) {
+			log('Trigger not found:', CONFIG.TRIGGER_SELECTOR);
+			return false;
+		}
+
+		trigger.click();
+		return true;
+	}
+
+	function onExitIntent(e) {
+		if (!isActivated) return;
+		if (isShown) return;
+
+		// Має бути "вихід" курсора за межі вікна (relatedTarget = null)
+		const to = e.relatedTarget || e.toElement;
+		if (to) return;
+
+		// Exit-intent тільки зверху
+		if (typeof e.clientY === 'number' && e.clientY > CONFIG.SENSITIVITY) return;
+
+		isShown = true;
+		markAsShown();
+		openOverlayPanel();
+
+		document.documentElement.removeEventListener('mouseout', onExitIntent);
+		log('Exit-intent fired');
+	}
+
+	function activate() {
+		if (isActivated) return;
+		if (wasShown()) {
+			log('Already shown (cookie)');
+			return;
+		}
+		if (isMobile()) {
+			log('Mobile/tablet detected, skipping');
 			return;
 		}
 
-		// Disable button
-		submitButton.disabled = true;
-		submitButton.textContent = 'Відправка...';
-
-		try {
-			// Use Events API
-			if (typeof window.mediciEvents === 'undefined') {
-				throw new Error('Events API не доступний');
-			}
-
-			const result = await window.mediciEvents.send('consultation_request', data);
-
-			if (result.success) {
-				showMessage(
-					messageContainer,
-					"✅ Дякуємо! Ми зв'яжемось з вами найближчим часом.",
-					'success'
-				);
-				form.reset();
-
-				// Close popup after 3 seconds
-				setTimeout(() => {
-					closeOverlayPanel();
-				}, 3000);
-			} else {
-				throw new Error(result.message || 'Помилка відправки форми');
-			}
-		} catch (error) {
-			console.error('Exit-Intent Form Error:', error);
-			showMessage(messageContainer, `❌ Помилка: ${error.message}`, 'error');
-		} finally {
-			// Re-enable button
-			submitButton.disabled = false;
-			submitButton.textContent = 'Отримати консультацію';
-		}
+		document.documentElement.addEventListener('mouseout', onExitIntent);
+		isActivated = true;
+		log('Activated');
 	}
 
-	/**
-	 * Show Message
-	 *
-	 * @param {HTMLElement} container - Message container
-	 * @param {string}      message   - Message text
-	 * @param {string}      type      - Message type (success/error)
-	 */
-	function showMessage(container, message, type) {
-		if (!container) {
-			return;
-		}
+	function init() {
+		if (wasShown() || isMobile()) return;
 
-		container.textContent = message;
-		container.className = `exit-intent-message ${type}`;
-		container.setAttribute('role', 'alert');
-
-		// Clear after 5 seconds for errors
-		if (type === 'error') {
-			setTimeout(() => {
-				container.textContent = '';
-				container.className = 'exit-intent-message';
-			}, 5000);
-		}
+		window.setTimeout(activate, CONFIG.ACTIVATION_DELAY);
+		log('Initialized, activation in ms:', CONFIG.ACTIVATION_DELAY);
 	}
 
-	/**
-	 * Close Overlay Panel
-	 * GenerateBlocks Pro method
-	 */
-	function closeOverlayPanel() {
-		const closeButton = document.querySelector('[data-gb-close-panel]');
-		if (closeButton) {
-			closeButton.click();
-		}
-	}
+	// Public API (для дебагу/тесту)
+	window.MediciExitIntent = {
+		init,
+		trigger() {
+			isShown = true;
+			markAsShown();
+			openOverlayPanel();
+		},
+		reset() {
+			isShown = false;
+			deleteCookie(CONFIG.COOKIE_NAME);
+		},
+		config: CONFIG,
+	};
 
-	// Initialize on DOM ready
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', init);
 	} else {
