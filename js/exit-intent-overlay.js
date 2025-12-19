@@ -46,12 +46,17 @@
 		}
 	}
 
-	function closeViaBackdrop() {
-		const backdrop = document.querySelector('.gb-overlay-backdrop');
-		if (backdrop) {
-			backdrop.click();
-			log('Overlay closed via backdrop');
-		}
+	function closeViaEscape() {
+		// GenerateBlocks Overlay closes on Escape key
+		document.dispatchEvent(
+			new KeyboardEvent('keydown', {
+				key: 'Escape',
+				keyCode: 27,
+				which: 27,
+				bubbles: true,
+			})
+		);
+		log('Overlay closed via Escape key');
 	}
 
 	function bindManualClose() {
@@ -64,8 +69,8 @@
 				e.preventDefault();
 				e.stopPropagation();
 
-				// Use closeOverlayPanel instead of closeViaBackdrop (backdrop doesn't exist)
-				closeOverlayPanel();
+				// Use Escape key (GenerateBlocks handles it natively)
+				closeViaEscape();
 			},
 			true
 		);
