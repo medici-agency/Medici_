@@ -668,7 +668,7 @@ add_filter( 'wp_resource_hints', 'medici_manage_resource_hints', 10, 2 );
  * Critical CSS (variables, core, navigation) remains render-blocking
  * because they're needed for above-the-fold content.
  *
- * @var array
+ * @return array<string> List of CSS handles for async loading
  */
 function medici_get_async_css_handles(): array {
 	return array(
