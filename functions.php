@@ -304,6 +304,23 @@ add_action( 'init', 'medici_init_rest_api', 13 );
  * CRON endpoint для cleanup transients
  * Usage: wget https://www.medici.agency/?medici_cleanup_transients=1&secret=SECRET
  */
+add_action('wp_enqueue_scripts', function () {
+	$handle = 'medici-exit-intent-overlay';
+
+	$cfg = [
+		'overlayPanelId' => 'gb-overlay-424', // <-- ваш Data Attribute з Overlay Panel
+		'cookieExp'      => 30,
+		'delay'          => 2,
+		'debug'          => false,
+	];
+
+	// Додаємо ПЕРЕД exit-intent-overlay.js. Якщо конфіг уже існує — ми його перезапишемо.
+	wp_add_inline_script(
+		$handle,
+		'window.mediciExitIntentConfig = ' . wp_json_encode($cfg) . ';',
+		'before'
+	);
+}, 999);
 
 add_action('init', function() {
     if (isset($_GET['medici_cleanup_transients']) && $_GET['secret'] === 'ynww3jql0y0kb60qtmwa7pzgwita90qr') {
@@ -332,6 +349,26 @@ add_action('init', function() {
         die("Deleted {$count} expired transients\n");
     }
 });
+
+add_action('wp_enqueue_scripts', function () {
+	$handle = 'medici-exit-intent-overlay-js'; // якщо у вас інший — див. примітку нижче
+
+	// Додаємо/перезаписуємо конфіг перед основним скриптом
+	if (wp_script_is($handle, 'registered') || wp_script_is($handle, 'enqueued')) {
+		$cfg = [
+			'overlayPanelId' => 'gb-overlay-424',
+			'cookieExp'      => 30,
+			'delay'          => 2,
+			'debug'          => false,
+		];
+
+		wp_add_inline_script(
+			$handle,
+			'window.mediciExitIntentConfig = ' . wp_json_encode($cfg) . ';',
+			'before'
+		);
+	}
+}, 999);
 
 // CRON Endpoints
 require_once get_stylesheet_directory() . '/inc/cron-endpoints.php';
