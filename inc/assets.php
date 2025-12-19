@@ -677,7 +677,7 @@ function medici_get_async_css_handles(): array {
 	$async_handles = array(
 		// Components (below-the-fold or optional)
 		'medici-lazy-load',
-		'medici-animations',
+		// 'medici-animations', // Removed from async - critical for scroll-triggered animations (initial opacity: 0 state)
 		'medici-faq',
 		'medici-widgets',
 		// Exit-intent (loaded on demand)
