@@ -9,17 +9,36 @@
  * - Keyboard navigation support
  * - Supports multiple accordions on same page
  *
+ * API:
+ * - window.MediciFaqAccordion.init()    - Initialize accordions
+ * - window.MediciFaqAccordion.destroy() - Cleanup event listeners
+ *
  * @package
- * @since 1.3.4
+ * @since   1.3.4
+ * @version 1.5.0 Added cleanup/destroy method to prevent memory leaks
  */
 
 (function () {
 	'use strict';
 
+	// =====================================================
+	// STATE - Store references for cleanup
+	// =====================================================
+	const state = {
+		initialized: false,
+		containers: [],
+		handlers: new WeakMap(),
+	};
+
 	/**
 	 * Initialize accordion when DOM is ready
 	 */
-	function initAccordion() {
+	function init() {
+		// Prevent double initialization
+		if (state.initialized) {
+			return;
+		}
+
 		const accordionContainers = document.querySelectorAll('[data-accordion="true"]');
 
 		if (!accordionContainers.length) {
@@ -37,20 +56,58 @@
 					return;
 				}
 
-				// Add click handler
-				button.addEventListener('click', () => {
+				// Create bound handlers
+				const clickHandler = () => {
 					toggleAccordionItem(item, button, panel);
-				});
+				};
 
-				// Add keyboard support (Enter and Space)
-				button.addEventListener('keydown', (e) => {
+				const keydownHandler = (e) => {
 					if (e.key === 'Enter' || e.key === ' ') {
 						e.preventDefault();
 						toggleAccordionItem(item, button, panel);
 					}
-				});
+				};
+
+				// Store handlers for cleanup
+				state.handlers.set(button, { click: clickHandler, keydown: keydownHandler });
+
+				// Add event listeners
+				button.addEventListener('click', clickHandler);
+				button.addEventListener('keydown', keydownHandler);
+			});
+
+			// Store container reference
+			state.containers.push(container);
+		});
+
+		state.initialized = true;
+	}
+
+	/**
+	 * Destroy/cleanup all event listeners
+	 * Call this before removing accordions from DOM or on page unload
+	 */
+	function destroy() {
+		if (!state.initialized) {
+			return;
+		}
+
+		state.containers.forEach((container) => {
+			const buttons = container.querySelectorAll('[data-accordion-button="true"]');
+
+			buttons.forEach((button) => {
+				const handlers = state.handlers.get(button);
+				if (handlers) {
+					button.removeEventListener('click', handlers.click);
+					button.removeEventListener('keydown', handlers.keydown);
+					state.handlers.delete(button);
+				}
 			});
 		});
+
+		// Clear containers array
+		state.containers = [];
+		state.initialized = false;
 	}
 
 	/**
@@ -124,12 +181,20 @@
 		panel.style.opacity = '0';
 	}
 
+	// =====================================================
+	// PUBLIC API
+	// =====================================================
+	window.MediciFaqAccordion = {
+		init,
+		destroy,
+	};
+
 	/**
 	 * Initialize on DOMContentLoaded
 	 */
 	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', initAccordion);
+		document.addEventListener('DOMContentLoaded', init);
 	} else {
-		initAccordion();
+		init();
 	}
 })();

@@ -11,9 +11,13 @@
  * - .js-newsletter-form    - Form element
  * - .js-newsletter-message - Message display element
  *
+ * API:
+ * - window.MediciNewsletterForm.init()    - Initialize forms
+ * - window.MediciNewsletterForm.destroy() - Cleanup event listeners
+ *
  * @package
  * @since   1.4.0
- * @version 1.4.0 Added js-* hooks for BEM separation
+ * @version 1.5.0 Added cleanup/destroy method to prevent memory leaks
  */
 
 (function () {
@@ -39,11 +43,25 @@
 		successSuffix: 'Перевірте вашу пошту.',
 	};
 
+	// =====================================================
+	// STATE - Store references for cleanup
+	// =====================================================
+	const state = {
+		initialized: false,
+		forms: [],
+		handlers: new WeakMap(),
+	};
+
 	/**
 	 * Initialize newsletter forms
 	 * Uses js-* hooks with fallback to legacy selectors
 	 */
 	function init() {
+		// Prevent double initialization
+		if (state.initialized) {
+			return;
+		}
+
 		// Check if Events API is loaded
 		if (!window.mediciEvents) {
 			console.warn('Newsletter forms: mediciEvents API not loaded');
@@ -51,7 +69,7 @@
 		}
 
 		// Find all newsletter forms (js-* hook preferred, legacy class supported)
-		const forms = document.querySelectorAll('.js-newsletter-form, .newsletter-form');
+		const forms = document.querySelectorAll(SELECTORS.form);
 
 		if (!forms.length) {
 			return;
@@ -59,8 +77,39 @@
 
 		// Attach handlers to each form
 		forms.forEach((form) => {
-			form.addEventListener('submit', handleSubmit);
+			// Create bound handler for this form
+			const handler = handleSubmit.bind(null, form);
+			state.handlers.set(form, handler);
+			form.addEventListener('submit', handler);
+
+			// Store form reference
+			state.forms.push(form);
 		});
+
+		state.initialized = true;
+	}
+
+	/**
+	 * Destroy/cleanup all event listeners
+	 * Call this before removing forms from DOM or on page unload
+	 */
+	function destroy() {
+		if (!state.initialized) {
+			return;
+		}
+
+		// Remove submit handlers
+		state.forms.forEach((form) => {
+			const handler = state.handlers.get(form);
+			if (handler) {
+				form.removeEventListener('submit', handler);
+				state.handlers.delete(form);
+			}
+		});
+
+		// Clear forms array
+		state.forms = [];
+		state.initialized = false;
 	}
 
 	/**
@@ -78,17 +127,16 @@
 	/**
 	 * Handle form submission
 	 *
+	 * @param {HTMLFormElement} form - Form element (bound)
 	 * @param {Event} event - Submit event
 	 */
-	function handleSubmit(event) {
+	function handleSubmit(form, event) {
 		event.preventDefault();
-
-		const form = event.target;
 
 		// Get form elements (uses standard field selectors)
 		const emailField = form.querySelector('input[name="email"]');
 		const submitBtn = form.querySelector('button[type="submit"]');
-		const messageEl = form.querySelector('.js-newsletter-message, .newsletter-message');
+		const messageEl = form.querySelector(SELECTORS.message);
 
 		if (!emailField) {
 			console.error('Newsletter form: email field not found');
@@ -173,6 +221,14 @@
 		messageEl.className = `newsletter-form__message newsletter-form__message--${type} newsletter-message ${type}`;
 		messageEl.textContent = text;
 	}
+
+	// =====================================================
+	// PUBLIC API
+	// =====================================================
+	window.MediciNewsletterForm = {
+		init,
+		destroy,
+	};
 
 	// Initialize on DOM ready
 	if (document.readyState === 'loading') {

@@ -11,9 +11,13 @@
  * - .js-consultation-form    - Form element
  * - .js-consultation-message - Message display element
  *
+ * API:
+ * - window.MediciConsultationForm.init()    - Initialize forms
+ * - window.MediciConsultationForm.destroy() - Cleanup event listeners
+ *
  * @package
  * @since   1.4.0
- * @version 1.4.0 Added js-* hooks for BEM separation
+ * @version 1.5.0 Added cleanup/destroy method to prevent memory leaks
  */
 
 (function () {
@@ -42,11 +46,26 @@
 		errorGeneral: 'Сталася помилка. Спробуйте ще раз.',
 	};
 
+	// =====================================================
+	// STATE - Store references for cleanup
+	// =====================================================
+	const state = {
+		initialized: false,
+		forms: [],
+		handlers: new WeakMap(),
+		textareaHandlers: new WeakMap(),
+	};
+
 	/**
 	 * Initialize consultation forms
 	 * Uses js-* hooks with fallback to legacy selectors
 	 */
 	function init() {
+		// Prevent double initialization
+		if (state.initialized) {
+			return;
+		}
+
 		// Check if Events API is loaded
 		if (!window.mediciEvents) {
 			console.warn('Consultation forms: mediciEvents API not loaded');
@@ -54,7 +73,7 @@
 		}
 
 		// Find all consultation forms (js-* hook preferred, legacy class supported)
-		const forms = document.querySelectorAll('.js-consultation-form, .consultation-form');
+		const forms = document.querySelectorAll(SELECTORS.form);
 
 		if (!forms.length) {
 			return;
@@ -62,11 +81,52 @@
 
 		// Attach handlers to each form
 		forms.forEach((form) => {
-			form.addEventListener('submit', handleSubmit);
+			// Create bound handler for this form
+			const handler = handleSubmit.bind(null, form);
+			state.handlers.set(form, handler);
+			form.addEventListener('submit', handler);
 
 			// Initialize autogrowing textarea
 			initAutogrowingTextarea(form);
+
+			// Store form reference
+			state.forms.push(form);
 		});
+
+		state.initialized = true;
+	}
+
+	/**
+	 * Destroy/cleanup all event listeners
+	 * Call this before removing forms from DOM or on page unload
+	 */
+	function destroy() {
+		if (!state.initialized) {
+			return;
+		}
+
+		// Remove submit handlers
+		state.forms.forEach((form) => {
+			const handler = state.handlers.get(form);
+			if (handler) {
+				form.removeEventListener('submit', handler);
+				state.handlers.delete(form);
+			}
+
+			// Remove textarea handlers
+			const textareas = form.querySelectorAll('textarea');
+			textareas.forEach((textarea) => {
+				const inputHandler = state.textareaHandlers.get(textarea);
+				if (inputHandler) {
+					textarea.removeEventListener('input', inputHandler);
+					state.textareaHandlers.delete(textarea);
+				}
+			});
+		});
+
+		// Clear forms array
+		state.forms = [];
+		state.initialized = false;
 	}
 
 	/**
@@ -92,10 +152,16 @@
 			textarea.parentNode.insertBefore(wrapper, textarea);
 			wrapper.appendChild(textarea);
 
-			// Update wrapper data on input
-			textarea.addEventListener('input', () => {
+			// Create bound handler for cleanup
+			const inputHandler = () => {
 				wrapper.setAttribute('data-cloned-val', textarea.value);
-			});
+			};
+
+			// Store handler reference
+			state.textareaHandlers.set(textarea, inputHandler);
+
+			// Update wrapper data on input
+			textarea.addEventListener('input', inputHandler);
 
 			// Trigger initial update
 			wrapper.setAttribute('data-cloned-val', textarea.value);
@@ -130,12 +196,11 @@
 	/**
 	 * Handle form submission
 	 *
+	 * @param {HTMLFormElement} form - Form element (bound)
 	 * @param {Event} event - Submit event
 	 */
-	function handleSubmit(event) {
+	function handleSubmit(form, event) {
 		event.preventDefault();
-
-		const form = event.target;
 
 		// Get form elements
 		const nameField = form.querySelector('input[name="name"]');
@@ -145,7 +210,7 @@
 		const serviceField = form.querySelector('input[name="service"], select[name="service"]');
 		const consentField = form.querySelector('input[name="consent"]');
 		const submitBtn = form.querySelector('button[type="submit"]');
-		const messageEl = form.querySelector('.js-consultation-message, .consultation-message');
+		const messageEl = form.querySelector(SELECTORS.message);
 
 		// Validate required fields exist
 		if (!nameField || !emailField || !phoneField || !consentField) {
@@ -261,6 +326,14 @@
 		messageEl.className = `consultation-form__message consultation-form__message--${type} consultation-message ${type}`;
 		messageEl.textContent = text;
 	}
+
+	// =====================================================
+	// PUBLIC API
+	// =====================================================
+	window.MediciConsultationForm = {
+		init,
+		destroy,
+	};
 
 	// Initialize on DOM ready
 	if (document.readyState === 'loading') {

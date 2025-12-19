@@ -123,6 +123,7 @@ function medici_enqueue_assets(): void {
 		'medici-sections'   => '/css/components/sections.css',
 		'medici-navigation' => '/css/components/navigation.css',
 		'medici-lazy-load'  => '/css/components/lazy-load.css',
+		'medici-animations' => '/css/components/animations.css',
 	);
 
 	foreach ( $component_styles as $handle => $path ) {
@@ -338,7 +339,7 @@ function medici_enqueue_assets(): void {
 		wp_enqueue_script(
 			'medici-events',
 			get_stylesheet_directory_uri() . '/js/events.js',
-			array(),
+			array( 'medici-app' ), // Dependency: medici-app must load first
 			filemtime( $events_js_path ),
 			true
 		);

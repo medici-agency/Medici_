@@ -1,0 +1,149 @@
+/**
+ * Scroll-triggered Animations
+ *
+ * CSS стилі для анімацій при скролі.
+ * JavaScript модуль ScrollAnimationsModule (js/scripts.js) використовує
+ * Intersection Observer API для додавання класу .is-visible.
+ *
+ * @package Medici
+ * @version 1.0.0
+ * @since 2025-12-18
+ */
+
+/* =====================================================
+   BASE ANIMATION STYLES
+   ===================================================== */
+
+/**
+ * Початковий стан - елементи приховані
+ * Всі fade-in елементи починають з opacity: 0
+ */
+.fade-in,
+.fade-in-up,
+.fade-in-left,
+.fade-in-right,
+.fade-in-scale {
+	opacity: 0;
+	transition:
+		opacity 0.6s ease-out,
+		transform 0.6s ease-out;
+	will-change: opacity, transform;
+}
+
+/* =====================================================
+   DIRECTION-SPECIFIC TRANSFORMS
+   ===================================================== */
+
+/**
+ * Fade In Up - елемент з'являється знизу вгору
+ */
+.fade-in-up {
+	transform: translateY(30px);
+}
+
+/**
+ * Fade In Left - елемент з'являється зліва
+ */
+.fade-in-left {
+	transform: translateX(-30px);
+}
+
+/**
+ * Fade In Right - елемент з'являється справа
+ */
+.fade-in-right {
+	transform: translateX(30px);
+}
+
+/**
+ * Fade In Scale - елемент збільшується
+ */
+.fade-in-scale {
+	transform: scale(0.95);
+}
+
+/* =====================================================
+   VISIBLE STATE (triggered by JS)
+   ===================================================== */
+
+/**
+ * Коли елемент стає видимим (Intersection Observer)
+ * JavaScript додає клас .is-visible
+ */
+.fade-in.is-visible,
+.fade-in-up.is-visible,
+.fade-in-left.is-visible,
+.fade-in-right.is-visible,
+.fade-in-scale.is-visible {
+	opacity: 1;
+	transform: none;
+}
+
+/* =====================================================
+   STAGGER DELAYS (optional)
+   ===================================================== */
+
+/**
+ * Затримка анімації для послідовного появлення елементів
+ * Використання: <div class="fade-in-up delay-1">...</div>
+ */
+.delay-1 {
+	transition-delay: 0.1s;
+}
+
+.delay-2 {
+	transition-delay: 0.2s;
+}
+
+.delay-3 {
+	transition-delay: 0.3s;
+}
+
+.delay-4 {
+	transition-delay: 0.4s;
+}
+
+.delay-5 {
+	transition-delay: 0.5s;
+}
+
+/* =====================================================
+   REDUCED MOTION SUPPORT (Accessibility)
+   ===================================================== */
+
+/**
+ * Вимкнення анімацій для користувачів з prefers-reduced-motion
+ * Важливо для доступності (WCAG 2.1)
+ */
+@media (prefers-reduced-motion: reduce) {
+	.fade-in,
+	.fade-in-up,
+	.fade-in-left,
+	.fade-in-right,
+	.fade-in-scale {
+		opacity: 1;
+		transform: none;
+		transition: none;
+		will-change: auto;
+	}
+
+	.delay-1,
+	.delay-2,
+	.delay-3,
+	.delay-4,
+	.delay-5 {
+		transition-delay: 0s;
+	}
+}
+
+/* =====================================================
+   DARK THEME (no changes needed, but explicit)
+   ===================================================== */
+
+[data-theme="dark"] .fade-in,
+[data-theme="dark"] .fade-in-up,
+[data-theme="dark"] .fade-in-left,
+[data-theme="dark"] .fade-in-right,
+[data-theme="dark"] .fade-in-scale {
+	/* Анімації працюють однаково в темній темі */
+}
