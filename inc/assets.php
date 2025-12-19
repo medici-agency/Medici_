@@ -451,12 +451,42 @@ add_action( 'wp_enqueue_scripts', 'medici_enqueue_assets' );
 function medici_preload_critical_assets(): void {
 	$base = MEDICI_THEME_URI . '/fonts/';
 
-	// Preload fonts with crossorigin attribute
+	// Preload fonts with crossorigin attribute (only regular and 600 for above-the-fold)
 	echo '<link rel="preload" as="font" href="' . esc_url( $base . 'montserrat-regular.woff2' ) . '" type="font/woff2" crossorigin="anonymous" />' . "\n";
 	echo '<link rel="preload" as="font" href="' . esc_url( $base . 'montserrat-600.woff2' ) . '" type="font/woff2" crossorigin="anonymous" />' . "\n";
-	echo '<link rel="preload" as="font" href="' . esc_url( $base . 'montserrat-700.woff2' ) . '" type="font/woff2" crossorigin="anonymous" />' . "\n";
+
+	// Preload critical CSS (core styles needed for above-the-fold)
+	echo '<link rel="preload" as="style" href="' . esc_url( MEDICI_THEME_URI . '/css/core/variables.css' ) . '" />' . "\n";
+	echo '<link rel="preload" as="style" href="' . esc_url( MEDICI_THEME_URI . '/css/core/core.css' ) . '" />' . "\n";
 }
 add_action( 'wp_head', 'medici_preload_critical_assets', 2 );
+
+/**
+ * Add resource hints for external resources
+ *
+ * @return void
+ */
+function medici_add_resource_hints(): void {
+	// DNS Prefetch for common external services (analytics, etc)
+	$dns_prefetch = array(
+		'www.google-analytics.com',
+		'www.googletagmanager.com',
+	);
+
+	foreach ( $dns_prefetch as $domain ) {
+		echo '<link rel="dns-prefetch" href="//' . esc_attr( $domain ) . '" />' . "\n";
+	}
+
+	// Preconnect for critical third-party resources
+	$preconnect = array(
+		'https://www.google-analytics.com',
+	);
+
+	foreach ( $preconnect as $url ) {
+		echo '<link rel="preconnect" href="' . esc_url( $url ) . '" crossorigin />' . "\n";
+	}
+}
+add_action( 'wp_head', 'medici_add_resource_hints', 1 );
 
 // ============================================================================
 // LOCAL FONTS (Montserrat with inline styles)
@@ -627,3 +657,141 @@ function medici_manage_resource_hints( array $urls, string $relation_type ): arr
 	return $urls;
 }
 add_filter( 'wp_resource_hints', 'medici_manage_resource_hints', 10, 2 );
+
+// ============================================================================
+// ASYNC CSS LOADING (Performance Optimization)
+// ============================================================================
+
+/**
+ * List of CSS handles that should be loaded asynchronously
+ *
+ * Critical CSS (variables, core, navigation) remains render-blocking
+ * because they're needed for above-the-fold content.
+ *
+ * @var array
+ */
+function medici_get_async_css_handles(): array {
+	return array(
+		// Components (below-the-fold or optional)
+		'medici-buttons',
+		'medici-sections',
+		'medici-lazy-load',
+		'medici-animations',
+		'medici-cards',
+		'medici-faq',
+		'medici-widgets',
+		// Forms (usually below-the-fold)
+		'medici-forms',
+		// Blog module
+		'medici-blog',
+		'medici-blog-single',
+		// Exit-intent (loaded on demand)
+		'medici-exit-intent-overlay',
+	);
+}
+
+/**
+ * Convert render-blocking CSS to async loading
+ *
+ * Uses media="print" onload="this.media='all'" technique
+ * for non-critical stylesheets. This technique is recommended
+ * by Google and works in all modern browsers.
+ *
+ * @param string $tag    Style HTML tag.
+ * @param string $handle Style handle.
+ * @param string $href   Stylesheet URL.
+ * @param string $media  Media type.
+ * @return string Modified style tag
+ */
+function medici_async_css_loading( string $tag, string $handle, string $href, string $media ): string {
+	// Skip if admin
+	if ( is_admin() ) {
+		return $tag;
+	}
+
+	// Get async handles
+	$async_handles = medici_get_async_css_handles();
+
+	// Check if this handle should be async
+	if ( ! in_array( $handle, $async_handles, true ) ) {
+		return $tag;
+	}
+
+	// Convert to async loading
+	// Pattern: <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+	// Fallback: <noscript><link rel="stylesheet"></noscript>
+	$async_tag = sprintf(
+		'<link rel="preload" href="%s" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" media="%s">' . "\n" .
+		'<noscript><link rel="stylesheet" href="%s" media="%s"></noscript>' . "\n",
+		esc_url( $href ),
+		esc_attr( $media ),
+		esc_url( $href ),
+		esc_attr( $media )
+	);
+
+	return $async_tag;
+}
+add_filter( 'style_loader_tag', 'medici_async_css_loading', 10, 4 );
+
+// ============================================================================
+// BROWSER CACHING HEADERS (Performance Optimization)
+// ============================================================================
+
+/**
+ * Add browser caching headers for theme assets
+ *
+ * Sets Cache-Control and Expires headers for static resources.
+ * This helps browsers cache CSS, JS, fonts, and images.
+ *
+ * @return void
+ */
+function medici_add_cache_headers(): void {
+	// Only for front-end
+	if ( is_admin() ) {
+		return;
+	}
+
+	// Check if this is a theme asset request
+	$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+
+	// Theme directory pattern
+	$theme_pattern = '/wp-content/themes/medici/';
+
+	// Check if request is for theme assets
+	if ( false === strpos( $request_uri, $theme_pattern ) ) {
+		return;
+	}
+
+	// Determine file type and set appropriate cache time
+	$extension = strtolower( pathinfo( $request_uri, PATHINFO_EXTENSION ) );
+
+	$cache_times = array(
+		// Fonts - long cache (1 year)
+		'woff'  => 31536000,
+		'woff2' => 31536000,
+		'ttf'   => 31536000,
+		'eot'   => 31536000,
+		// Images - long cache (1 year)
+		'jpg'   => 31536000,
+		'jpeg'  => 31536000,
+		'png'   => 31536000,
+		'gif'   => 31536000,
+		'svg'   => 31536000,
+		'webp'  => 31536000,
+		'ico'   => 31536000,
+		// CSS/JS - medium cache (1 week) - versioned via filemtime
+		'css'   => 604800,
+		'js'    => 604800,
+	);
+
+	if ( isset( $cache_times[ $extension ] ) ) {
+		$max_age = $cache_times[ $extension ];
+
+		// Set caching headers
+		header( 'Cache-Control: public, max-age=' . $max_age . ', immutable' );
+		header( 'Expires: ' . gmdate( 'D, d M Y H:i:s', time() + $max_age ) . ' GMT' );
+	}
+}
+// Note: This hook runs early in WordPress lifecycle
+// For better control, consider using .htaccess or server config
+add_action( 'send_headers', 'medici_add_cache_headers' );
