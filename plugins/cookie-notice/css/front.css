@@ -10,7 +10,7 @@
 	text-align: center;
 	/* border-top: 2px solid #fbb03b; */
 	font-weight: normal;
-	font-family: -apple-system,BlinkMacSystemFont,Arial,Roboto,"Helvetica Neue",sans-serif;
+	font-family: -apple-system, BlinkMacSystemFont, Arial, Roboto, "Helvetica Neue", sans-serif;
 }
 #cookie-notice,
 #cookie-notice * {
@@ -66,10 +66,10 @@
 	height: 15px;
 	opacity: 0.5;
 	padding: 10px;
-    border: none;
+	border: none;
 	outline: none;
-    background: none;
-    box-shadow: none;
+	background: none;
+	box-shadow: none;
 	cursor: pointer;
 }
 .cn-close-icon:focus,
@@ -80,14 +80,14 @@
 .cn-close-icon:hover {
 	opacity: 1;
 }
-.cn-close-icon:before, 
+.cn-close-icon:before,
 .cn-close-icon:after {
 	position: absolute;
-	content: ' ';
+	content: " ";
 	height: 15px;
 	width: 2px;
 	top: 3px;
-	background-color: rgba(128,128,128,1);
+	background-color: rgba(128, 128, 128, 1);
 }
 .cn-close-icon:before {
 	transform: rotate(45deg);
@@ -103,7 +103,7 @@
 	display: inline-block;
 }
 #cookie-notice .cn-button:not(.cn-button-custom) {
-	font-family: -apple-system,BlinkMacSystemFont,Arial,Roboto,"Helvetica Neue",sans-serif;
+	font-family: -apple-system, BlinkMacSystemFont, Arial, Roboto, "Helvetica Neue", sans-serif;
 	font-weight: normal;
 	font-size: 13px;
 	letter-spacing: 0.25px;
@@ -153,7 +153,7 @@
 	animation-name: fadeOut;
 }
 #cookie-notice.cookie-notice-visible.cn-effect-slide,
-#cookie-notice.cookie-revoke-visible.cn-effect-slide{
+#cookie-notice.cookie-revoke-visible.cn-effect-slide {
 	-webkit-animation-name: slideInUp;
 	animation-name: slideInUp;
 }
