@@ -74,6 +74,54 @@ class Exit_Intent_Public {
 	}
 
 	/**
+	 * Fix GenerateBlocks Overlay Panel data-gb-overlay attribute
+	 *
+	 * Removes empty data-gb-overlay="" from overlay containers
+	 * to prevent "Empty string passed to getElementById()" errors
+	 *
+	 * @since 1.0.1
+	 */
+	public function fix_overlay_panel_attributes(): void {
+		?>
+		<script id="medici-overlay-panel-fix">
+		(function() {
+			'use strict';
+
+			// Run early to fix before GenerateBlocks overlay.js initializes
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', fixOverlayAttributes);
+			} else {
+				fixOverlayAttributes();
+			}
+
+			function fixOverlayAttributes() {
+				// Find all elements with empty data-gb-overlay attribute
+				const elements = document.querySelectorAll('[data-gb-overlay]');
+
+				elements.forEach(function(el) {
+					const overlayValue = el.getAttribute('data-gb-overlay');
+
+					// Remove ONLY empty data-gb-overlay="" from overlay containers
+					// Keep non-empty values (triggers like data-gb-overlay="gb-overlay-424")
+					if (overlayValue === '') {
+						// Check if it's the overlay container itself (has id starting with gb-overlay-)
+						const elId = el.getAttribute('id');
+						if (elId && elId.indexOf('gb-overlay-') === 0) {
+							el.removeAttribute('data-gb-overlay');
+
+							if (<?php echo $this->config['debug'] ? 'true' : 'false'; ?>) {
+								console.log('[Medici] Fixed empty data-gb-overlay on:', elId);
+							}
+						}
+					}
+				});
+			}
+		})();
+		</script>
+		<?php
+	}
+
+	/**
 	 * Get configuration
 	 *
 	 * @return array<string, mixed>
