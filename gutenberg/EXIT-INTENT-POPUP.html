@@ -63,15 +63,28 @@
    При exit-intent:
    - [Medici Exit-Intent] Overlay opened: medici-exit-intent-panel
 
+   Перевірка в консолі:
+   - typeof window.bioEp → 'object' (NOT 'function'!)
+   - typeof window.bioEp.init → 'function'
+   - typeof window.mediciExitIntentConfig → 'object'
+
 🔧 ЯК ПРАЦЮЄ:
-1. bioEp детектить exit-intent (миша до верхньої частини екрану)
-2. Перевіряє cookie (якщо показано протягом 30 днів - не показує)
-3. bioEp викликає window.bioEp.showPopup() при exit-intent
-4. exit-intent-overlay.js перехоплює showPopup() та тригерить GenerateBlocks Overlay
-5. Popup відкривається з анімацією Scale In
-6. bioEp зберігає cookie на 30 днів через cookieManager
-7. Форма відправляється через Events API
-8. Закриття через data-gb-close-panel (кнопка X або "Ні, дякую")
+1. exit-intent-overlay.js перехоплює bioEp.addPopup() та bioEp.addCSS() (no-op)
+2. bioEp.init() запускається БЕЗ створення зайвого DOM/CSS
+3. bioEp детектить exit-intent (миша до верхньої частини екрану)
+4. bioEp перевіряє cookie (якщо показано протягом 30 днів - не показує)
+5. bioEp викликає window.bioEp.showPopup() при exit-intent
+6. exit-intent-overlay.js перехоплює showPopup() та тригерить GenerateBlocks Overlay
+7. Popup відкривається з анімацією Scale In
+8. bioEp зберігає cookie на 30 днів через cookieManager
+9. Форма відправляється через Events API
+10. Закриття через data-gb-close-panel (кнопка X або "Ні, дякую")
+
+⚡ ОПТИМІЗАЦІЯ:
+- bioEp НЕ створює власний DOM popup (addPopup() перехоплено)
+- bioEp НЕ впроваджує власні стилі (addCSS() перехоплено)
+- Використовуємо ТІЛЬКИ exit-intent detector + cookie manager
+- Результат: мінімальний overhead, максимальна продуктивність
 -->
 
 <!-- wp:html -->

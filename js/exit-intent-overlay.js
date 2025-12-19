@@ -82,9 +82,24 @@
 		}
 
 		// Check if bioEp is loaded (it's an object, not a function!)
+		// Correct check: typeof window.bioEp === 'object'
 		if (!window.bioEp || typeof window.bioEp.init !== 'function') {
 			warn('bioEp library not loaded (window.bioEp missing)');
 			return;
+		}
+
+		// Prevent bioEp from adding unnecessary DOM/CSS
+		// We only need exit-intent detection + cookie management
+		if (typeof window.bioEp.addPopup === 'function') {
+			window.bioEp.addPopup = function () {
+				// No-op: prevent bioEp's DOM popup creation
+			};
+		}
+
+		if (typeof window.bioEp.addCSS === 'function') {
+			window.bioEp.addCSS = function () {
+				// No-op: prevent bioEp's CSS injection
+			};
 		}
 
 		// Intercept showPopup() - this is what bioEp calls on exit-intent
