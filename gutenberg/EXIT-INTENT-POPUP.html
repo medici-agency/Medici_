@@ -50,17 +50,28 @@
 7. Активуйте обидва Elements
 
 8. Перевірте що JavaScript файли завантажились:
-   - bioep.min.js (beeker1121 library)
-   - exit-intent-overlay.js (повний хендлер v2.0.0)
+   - bioep.min.js (beeker1121 library - window.bioEp object)
+   - exit-intent-overlay.js (повний хендлер v2.1.0)
+
+9. Debug (якщо WP_DEBUG = true):
+   Консоль браузера покаже:
+   - [Medici Exit-Intent] Initialized
+   - [Medici Exit-Intent] bioEp.showPopup() intercepted
+   - [Medici Exit-Intent] bioEp configured (window.bioEp.init)
+   - [Medici Exit-Intent] Form handler attached
+
+   При exit-intent:
+   - [Medici Exit-Intent] Overlay opened: medici-exit-intent-panel
 
 🔧 ЯК ПРАЦЮЄ:
 1. bioEp детектить exit-intent (миша до верхньої частини екрану)
 2. Перевіряє cookie (якщо показано протягом 30 днів - не показує)
-3. exit-intent-overlay.js тригерить GenerateBlocks Overlay Panel через прихований тригер
-4. Popup відкривається з анімацією Scale In
-5. Форма відправляється через Events API
-6. bioEp зберігає cookie на 30 днів
-7. Закриття через data-gb-close-panel (кнопка X або "Ні, дякую")
+3. bioEp викликає window.bioEp.showPopup() при exit-intent
+4. exit-intent-overlay.js перехоплює showPopup() та тригерить GenerateBlocks Overlay
+5. Popup відкривається з анімацією Scale In
+6. bioEp зберігає cookie на 30 днів через cookieManager
+7. Форма відправляється через Events API
+8. Закриття через data-gb-close-panel (кнопка X або "Ні, дякую")
 -->
 
 <!-- wp:html -->

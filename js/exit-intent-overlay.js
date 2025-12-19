@@ -1,9 +1,9 @@
 /**
  * Exit-Intent Overlay Popup - Complete Handler
  *
- * Version: 2.0.0
+ * Version: 2.1.0
  * Features:
- * - bioEp (beeker1121) exit-intent detection
+ * - bioEp (beeker1121) exit-intent detection via window.bioEp.init()
  * - GenerateBlocks Pro 2.3+ Overlay Panel trigger
  * - Events API: consultation_request
  *
@@ -21,76 +21,107 @@
 		debug: false,
 	};
 
-	/**
-	 * Initialize Exit-Intent Handler
-	 */
-	function init() {
-		// 1. Initialize bioEp exit-intent detection
-		initBioEp();
-
-		// 2. Initialize form handler
-		initFormHandler();
-
-		if (config.debug) {
-			console.log('[Medici Exit-Intent] Initialized', config);
-		}
-	}
+	// Debug helpers
+	const log = (...args) => {
+		if (config.debug) console.log('[Medici Exit-Intent]', ...args);
+	};
+	const warn = (...args) => {
+		if (config.debug) console.warn('[Medici Exit-Intent]', ...args);
+	};
+	const error = (...args) => {
+		if (config.debug) console.error('[Medici Exit-Intent]', ...args);
+	};
 
 	/**
-	 * Initialize bioEp Exit-Intent Detection
+	 * Check if desktop (>1024px)
 	 */
-	function initBioEp() {
-		// Check if bioEp is loaded
-		if (typeof bioEp !== 'function') {
-			if (config.debug) {
-				console.warn('[Medici Exit-Intent] bioEp library not loaded');
-			}
-			return;
-		}
-
-		// Configure bioEp
-		bioEp({
-			// Cookie expiration (days)
-			cookieExp: config.cookieExp,
-
-			// Delay before showing (seconds)
-			delay: config.delay,
-
-			// Show only on desktop (>1024px)
-			showOnDelay: false,
-			showOnScroll: false,
-
-			// Callback when exit-intent detected
-			onExit: function () {
-				openOverlayPanel();
-			},
-		});
-
-		if (config.debug) {
-			console.log('[Medici Exit-Intent] bioEp configured');
-		}
+	function isDesktop() {
+		return window.matchMedia && window.matchMedia('(min-width: 1025px)').matches;
 	}
 
 	/**
 	 * Open GenerateBlocks Overlay Panel
 	 */
 	function openOverlayPanel() {
-		// Find overlay trigger element
 		const trigger = document.querySelector(`[data-gb-overlay="${config.overlayPanelId}"]`);
 
 		if (!trigger) {
-			if (config.debug) {
-				console.error('[Medici Exit-Intent] Overlay trigger not found:', config.overlayPanelId);
-			}
+			error('Overlay trigger not found:', config.overlayPanelId);
 			return;
 		}
 
-		// Trigger click to open overlay
 		trigger.click();
+		log('Overlay opened:', config.overlayPanelId);
+	}
 
-		if (config.debug) {
-			console.log('[Medici Exit-Intent] Overlay opened:', config.overlayPanelId);
+	/**
+	 * Close Overlay Panel
+	 * GenerateBlocks Pro method
+	 */
+	function closeOverlayPanel() {
+		// Safer to scope to exit-intent popup to avoid closing other overlays
+		const scope = document.querySelector('.exit-intent-content') || document;
+		const closeButton = scope.querySelector('[data-gb-close-panel]');
+		if (closeButton) {
+			closeButton.click();
+			log('Overlay closed');
 		}
+	}
+
+	/**
+	 * Initialize bioEp Exit-Intent Detection
+	 *
+	 * IMPORTANT: bioEp uses window.bioEp.init() and triggers via showPopup()
+	 * We intercept showPopup() to open GenerateBlocks Overlay instead
+	 */
+	function initBioEp() {
+		// Desktop only
+		if (!isDesktop()) {
+			log('Skipped (not desktop)');
+			return;
+		}
+
+		// Check if bioEp is loaded (it's an object, not a function!)
+		if (!window.bioEp || typeof window.bioEp.init !== 'function') {
+			warn('bioEp library not loaded (window.bioEp missing)');
+			return;
+		}
+
+		// Intercept showPopup() - this is what bioEp calls on exit-intent
+		const originalShowPopup = window.bioEp.showPopup && window.bioEp.showPopup.bind(window.bioEp);
+
+		if (typeof originalShowPopup === 'function') {
+			window.bioEp.showPopup = function () {
+				// Prevent showing twice
+				if (this.shown) {
+					return;
+				}
+
+				this.shown = true;
+
+				// Set cookie using bioEp's cookie manager
+				if (this.cookieManager && typeof this.cookieManager.create === 'function') {
+					this.cookieManager.create('bioep_shown', 'true', config.cookieExp, false);
+				}
+
+				// Open GenerateBlocks Overlay instead of bioEp's DOM popup
+				openOverlayPanel();
+
+				// IMPORTANT: Don't call originalShowPopup() to avoid showing bioEp's popup
+			};
+
+			log('bioEp.showPopup() intercepted');
+		}
+
+		// Initialize bioEp with configuration
+		window.bioEp.init({
+			cookieExp: config.cookieExp,
+			delay: config.delay,
+			showOnDelay: false,
+			showOncePerSession: false,
+		});
+
+		log('bioEp configured (window.bioEp.init)');
 	}
 
 	/**
@@ -99,17 +130,12 @@
 	function initFormHandler() {
 		const form = document.querySelector('.js-exit-intent-form');
 		if (!form) {
-			if (config.debug) {
-				console.warn('[Medici Exit-Intent] Form not found');
-			}
+			warn('Form not found');
 			return;
 		}
 
 		form.addEventListener('submit', handleFormSubmit);
-
-		if (config.debug) {
-			console.log('[Medici Exit-Intent] Form handler attached');
-		}
+		log('Form handler attached');
 	}
 
 	/**
@@ -144,39 +170,45 @@
 		}
 
 		// Disable button
-		submitButton.disabled = true;
-		submitButton.textContent = 'Відправка...';
+		if (submitButton) {
+			submitButton.disabled = true;
+			submitButton.textContent = 'Відправка...';
+		}
 
 		try {
 			// Use Events API
-			if (typeof window.mediciEvents === 'undefined') {
+			if (!window.mediciEvents || typeof window.mediciEvents.send !== 'function') {
 				throw new Error('Events API не доступний');
 			}
 
 			const result = await window.mediciEvents.send('consultation_request', data);
 
-			if (result.success) {
-				showMessage(
-					messageContainer,
-					"✅ Дякуємо! Ми зв'яжемось з вами найближчим часом.",
-					'success'
-				);
-				form.reset();
-
-				// Close popup after 3 seconds
-				setTimeout(() => {
-					closeOverlayPanel();
-				}, 3000);
-			} else {
-				throw new Error(result.message || 'Помилка відправки форми');
+			if (!result || !result.success) {
+				throw new Error((result && result.message) || 'Помилка відправки форми');
 			}
-		} catch (error) {
-			console.error('Exit-Intent Form Error:', error);
-			showMessage(messageContainer, `❌ Помилка: ${error.message}`, 'error');
+
+			showMessage(
+				messageContainer,
+				"✅ Дякуємо! Ми зв'яжемось з вами найближчим часом.",
+				'success'
+			);
+			form.reset();
+
+			// Close popup after 3 seconds
+			setTimeout(() => {
+				closeOverlayPanel();
+			}, 3000);
+
+			log('Form submitted successfully');
+		} catch (err) {
+			error('Form error:', err);
+			showMessage(messageContainer, `❌ Помилка: ${err.message || err}`, 'error');
 		} finally {
 			// Re-enable button
-			submitButton.disabled = false;
-			submitButton.textContent = 'Отримати консультацію';
+			if (submitButton) {
+				submitButton.disabled = false;
+				submitButton.textContent = 'Отримати консультацію';
+			}
 		}
 	}
 
@@ -193,7 +225,7 @@
 		}
 
 		container.textContent = message;
-		container.className = `exit-intent-message ${type}`;
+		container.className = `exit-intent-message ${type || ''}`.trim();
 		container.setAttribute('role', 'alert');
 
 		// Clear after 5 seconds for errors
@@ -206,14 +238,16 @@
 	}
 
 	/**
-	 * Close Overlay Panel
-	 * GenerateBlocks Pro method
+	 * Initialize Exit-Intent Handler
 	 */
-	function closeOverlayPanel() {
-		const closeButton = document.querySelector('[data-gb-close-panel]');
-		if (closeButton) {
-			closeButton.click();
-		}
+	function init() {
+		// 1. Initialize bioEp exit-intent detection
+		initBioEp();
+
+		// 2. Initialize form handler
+		initFormHandler();
+
+		log('Initialized', config);
 	}
 
 	// Initialize on DOM ready
