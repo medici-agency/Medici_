@@ -668,26 +668,33 @@ add_filter( 'wp_resource_hints', 'medici_manage_resource_hints', 10, 2 );
  * Critical CSS (variables, core, navigation) remains render-blocking
  * because they're needed for above-the-fold content.
  *
+ * NOTE: Blog CSS is NOT async because it's needed for above-the-fold on blog pages.
+ *
  * @return array<string> List of CSS handles for async loading
  */
 function medici_get_async_css_handles(): array {
-	return array(
+	// Base async handles (truly non-critical)
+	$async_handles = array(
 		// Components (below-the-fold or optional)
-		'medici-buttons',
-		'medici-sections',
 		'medici-lazy-load',
 		'medici-animations',
-		'medici-cards',
 		'medici-faq',
 		'medici-widgets',
-		// Forms (usually below-the-fold)
-		'medici-forms',
-		// Blog module
-		'medici-blog',
-		'medici-blog-single',
 		// Exit-intent (loaded on demand)
 		'medici-exit-intent-overlay',
 	);
+
+	// Forms are async only on pages without forms above-the-fold
+	if ( ! is_page( array( 'contact', 'контакти', 'consultation', 'консультація' ) ) ) {
+		$async_handles[] = 'medici-forms';
+	}
+
+	// Cards are async only on pages without cards above-the-fold
+	if ( ! is_front_page() && ! is_page( array( 'services', 'послуги' ) ) ) {
+		$async_handles[] = 'medici-cards';
+	}
+
+	return $async_handles;
 }
 
 /**
