@@ -48,6 +48,21 @@ class Settings {
 	public function __construct( Cookie_Notice $plugin ) {
 		$this->plugin = $plugin;
 
+		add_action( 'admin_menu', [ $this, 'add_menu_page' ] );
+		add_action( 'admin_init', [ $this, 'register_settings' ] );
+		add_action( 'admin_init', [ $this, 'init_tabs' ], 1 ); // WordPress 6.7+ - after textdomain loaded
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
+
+		// AJAX для preview
+		add_action( 'wp_ajax_mcn_preview_banner', [ $this, 'ajax_preview_banner' ] );
+	}
+
+	/**
+	 * Initialize tabs (after textdomain loaded on init)
+	 *
+	 * @return void
+	 */
+	public function init_tabs(): void {
 		$this->tabs = [
 			'general'     => __( '🍪 Загальні', 'medici-cookie-notice' ),
 			'appearance'  => __( '🎨 Вигляд', 'medici-cookie-notice' ),
@@ -59,13 +74,6 @@ class Settings {
 			'integration' => __( '🔗 Інтеграції', 'medici-cookie-notice' ),
 			'advanced'    => __( '⚙️ Додатково', 'medici-cookie-notice' ),
 		];
-
-		add_action( 'admin_menu', [ $this, 'add_menu_page' ] );
-		add_action( 'admin_init', [ $this, 'register_settings' ] );
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
-
-		// AJAX для preview
-		add_action( 'wp_ajax_mcn_preview_banner', [ $this, 'ajax_preview_banner' ] );
 	}
 
 	/**
