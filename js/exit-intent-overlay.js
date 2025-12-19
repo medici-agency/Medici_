@@ -80,10 +80,7 @@
 
 		if (!trigger) {
 			if (config.debug) {
-				console.error(
-					'[Medici Exit-Intent] Overlay trigger not found:',
-					config.overlayPanelId
-				);
+				console.error('[Medici Exit-Intent] Overlay trigger not found:', config.overlayPanelId);
 			}
 			return;
 		}
