@@ -74,8 +74,7 @@
 				this.addEvent(document, 'mouseout', function (e) {
 					e = e || window.event;
 
-					const targetTag =
-						e.target && e.target.tagName ? e.target.tagName.toLowerCase() : '';
+					const targetTag = e.target && e.target.tagName ? e.target.tagName.toLowerCase() : '';
 					if (targetTag === 'input' || targetTag === 'select' || targetTag === 'textarea') {
 						return;
 					}
@@ -97,7 +96,9 @@
 		}
 
 		const originalShowPopup =
-			typeof window.bioEp.showPopup === 'function' ? window.bioEp.showPopup.bind(window.bioEp) : null;
+			typeof window.bioEp.showPopup === 'function'
+				? window.bioEp.showPopup.bind(window.bioEp)
+				: null;
 
 		if (typeof originalShowPopup === 'function') {
 			window.bioEp.showPopup = function () {
@@ -188,7 +189,11 @@
 					throw new Error((result && result.message) || 'Помилка відправки форми');
 				}
 
-				showMessage(messageContainer, "✅ Дякуємо! Ми зв'яжемось з вами найближчим часом.", 'success');
+				showMessage(
+					messageContainer,
+					"✅ Дякуємо! Ми зв'яжемось з вами найближчим часом.",
+					'success'
+				);
 				form.reset();
 				setTimeout(closeOverlayPanel, 3000);
 			} catch (e2) {
