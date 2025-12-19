@@ -100,6 +100,37 @@ Parameter #1 $post_id of function esc_html expects string, int given
 
 **Рішення:** Cast: `esc_html((string) $post_id)`
 
+**5. npm ci / package-lock.json Error:**
+
+```
+npm error Invalid: lock file's keyv@4.5.4 does not satisfy keyv@5.5.5
+npm error Missing: typescript@5.9.3 from lock file
+```
+
+**Рішення:**
+
+```bash
+rm -rf node_modules package-lock.json && npm install
+```
+
+**6. Node Version Mismatch (EBADENGINE):**
+
+```
+npm warn EBADENGINE required: { node: '>=20' }
+npm warn EBADENGINE current: { node: 'v18.20.8' }
+```
+
+**Рішення:** CI та локально мають використовувати Node 20+. Перевір `.github/workflows/*.yml`
+
+### ⚠️ NODE.JS ВИМОГИ:
+
+| Компонент   | Мінімальна версія |
+| ----------- | ----------------- |
+| **Node.js** | >= 20.0.0         |
+| **npm**     | >= 10.0.0         |
+
+**Перевірка:** `node --version && npm --version`
+
 ### ⚡ QUICK COMMANDS:
 
 ```bash
@@ -116,6 +147,8 @@ npm run format:check && npm run lint:js && npm run lint:css && composer phpstan
 - ❌ Ігнорувати CI/CD помилки
 - ❌ Використовувати `--no-verify` для git hooks
 - ❌ Force push без виправлення CI помилок
+- ❌ Змінювати Node версію в CI без оновлення package-lock.json
+- ❌ Використовувати Node < 20 (залежності вимагають >= 20)
 
 ---
 
