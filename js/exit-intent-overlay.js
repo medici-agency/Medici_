@@ -1,9 +1,11 @@
 /**
- * Exit-Intent Overlay Popup - Form Handler
+ * Exit-Intent Overlay Popup - Complete Handler
  *
- * Version: 1.0.0
- * GenerateBlocks Pro 2.3+ Overlay Panel Integration
- * Events API: consultation_request
+ * Version: 2.0.0
+ * Features:
+ * - bioEp (beeker1121) exit-intent detection
+ * - GenerateBlocks Pro 2.3+ Overlay Panel trigger
+ * - Events API: consultation_request
  *
  * @package
  */
@@ -11,16 +13,106 @@
 (function () {
 	'use strict';
 
+	// Configuration from PHP (window.mediciExitIntentConfig)
+	const config = window.mediciExitIntentConfig || {
+		overlayPanelId: 'medici-exit-intent-panel',
+		cookieExp: 30,
+		delay: 2,
+		debug: false,
+	};
+
 	/**
-	 * Initialize Exit-Intent Form Handler
+	 * Initialize Exit-Intent Handler
 	 */
 	function init() {
+		// 1. Initialize bioEp exit-intent detection
+		initBioEp();
+
+		// 2. Initialize form handler
+		initFormHandler();
+
+		if (config.debug) {
+			console.log('[Medici Exit-Intent] Initialized', config);
+		}
+	}
+
+	/**
+	 * Initialize bioEp Exit-Intent Detection
+	 */
+	function initBioEp() {
+		// Check if bioEp is loaded
+		if (typeof bioEp !== 'function') {
+			if (config.debug) {
+				console.warn('[Medici Exit-Intent] bioEp library not loaded');
+			}
+			return;
+		}
+
+		// Configure bioEp
+		bioEp({
+			// Cookie expiration (days)
+			cookieExp: config.cookieExp,
+
+			// Delay before showing (seconds)
+			delay: config.delay,
+
+			// Show only on desktop (>1024px)
+			showOnDelay: false,
+			showOnScroll: false,
+
+			// Callback when exit-intent detected
+			onExit: function () {
+				openOverlayPanel();
+			},
+		});
+
+		if (config.debug) {
+			console.log('[Medici Exit-Intent] bioEp configured');
+		}
+	}
+
+	/**
+	 * Open GenerateBlocks Overlay Panel
+	 */
+	function openOverlayPanel() {
+		// Find overlay trigger element
+		const trigger = document.querySelector(`[data-gb-overlay="${config.overlayPanelId}"]`);
+
+		if (!trigger) {
+			if (config.debug) {
+				console.error(
+					'[Medici Exit-Intent] Overlay trigger not found:',
+					config.overlayPanelId
+				);
+			}
+			return;
+		}
+
+		// Trigger click to open overlay
+		trigger.click();
+
+		if (config.debug) {
+			console.log('[Medici Exit-Intent] Overlay opened:', config.overlayPanelId);
+		}
+	}
+
+	/**
+	 * Initialize Form Handler
+	 */
+	function initFormHandler() {
 		const form = document.querySelector('.js-exit-intent-form');
 		if (!form) {
+			if (config.debug) {
+				console.warn('[Medici Exit-Intent] Form not found');
+			}
 			return;
 		}
 
 		form.addEventListener('submit', handleFormSubmit);
+
+		if (config.debug) {
+			console.log('[Medici Exit-Intent] Form handler attached');
+		}
 	}
 
 	/**
