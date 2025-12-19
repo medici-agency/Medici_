@@ -73,6 +73,14 @@
   - GitHub Actions CI/CD (3 нові jobs)
   - Pre-commit hook integration (6 перевірок)
   - Документація: CODE-QUALITY.md
+- [x] **CLAUDE.md Critical Update** — @prettier/plugin-php помилка ✅ 2025-12-19
+  - Додано критичну помилку #7 (Missing @prettier/plugin-php)
+  - Посилено "MANDATORY PRE-COMMIT WORKFLOW" (крок #0)
+  - Оновлено "ПЕРЕД НАПИСАННЯМ КОДУ" (+2 пункти)
+  - Розширено секцію "ЗАБОРОНЕНО" (+3 заборони)
+  - Bash скрипт автоперевірки node_modules/@prettier/
+  - Золоте правило: npm run format:check перед комітом
+  - Мета: уникнення повторних помилок з npm залежностями
 
 ### Фаза 2: Аналітика та трекінг (✅ Завершено)
 
