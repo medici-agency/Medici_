@@ -141,21 +141,19 @@
 - [x] **Verification (no action needed)**
   - [x] SQL injection in rest-api.php — вже sanitized via absint()
 
-### Фаза 6: Legacy → OOP Migration (📋 Планується)
+### Фаза 6: Legacy → OOP Migration (✅ Завершено 2025-12-19)
 
-⚠️ **Архітектурні проблеми виявлені під час аудиту:**
-
-- [ ] **OOP Observers не викликаються**
-  - Legacy `class-events.php` не dispatch'ить події через `EventDispatcher`
-  - OOP модуль (`inc/events/`) фактично не використовується
-  - Потрібно: інтегрувати EventDispatcher в legacy handler
-- [ ] **~900 рядків дублювання коду**
-  - `lead-integrations.php` vs `inc/lead/` adapters
-  - `blog-meta-fields.php` vs `inc/blog/` services
-  - Потрібно: поступова міграція з deprecation warnings
-- [ ] **Видалення legacy файлів (після міграції)**
-  - `inc/lead-integrations.php` — замінено на `inc/lead/`
-  - `inc/blog-cache.php` — функціонал в `BlogPostRepository`
+- [x] **OOP Observers тепер викликаються**
+  - Legacy `class-events.php` dispatch'ить події через `EventDispatcher`
+  - Метод `dispatch_oop_event()` створює OOP події
+  - Lead ID передається для уникнення дублювання
+- [x] **Дублювання коду усунено**
+  - `lead-integrations.php` → deprecated wrapper для `IntegrationManager`
+  - `LeadCreationObserver` перевіряє чи лід вже створений
+  - Інтеграції викликаються тільки через OOP `IntegrationObserver`
+- [x] **Legacy файли збережено для backwards compatibility**
+  - `inc/lead-integrations.php` — deprecated, делегує на OOP
+  - `inc/blog-cache.php` — залишено (унікальний функціонал кешування)
 
 ---
 
@@ -464,6 +462,6 @@ composer lint             # Все разом
 
 ---
 
-**Last Updated:** 2025-12-18
-**Theme Version:** 2.0.0
-**Roadmap Version:** 1.3
+**Last Updated:** 2025-12-19
+**Theme Version:** 2.1.0
+**Roadmap Version:** 1.4

@@ -8,7 +8,8 @@
  * @package    Medici_Agency
  * @subpackage Events
  * @since      1.4.0
- * @version    1.2.3
+ * @version    2.0.0
+ * @changelog  2.0.0 - OOP Integration: EventDispatcher + IntegrationManager bridge
  * @changelog  1.2.3 - Lenient nonce verification for public forms (honeypot + User-Agent + Referer)
  * @changelog  1.2.2 - Better nonce verification + Lead CPT integration
  */
@@ -290,33 +291,21 @@ final class Events {
 		// Send to webhook (Zapier/Make)
 		$this->send_to_webhook( $event_type, $payload, $event_id );
 
-		// Create lead in CPT for consultation requests
+		// Create lead in CPT for consultation requests (legacy handler)
+		$lead_id = 0;
 		if ( 'consultation_request' === $event_type ) {
-			// Check if Lead_CPT class exists (autoloader may not have loaded it yet)
-			if ( class_exists( 'Medici\Lead_CPT' ) && class_exists( 'Medici\Lead_Integrations' ) ) {
+			if ( class_exists( 'Medici\Lead_CPT' ) ) {
 				$lead_id = \Medici\Lead_CPT::create_lead( $payload );
 
-				if ( $lead_id > 0 ) {
-					// Send all integrations (Email, Telegram, Google Sheets)
-					\Medici\Lead_Integrations::send_all( $payload, $lead_id );
-
-					// Log success
-					if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-						error_log( sprintf( '[Medici Events] Lead created: ID=%d, Email=%s', $lead_id, $payload['email'] ?? 'N/A' ) );
-					}
-				} else {
-					// Log failure (but don't break the flow - event still logged)
-					if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-						error_log( '[Medici Events] Failed to create lead in CPT' );
-					}
-				}
-			} else {
-				// Log missing classes (configuration issue)
-				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-					error_log( '[Medici Events] Lead_CPT or Lead_Integrations class not found' );
+				if ( $lead_id > 0 && defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+					error_log( sprintf( '[Medici Events] Lead created: ID=%d, Email=%s', $lead_id, $payload['email'] ?? 'N/A' ) );
 				}
 			}
 		}
+
+		// Dispatch OOP event through EventDispatcher (v2.0.0)
+		// Integrations are handled by OOP IntegrationObserver
+		$this->dispatch_oop_event( $event_type, $payload, $event_id, $lead_id );
 
 		// Success response
 		wp_send_json_success(
@@ -699,5 +688,60 @@ final class Events {
 		);
 
 		return $messages[ $event_type ] ?? __( 'Дякуємо! Дані успішно відправлені.', 'medici.agency' );
+	}
+
+	/**
+	 * Dispatch OOP event through EventDispatcher
+	 *
+	 * Bridges legacy Events API with new OOP Event system (v2.0.0).
+	 * Creates appropriate event object and dispatches through EventDispatcher.
+	 *
+	 * @since 2.0.0
+	 * @param string $event_type Event type identifier
+	 * @param array  $payload    Sanitized payload data
+	 * @param int    $event_id   Local event ID
+	 * @param int    $lead_id    Lead ID (for consultation requests, created by legacy handler)
+	 * @return void
+	 */
+	private function dispatch_oop_event( string $event_type, array $payload, int $event_id, int $lead_id = 0 ): void {
+		// Check if OOP Events module is loaded
+		if ( ! class_exists( 'Medici\Events\EventDispatcher' ) ) {
+			return;
+		}
+
+		$dispatcher = \Medici\Events\EventDispatcher::getInstance();
+
+		// Create and dispatch appropriate event
+		switch ( $event_type ) {
+			case 'consultation_request':
+				if ( class_exists( 'Medici\Events\ConsultationRequestEvent' ) ) {
+					$event = \Medici\Events\ConsultationRequestEvent::fromPayload( $payload );
+					$event->setEventId( $event_id );
+
+					// Pass lead_id from legacy handler to avoid duplicate creation
+					if ( $lead_id > 0 ) {
+						$event->setLeadId( $lead_id );
+					}
+
+					$dispatcher->dispatch( $event );
+
+					if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+						error_log( sprintf( '[Medici Events] OOP ConsultationRequestEvent dispatched: ID=%d, LeadID=%d', $event_id, $lead_id ) );
+					}
+				}
+				break;
+
+			case 'newsletter_subscribe':
+				if ( class_exists( 'Medici\Events\NewsletterSubscribeEvent' ) ) {
+					$event = \Medici\Events\NewsletterSubscribeEvent::fromPayload( $payload );
+					$event->setEventId( $event_id );
+					$dispatcher->dispatch( $event );
+
+					if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+						error_log( sprintf( '[Medici Events] OOP NewsletterSubscribeEvent dispatched: ID=%d', $event_id ) );
+					}
+				}
+				break;
+		}
 	}
 }
