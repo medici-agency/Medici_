@@ -48,7 +48,10 @@ class Settings {
 	public function __construct( Cookie_Notice $plugin ) {
 		$this->plugin = $plugin;
 
-		add_action( 'admin_menu', [ $this, 'add_menu_page' ] );
+		// Меню реєструється тільки якщо Admin_Menu не активний (для сумісності)
+		if ( ! class_exists( 'Medici\CookieNotice\Admin\Admin_Menu' ) ) {
+			add_action( 'admin_menu', [ $this, 'add_menu_page' ] );
+		}
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
 		add_action( 'admin_init', [ $this, 'init_tabs' ], 1 ); // WordPress 6.7+ - after textdomain loaded
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
@@ -1266,21 +1269,22 @@ class Settings {
 		// Маппінг полів по вкладках
 		$tab_fields = [
 			'general'     => [
-				'checkboxes' => [ 'enabled', 'show_reject_button', 'show_settings_button', 'show_revoke_button', 'open_in_new_tab', 'enable_categories' ],
+				'checkboxes' => [ 'enabled', 'show_reject_button', 'show_settings_button', 'show_revoke_button', 'open_in_new_tab' ],
 				'text'       => [ 'message', 'accept_text', 'reject_text', 'settings_text', 'save_text', 'privacy_policy_text', 'revoke_text' ],
 				'select'     => [ 'position', 'layout' ],
 				'number'     => [ 'cookie_expiry', 'cookie_expiry_rejected' ],
 				'other'      => [ 'privacy_policy_page' ],
 			],
 			'appearance'  => [
-				'checkboxes' => [ 'use_twemoji' ],
+				'checkboxes' => [],
 				'text'       => [],
 				'select'     => [ 'animation', 'hide_effect' ],
 				'color'      => [ 'bar_bg_color', 'bar_text_color', 'btn_accept_bg', 'btn_accept_text', 'btn_reject_bg', 'btn_reject_text', 'btn_settings_bg', 'btn_settings_text' ],
 				'number'     => [ 'bar_opacity', 'btn_border_radius' ],
 			],
 			'categories'  => [
-				'complex' => [ 'categories' ],
+				'checkboxes' => [ 'enable_categories' ],
+				'complex'    => [ 'categories' ],
 			],
 			'blocking'    => [
 				'checkboxes' => [ 'enable_script_blocking' ],
@@ -1305,7 +1309,7 @@ class Settings {
 				'number'     => [ 'gcm_wait_for_update' ],
 			],
 			'advanced'    => [
-				'checkboxes' => [ 'wpml_support', 'cache_compatibility', 'amp_support', 'accept_on_scroll', 'accept_on_click', 'reload_on_change', 'debug_mode' ],
+				'checkboxes' => [ 'wpml_support', 'cache_compatibility', 'amp_support', 'accept_on_scroll', 'accept_on_click', 'reload_on_change', 'debug_mode', 'use_twemoji' ],
 				'text'       => [ 'cookie_path', 'custom_css', 'custom_js' ],
 				'number'     => [ 'scroll_offset' ],
 			],
@@ -1446,7 +1450,8 @@ class Settings {
 	 * @return void
 	 */
 	public function enqueue_admin_assets( string $hook ): void {
-		if ( 'settings_page_medici-cookie-notice' !== $hook ) {
+		// Support both old and new admin menu pages
+		if ( 'settings_page_medici-cookie-notice' !== $hook && ! str_contains( $hook, 'mcn-' ) ) {
 			return;
 		}
 
@@ -1460,18 +1465,57 @@ class Settings {
 			MCN_VERSION
 		);
 
+		// Twemoji для preview та адмінки
+		$theme_twemoji_path = get_stylesheet_directory() . '/js/twemoji/twemoji.min.js';
+		if ( file_exists( $theme_twemoji_path ) ) {
+			wp_enqueue_script(
+				'twemoji',
+				get_stylesheet_directory_uri() . '/js/twemoji/twemoji.min.js',
+				[],
+				'14.0.2',
+				true
+			);
+		} else {
+			wp_enqueue_script(
+				'twemoji',
+				'https://cdn.jsdelivr.net/npm/@twemoji/api@latest/dist/twemoji.min.js',
+				[],
+				'15.0.0',
+				true
+			);
+		}
+
+		// Frontend styles for preview
+		wp_enqueue_style(
+			'mcn-frontend',
+			MCN_PLUGIN_URL . 'assets/css/frontend.css',
+			[],
+			MCN_VERSION
+		);
+
 		wp_enqueue_script(
 			'mcn-admin',
 			MCN_PLUGIN_URL . 'assets/js/admin.js',
-			[ 'jquery', 'wp-color-picker' ],
+			[ 'jquery', 'wp-color-picker', 'twemoji' ],
 			MCN_VERSION,
 			true
 		);
 
+		// Get Twemoji base URL
+		$twemoji_base = 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/';
+		$theme_twemoji_assets = get_stylesheet_directory() . '/assets/twemoji/';
+		if ( is_dir( $theme_twemoji_assets ) ) {
+			$twemoji_base = get_stylesheet_directory_uri() . '/assets/twemoji/';
+		}
+
 		wp_localize_script( 'mcn-admin', 'mcnAdmin', [
-			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-			'nonce'   => wp_create_nonce( 'mcn_admin_nonce' ),
-			'i18n'    => [
+			'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
+			'nonce'        => wp_create_nonce( 'mcn_admin_nonce' ),
+			'useTwemoji'   => $this->plugin->get_option( 'use_twemoji' ),
+			'twemojiBase'  => $twemoji_base,
+			'options'      => $this->plugin->options,
+			'defaults'     => $this->plugin->defaults,
+			'i18n'         => [
 				'saved'   => __( 'Налаштування збережено', 'medici-cookie-notice' ),
 				'error'   => __( 'Помилка збереження', 'medici-cookie-notice' ),
 				'confirm' => __( 'Ви впевнені?', 'medici-cookie-notice' ),
@@ -1571,32 +1615,33 @@ class Settings {
 	 * @return void
 	 */
 	private function render_preview_section(): void {
+		$position = $this->plugin->get_option( 'position' );
+		$layout   = $this->plugin->get_option( 'layout' );
 		?>
 		<div class="mcn-preview-section">
 			<h3><?php esc_html_e( '👁️ Попередній перегляд', 'medici-cookie-notice' ); ?></h3>
-			<div class="mcn-preview-container">
-				<div id="mcn-banner-preview" class="mcn-preview-banner">
+			<div class="mcn-preview-info"></div>
+			<div class="mcn-preview-container mcn-preview-<?php echo esc_attr( $layout ); ?>">
+				<div id="mcn-banner-preview" class="mcn-preview-banner mcn-preview-<?php echo esc_attr( $position ); ?> mcn-preview-<?php echo esc_attr( $layout ); ?>">
 					<div class="mcn-preview-content">
-						<span class="mcn-preview-icon">🍪</span>
 						<p class="mcn-preview-message"><?php echo esc_html( $this->plugin->get_option( 'message' ) ); ?></p>
 						<div class="mcn-preview-buttons">
-							<button class="mcn-preview-btn mcn-preview-btn-accept">
+							<button type="button" class="mcn-preview-btn mcn-preview-btn-accept">
 								<?php echo esc_html( $this->plugin->get_option( 'accept_text' ) ); ?>
 							</button>
-							<?php if ( $this->plugin->get_option( 'show_reject_button' ) ) : ?>
-								<button class="mcn-preview-btn mcn-preview-btn-reject">
-									<?php echo esc_html( $this->plugin->get_option( 'reject_text' ) ); ?>
-								</button>
-							<?php endif; ?>
-							<?php if ( $this->plugin->get_option( 'show_settings_button' ) ) : ?>
-								<button class="mcn-preview-btn mcn-preview-btn-settings">
-									<?php echo esc_html( $this->plugin->get_option( 'settings_text' ) ); ?>
-								</button>
-							<?php endif; ?>
+							<button type="button" class="mcn-preview-btn mcn-preview-btn-reject" <?php echo $this->plugin->get_option( 'show_reject_button' ) ? '' : 'style="display:none"'; ?>>
+								<?php echo esc_html( $this->plugin->get_option( 'reject_text' ) ); ?>
+							</button>
+							<button type="button" class="mcn-preview-btn mcn-preview-btn-settings" <?php echo $this->plugin->get_option( 'show_settings_button' ) ? '' : 'style="display:none"'; ?>>
+								<?php echo esc_html( $this->plugin->get_option( 'settings_text' ) ); ?>
+							</button>
 						</div>
 					</div>
 				</div>
 			</div>
+			<p class="mcn-preview-note">
+				<em><?php esc_html_e( 'Попередній перегляд оновлюється в реальному часі при зміні налаштувань.', 'medici-cookie-notice' ); ?></em>
+			</p>
 		</div>
 		<?php
 	}
