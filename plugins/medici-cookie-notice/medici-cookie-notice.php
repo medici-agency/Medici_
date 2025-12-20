@@ -103,6 +103,13 @@ final class Cookie_Notice {
 	public ?Shortcodes $shortcodes = null;
 
 	/**
+	 * Об'єкт conditional display
+	 *
+	 * @var Conditional_Display|null
+	 */
+	public ?Conditional_Display $conditional_display = null;
+
+	/**
 	 * Loader для централізованого управління hooks
 	 *
 	 * @var Loader|null
@@ -352,6 +359,12 @@ final class Cookie_Notice {
 			// Bot Detection
 			'bot_detection'          => true,
 
+			// Conditional Display
+			'user_type'              => 'all', // all, logged_in, guest
+			'excluded_roles'         => [], // array of role slugs
+			'excluded_page_types'    => [], // array of page types
+			'excluded_page_ids'      => '', // comma-separated IDs
+
 			// Кастомний CSS/JS
 			'custom_css'             => '',
 			'custom_js'              => '',
@@ -400,6 +413,7 @@ final class Cookie_Notice {
 		require_once MCN_PLUGIN_DIR . 'includes/class-geo-detection.php';
 		require_once MCN_PLUGIN_DIR . 'includes/class-bot-detect.php';
 		require_once MCN_PLUGIN_DIR . 'includes/class-shortcodes.php';
+		require_once MCN_PLUGIN_DIR . 'includes/class-conditional-display.php';
 	}
 
 	/**
@@ -476,11 +490,15 @@ final class Cookie_Notice {
 		$this->consent_logs   = new Consent_Logs( $this );
 		$this->analytics      = new Analytics( $this );
 		$this->geo_detection  = new Geo_Detection( $this );
-		$this->bot_detect     = new Bot_Detect( $this );
-		$this->shortcodes     = new Shortcodes( $this );
+		$this->bot_detect           = new Bot_Detect( $this );
+		$this->shortcodes           = new Shortcodes( $this );
+		$this->conditional_display  = new Conditional_Display( $this );
 
 		// Ініціалізація bot detection на after_setup_theme
 		add_action( 'after_setup_theme', [ $this->bot_detect, 'init' ] );
+
+		// Ініціалізація conditional display на after_setup_theme
+		add_action( 'after_setup_theme', [ $this->conditional_display, 'init' ] );
 
 		// AJAX handlers
 		add_action( 'wp_ajax_mcn_save_consent', [ $this, 'ajax_save_consent' ] );

@@ -968,128 +968,18 @@ class Frontend {
 
 	/**
 	 * Перевірка conditional display rules
-	 * Адаптовано з оригінального cookie-notice плагіну
+	 * Використовує Conditional_Display клас для перевірки умов показу
 	 *
 	 * @return bool True якщо потрібно показувати банер
 	 */
 	private function check_conditional_display(): bool {
-		$rules = $this->plugin->get_option( 'conditional_rules' );
-
-		// Якщо правила не налаштовані - показуємо завжди
-		if ( empty( $rules ) || ! is_array( $rules ) ) {
-			return true;
+		// Використовуємо Conditional_Display клас якщо ініціалізований
+		if ( null !== $this->plugin->conditional_display ) {
+			return $this->plugin->conditional_display->should_display();
 		}
 
-		$conditional_enabled = $this->plugin->get_option( 'conditional_enabled' );
-		if ( ! $conditional_enabled ) {
-			return true;
-		}
-
-		$conditional_action = $this->plugin->get_option( 'conditional_action' ); // 'show' або 'hide'
-
-		foreach ( $rules as $rule ) {
-			if ( ! isset( $rule['param'], $rule['operator'], $rule['value'] ) ) {
-				continue;
-			}
-
-			$match = $this->evaluate_rule( $rule['param'], $rule['operator'], $rule['value'] );
-
-			if ( $match ) {
-				// Якщо знайдено відповідність
-				return 'show' === $conditional_action;
-			}
-		}
-
-		// Якщо жодне правило не спрацювало - інвертуємо action
-		return 'hide' === $conditional_action;
+		// Fallback - показуємо якщо Conditional_Display не ініціалізовано
+		return true;
 	}
 
-	/**
-	 * Оцінка окремого правила
-	 *
-	 * @param string $param Параметр правила
-	 * @param string $operator Оператор (equal, not_equal)
-	 * @param string $value Значення для порівняння
-	 * @return bool
-	 */
-	private function evaluate_rule( string $param, string $operator, string $value ): bool {
-		$result = false;
-
-		switch ( $param ) {
-			case 'page_type':
-				$result = $this->check_page_type( $value );
-				break;
-
-			case 'page':
-				$result = is_page( (int) $value );
-				break;
-
-			case 'post_type':
-				$result = is_singular( $value );
-				break;
-
-			case 'post_type_archive':
-				$result = is_post_type_archive( $value );
-				break;
-
-			case 'user_type':
-				$result = $this->check_user_type( $value );
-				break;
-
-			case 'taxonomy':
-				$result = is_tax( $value ) || is_category( $value ) || is_tag( $value );
-				break;
-		}
-
-		// Інверсія для not_equal
-		if ( 'not_equal' === $operator ) {
-			$result = ! $result;
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Перевірка типу сторінки
-	 *
-	 * @param string $type Тип сторінки
-	 * @return bool
-	 */
-	private function check_page_type( string $type ): bool {
-		switch ( $type ) {
-			case 'front_page':
-				return is_front_page();
-			case 'home':
-				return is_home();
-			case 'singular':
-				return is_singular();
-			case 'archive':
-				return is_archive();
-			case 'search':
-				return is_search();
-			case '404':
-				return is_404();
-			default:
-				return false;
-		}
-	}
-
-	/**
-	 * Перевірка типу користувача
-	 *
-	 * @param string $type Тип користувача
-	 * @return bool
-	 */
-	private function check_user_type( string $type ): bool {
-		switch ( $type ) {
-			case 'logged_in':
-				return is_user_logged_in();
-			case 'logged_out':
-				return ! is_user_logged_in();
-			case 'admin':
-				return current_user_can( 'manage_options' );
-			default:
-				return false;
-		}
-	}
 }
