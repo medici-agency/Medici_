@@ -67,7 +67,10 @@ enable_sparse_checkout() {
 
     echo -e "${GREEN}✅ Dev режим активовано!${NC}"
     echo -e "${YELLOW}📊 Статистика:${NC}"
-    git ls-files | wc -l | xargs echo "   Файлів в checkout:"
+    local excluded=$(git ls-files | grep -E "^(assets|bot|skills|fonts|scripts|docs)/" | wc -l)
+    local remaining=$(git ls-files | grep -v -E "^(assets|bot|skills|fonts|scripts|docs)/" | wc -l)
+    echo "   Файлів виключено: $excluded"
+    echo "   Файлів залишилось: $remaining"
 }
 
 disable_sparse_checkout() {
@@ -83,7 +86,7 @@ disable_sparse_checkout() {
 
     echo -e "${GREEN}✅ Full режим активовано!${NC}"
     echo -e "${YELLOW}📊 Статистика:${NC}"
-    git ls-files | wc -l | xargs echo "   Файлів в checkout:"
+    git ls-files | wc -l | xargs echo "   Всього файлів в checkout:"
 }
 
 show_status() {
@@ -94,11 +97,14 @@ show_status() {
         echo -e "\n${YELLOW}Виключені директорії:${NC}"
         grep "^!" .git/info/sparse-checkout 2>/dev/null | sed 's/^!/   - /' || echo "   (немає)"
         echo -e "\n${YELLOW}Файлів в checkout:${NC}"
-        git ls-files | wc -l | xargs echo "   "
+        local excluded=$(git ls-files | grep -E "^(assets|bot|skills|fonts|scripts|docs)/" | wc -l)
+        local remaining=$(git ls-files | grep -v -E "^(assets|bot|skills|fonts|scripts|docs)/" | wc -l)
+        echo "   Виключено: $excluded"
+        echo "   Залишилось: $remaining (активні для розробки)"
     else
         echo -e "${RED}❌ Dev режим ДЕАКТИВОВАНО (Full Checkout)${NC}"
         echo -e "\n${YELLOW}Файлів в checkout:${NC}"
-        git ls-files | wc -l | xargs echo "   "
+        git ls-files | wc -l | xargs echo "   Всього: "
     fi
 
     echo -e "\n${YELLOW}Розміри директорій:${NC}"
