@@ -3,7 +3,7 @@
  * Plugin Name: Medici Cookie Notice
  * Plugin URI: https://www.medici.agency
  * Description: Повноцінне рішення для управління згодою на cookies з підтримкою GDPR, CCPA, категорій згоди, блокування скриптів, аналітики та Twemoji іконок.
- * Version: 1.2.0
+ * Version: 1.3.0
  * Author: Medici Agency
  * Author URI: https://www.medici.agency
  * License: GPL-2.0+
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Константи плагіну
-define( 'MCN_VERSION', '1.2.0' );
+define( 'MCN_VERSION', '1.3.0' );
 define( 'MCN_PLUGIN_FILE', __FILE__ );
 define( 'MCN_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MCN_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -108,6 +108,27 @@ final class Cookie_Notice {
 	 * @var Conditional_Display|null
 	 */
 	public ?Conditional_Display $conditional_display = null;
+
+	/**
+	 * Об'єкт conditional rules (advanced)
+	 *
+	 * @var Conditional_Rules|null
+	 */
+	public ?Conditional_Rules $conditional_rules = null;
+
+	/**
+	 * Об'єкт cache compatibility
+	 *
+	 * @var Modules\Cache_Compatibility|null
+	 */
+	public ?Modules\Cache_Compatibility $cache_compatibility = null;
+
+	/**
+	 * Об'єкт admin menu
+	 *
+	 * @var Admin\Admin_Menu|null
+	 */
+	public ?Admin\Admin_Menu $admin_menu = null;
 
 	/**
 	 * Loader для централізованого управління hooks
@@ -365,6 +386,9 @@ final class Cookie_Notice {
 			'excluded_page_types'    => [], // array of page types
 			'excluded_page_ids'      => '', // comma-separated IDs
 
+			// Advanced Conditional Rules (v1.3.0)
+			'enable_conditional_rules' => true,
+
 			// Кастомний CSS/JS
 			'custom_css'             => '',
 			'custom_js'              => '',
@@ -414,6 +438,35 @@ final class Cookie_Notice {
 		require_once MCN_PLUGIN_DIR . 'includes/class-bot-detect.php';
 		require_once MCN_PLUGIN_DIR . 'includes/class-shortcodes.php';
 		require_once MCN_PLUGIN_DIR . 'includes/class-conditional-display.php';
+		require_once MCN_PLUGIN_DIR . 'includes/class-conditional-rules.php';
+
+		// Cache Modules (v1.3.0)
+		require_once MCN_PLUGIN_DIR . 'includes/modules/cache/interface-cache-module.php';
+		require_once MCN_PLUGIN_DIR . 'includes/modules/cache/class-wp-rocket.php';
+		require_once MCN_PLUGIN_DIR . 'includes/modules/cache/class-litespeed.php';
+		require_once MCN_PLUGIN_DIR . 'includes/modules/cache/class-autoptimize.php';
+		require_once MCN_PLUGIN_DIR . 'includes/modules/cache/class-w3-total-cache.php';
+		require_once MCN_PLUGIN_DIR . 'includes/modules/cache/class-wp-super-cache.php';
+		require_once MCN_PLUGIN_DIR . 'includes/modules/class-cache-compatibility.php';
+
+		// Rule Engine (v1.3.0)
+		require_once MCN_PLUGIN_DIR . 'includes/rules/interface-rule-evaluator.php';
+		require_once MCN_PLUGIN_DIR . 'includes/rules/class-rule.php';
+		require_once MCN_PLUGIN_DIR . 'includes/rules/class-rule-group.php';
+		require_once MCN_PLUGIN_DIR . 'includes/rules/evaluators/class-page-evaluator.php';
+		require_once MCN_PLUGIN_DIR . 'includes/rules/evaluators/class-user-evaluator.php';
+		require_once MCN_PLUGIN_DIR . 'includes/rules/evaluators/class-user-role-evaluator.php';
+		require_once MCN_PLUGIN_DIR . 'includes/rules/evaluators/class-device-evaluator.php';
+		require_once MCN_PLUGIN_DIR . 'includes/rules/evaluators/class-url-evaluator.php';
+		require_once MCN_PLUGIN_DIR . 'includes/rules/evaluators/class-geo-evaluator.php';
+
+		// Admin Components (v1.3.0)
+		if ( is_admin() ) {
+			require_once MCN_PLUGIN_DIR . 'includes/admin/class-admin-menu.php';
+			require_once MCN_PLUGIN_DIR . 'includes/admin/class-dashboard.php';
+			require_once MCN_PLUGIN_DIR . 'includes/admin/class-consent-logs-list-table.php';
+			require_once MCN_PLUGIN_DIR . 'includes/admin/class-consent-logs-page.php';
+		}
 	}
 
 	/**
@@ -493,6 +546,16 @@ final class Cookie_Notice {
 		$this->bot_detect           = new Bot_Detect( $this );
 		$this->shortcodes           = new Shortcodes( $this );
 		$this->conditional_display  = new Conditional_Display( $this );
+
+		// v1.3.0: Нові компоненти
+		$this->conditional_rules  = new Conditional_Rules( $this );
+		$this->cache_compatibility = new Modules\Cache_Compatibility( $this );
+
+		// Admin компоненти (v1.3.0)
+		if ( is_admin() ) {
+			$this->admin_menu = new Admin\Admin_Menu( $this );
+			$this->admin_menu->init();
+		}
 
 		// Ініціалізація bot detection на after_setup_theme
 		add_action( 'after_setup_theme', [ $this->bot_detect, 'init' ] );
@@ -613,9 +676,42 @@ final class Cookie_Notice {
 			UNIQUE KEY date_recorded (date_recorded)
 		) {$charset_collate};";
 
+		// Таблиця груп правил (v1.3.0)
+		$table_rule_groups = $wpdb->prefix . 'mcn_rule_groups';
+		$sql_rule_groups   = "CREATE TABLE IF NOT EXISTS {$table_rule_groups} (
+			id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+			name varchar(255) NOT NULL,
+			operator enum('AND','OR') NOT NULL DEFAULT 'AND',
+			action enum('show','hide') NOT NULL DEFAULT 'show',
+			priority int(11) NOT NULL DEFAULT 10,
+			is_active tinyint(1) NOT NULL DEFAULT 1,
+			created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			updated_at datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+			PRIMARY KEY (id),
+			KEY is_active (is_active),
+			KEY priority (priority)
+		) {$charset_collate};";
+
+		// Таблиця правил (v1.3.0)
+		$table_rules = $wpdb->prefix . 'mcn_rules';
+		$sql_rules   = "CREATE TABLE IF NOT EXISTS {$table_rules} (
+			id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+			group_id bigint(20) UNSIGNED NOT NULL,
+			rule_type varchar(50) NOT NULL,
+			operator varchar(20) NOT NULL,
+			value text NOT NULL,
+			created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			PRIMARY KEY (id),
+			KEY group_id (group_id),
+			KEY rule_type (rule_type),
+			CONSTRAINT fk_rule_group FOREIGN KEY (group_id) REFERENCES {$table_rule_groups}(id) ON DELETE CASCADE
+		) {$charset_collate};";
+
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( $sql_consent_logs );
 		dbDelta( $sql_analytics );
+		dbDelta( $sql_rule_groups );
+		dbDelta( $sql_rules );
 	}
 
 	/**
@@ -628,6 +724,18 @@ final class Cookie_Notice {
 		// Міграція з старих версій
 		if ( version_compare( $old_version, '1.0.0', '<' ) ) {
 			$this->create_tables();
+		}
+
+		// v1.3.0: Створення таблиць правил та нових опцій
+		if ( version_compare( $old_version, '1.3.0', '<' ) ) {
+			$this->create_tables();
+
+			// Додаємо нові опції за замовчуванням
+			$options = get_option( 'medici_cookie_notice', [] );
+			if ( ! isset( $options['enable_conditional_rules'] ) ) {
+				$options['enable_conditional_rules'] = true;
+				update_option( 'medici_cookie_notice', $options );
+			}
 		}
 	}
 
