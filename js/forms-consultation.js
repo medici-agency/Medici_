@@ -130,14 +130,14 @@
 		errorFields.forEach((el) => el.classList.remove('consultation-form__field--error'));
 
 		const errorControls = form.querySelectorAll(
-			'.consultation-form__input--error, .consultation-form__select--error, .consultation-form__textarea--error',
+			'.consultation-form__input--error, .consultation-form__select--error, .consultation-form__textarea--error'
 		);
 
 		errorControls.forEach((el) => {
 			el.classList.remove(
 				'consultation-form__input--error',
 				'consultation-form__select--error',
-				'consultation-form__textarea--error',
+				'consultation-form__textarea--error'
 			);
 		});
 	}
@@ -173,7 +173,10 @@
 			}
 
 			// If already wrapped with our wrapper, do nothing.
-			if (textarea.parentElement && textarea.parentElement.classList.contains('consultation-form__textarea-wrapper')) {
+			if (
+				textarea.parentElement &&
+				textarea.parentElement.classList.contains('consultation-form__textarea-wrapper')
+			) {
 				return;
 			}
 
