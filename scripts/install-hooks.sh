@@ -1,13 +1,12 @@
+cat > scripts/install-hooks.sh << 'EOF'
 #!/bin/bash
-#
+
 # Medici Theme - Install Git Hooks
 # Run this script once after cloning the repository
-#
 # Usage: ./scripts/install-hooks.sh
 
 set -e
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 HOOKS_DIR="$ROOT_DIR/.git/hooks"
 
@@ -44,3 +43,4 @@ echo "The pre-commit hook will now run automatically before each commit."
 echo "To skip the hook temporarily: git commit --no-verify"
 echo ""
 echo "To uninstall hooks: rm .git/hooks/pre-commit"
+EOF
