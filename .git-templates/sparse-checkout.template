@@ -35,9 +35,10 @@
 /CODING-RULES.md
 /TODO.md
 
-# ВАЖЛИВО: Залишаємо docs/coding-rules/ (потрібні для LLM)
+# ВАЖЛИВО: Залишаємо docs/coding-rules/ та docs/devops/
 !docs/
 docs/coding-rules/
+docs/devops/
 
 # GitHub Actions (потрібні для CI/CD)
 /.github/
