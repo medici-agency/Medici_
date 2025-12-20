@@ -1249,14 +1249,225 @@ document.querySelector('[data-gb-overlay="gb-overlay-424"]'); // → <button> а
 **Перевірка перед комітом:**
 
 ```bash
-# Якщо файл > 1000 рядків - перевір чи немає надмірних пояснень
-wc -l CLAUDE.md CHANGELOG.md docs/coding-rules/*.md
-
-# Шукай keywords що вказують на tutorials/guides (ЗАБОРОНЕНО в LLM docs):
-grep -i "how to\|step by step\|tutorial\|guide\|troubleshooting" CLAUDE.md
-````
+# Перевірка файлів перед комітом - використовуй validation script:
+./scripts/validate-docs.sh
+```
 
 **Мета:** **Максимум корисної інформації, мінімум токенів, мінімум часу LLM.**
+
+---
+
+## 📋 ФАЙЛ-СПЕЦИФІЧНІ ПРАВИЛА ДОКУМЕНТАЦІЇ
+
+### ⚠️ КРИТИЧНІ ФАЙЛИ - СУВОРІ ЗАБОРОНИ
+
+**Ці файли КРИТИЧНО ВАЖЛИВІ для LLM та мають найсуворіші обмеження:**
+
+#### 1. CLAUDE.md (AI Assistant Guide)
+
+**ЗАБОРОНЕНО:**
+
+- ❌ Change logs та version history (використовуй CHANGELOG.md)
+- ❌ Детальні implementation tutorials
+- ❌ User-facing documentation (як користувачу щось зробити)
+- ❌ Розгорнуті приклади з поясненнями > 50 рядків
+- ❌ Troubleshooting guides з багатьма кроками
+
+**ДОЗВОЛЕНО:**
+
+- ✅ Архітектурні діаграми та структура проєкту
+- ✅ Critical rules та заборони
+- ✅ Technical reference (файли, класи, API endpoints)
+- ✅ Code snippets (максимум 10-15 рядків)
+- ✅ Маршрутизація до детальних файлів
+
+**Ліміт:** 20000 токенів (~2500 рядків)
+
+---
+
+#### 2. CHANGELOG.md (Project History)
+
+**ЗАБОРОНЕНО:**
+
+- ❌ Великі code snippets (> 20 рядків)
+- ❌ Детальні таблиці з усіма файлами
+- ❌ Покрокові інструкції виправлень
+- ❌ Duplicate descriptions (якщо є в commit message)
+- ❌ Benchmarks та performance metrics (винятки: критичні оптимізації)
+
+**ДОЗВОЛЕНО:**
+
+- ✅ Короткі описи змін (1-3 речення)
+- ✅ Список файлів (без деталей)
+- ✅ Commit hashes та branch names
+- ✅ Breaking changes warnings
+- ✅ Migration guides (короткі, тільки команди)
+
+**Ліміт:** 10000 токенів (~1000 рядків)
+
+---
+
+#### 3. CODING-RULES\*.md (Coding Standards)
+
+**ЗАБОРОНЕНО:**
+
+- ❌ Tutorials "як створити блок з нуля"
+- ❌ Теоретичні пояснення "чому BEM краще SMACSS"
+- ❌ Multiple examples одного й того ж (1 приклад достатньо)
+- ❌ Historical context (чому було прийнято рішення)
+- ❌ Comparisons з іншими frameworks
+
+**ДОЗВОЛЕНО:**
+
+- ✅ Rules: "ОБОВ'ЯЗКОВО робити X", "ЗАБОРОНЕНО робити Y"
+- ✅ Code examples (1 приклад per rule, < 15 рядків)
+- ✅ Validation patterns (regex, functions)
+- ✅ Заборонені практики з коротким "чому"
+- ✅ File references (де знайти приклад у коді)
+
+**Ліміт:** ~1500 рядків per file
+
+---
+
+#### 4. docs/api/\*.md (API Documentation)
+
+**ЗАБОРОНЕНО:**
+
+- ❌ Installation tutorials (крок 1, крок 2, крок 3...)
+- ❌ Usage guides для кінцевих користувачів
+- ❌ Zapier/Make integration tutorials
+- ❌ Troubleshooting з багатьма кейсами
+- ❌ "How it works" теоретичні секції
+
+**ДОЗВОЛЕНО:**
+
+- ✅ Function signatures з type hints
+- ✅ Database schema (CREATE TABLE statements)
+- ✅ Payload structure (JSON examples)
+- ✅ Endpoint URLs та HTTP methods
+- ✅ Code examples (мінімальні, working code тільки)
+
+**Ліміт:** ~400 рядків per file
+
+---
+
+#### 5. TODO.md (Project Roadmap)
+
+**ЗАБОРОНЕНО:**
+
+- ❌ Детальні change logs завершених версій
+- ❌ Розгорнуті описи кожного завдання (> 5 рядків)
+- ❌ Historical context "чому ми це робили"
+- ❌ Meeting notes та discussions
+- ❌ Застарілі завдання старші 3 місяців (archive або видали)
+
+**ДОЗВОЛЕНО:**
+
+- ✅ Active tasks списки (короткі, actionable)
+- ✅ Пріоритети (High/Medium/Low)
+- ✅ Технічні довідники (UTM strategy, commands)
+- ✅ Roadmap phases (summary only)
+- ✅ Links to detailed change log (CHANGELOG.md)
+
+**Ліміт:** ~300 рядків
+
+---
+
+#### 6. docs/\*\*/\*.md (Supporting Documentation)
+
+**ЗАБОРОНЕНО:**
+
+- ❌ Detailed implementation examples (>30 lines)
+- ❌ Duplicate content з інших файлів
+- ❌ Archive information старша 6 місяців
+- ❌ Bot/3rd party documentation (unless critical)
+- ❌ Version history файла (git log для цього)
+
+**ДОЗВОЛЕНО:**
+
+- ✅ Technical specifications
+- ✅ Quick reference tables
+- ✅ File structure maps
+- ✅ Validation rules та patterns
+- ✅ Critical security notes
+
+**Ліміт:** ~300-500 рядків per file
+
+---
+
+### 🔍 AUTOMATED VALIDATION CHECKLIST
+
+**Pre-commit перевірки (ОБОВ'ЯЗКОВО!):**
+
+```bash
+# Automated validation script
+./scripts/validate-docs.sh
+
+# Checks:
+# - File size limits (CLAUDE.md: 2500, CHANGELOG.md: 1000, TODO.md: 300)
+# - Keywords validation (verbose docs, detailed instructions)
+# - Changelog duplicates in CLAUDE.md
+# - Archive references
+```
+
+**Повний код:** `scripts/validate-docs.sh` (119 lines)
+
+---
+
+### 📊 MANUAL REVIEW CHECKLIST
+
+**Перед комітом documentation changes:**
+
+- [ ] Прочитав файл за < 60 секунд (якщо ні → занадто деталь но)
+- [ ] Немає tutorials "як зробити X"
+- [ ] Немає troubleshooting "проблема A → рішення B"
+- [ ] Немає дублікатів з інших файлів
+- [ ] Code examples < 15 рядків (винятки: critical complex cases)
+- [ ] Списки заборон чіткі та короткі
+- [ ] Посилання на детальні файли замість copy-paste
+- [ ] Файл не перевищує token limit для свого типу
+- [ ] Запустив `npm run format` перед комітом
+- [ ] Запустив validation script (якщо є)
+
+---
+
+### 🚨 КРИТИЧНІ ПОМИЛКИ - INSTANT REJECT
+
+**Якщо LLM додав це у commit - НЕГАЙНО REJECT:**
+
+1. ❌ **Tutorial секція з >5 steps** в CLAUDE.md або API docs
+2. ❌ **Changelog entries** в CLAUDE.md (belongs to CHANGELOG.md)
+3. ❌ **Code snippets >50 рядків** в будь-якому .md файлі
+4. ❌ **Troubleshooting guide** з multiple scenarios
+5. ❌ **Duplicate content** що вже є в іншому файлі
+6. ❌ **Archive information** старша 6 місяців в active docs
+7. ❌ **User-facing tutorials** в LLM documentation files
+8. ❌ **Theoretical explanations** без actionable rules
+
+**Action:** `git reset HEAD~1` і перепиши commit з правильною документацією.
+
+---
+
+### 💡 BEST PRACTICES
+
+**Замість tutorials - дай:**
+
+- ✅ File path + function name: `inc/events/class-events.php:174-256`
+- ✅ Command to run: `wp option update medici_webhook_url 'https://...'`
+- ✅ Config example: `{overlayPanelId: 'gb-overlay-424', cookieExp: 30}`
+- ✅ Critical rule: "Panel ID MUST match in config and data-gb-overlay attribute"
+
+**Замість troubleshooting - дай:**
+
+- ✅ Diagnostic command: `console.log(window.mediciExitIntentConfig)`
+- ✅ Validation check: `document.querySelector('[data-gb-close-panel]') !== null`
+- ✅ Error indicator: "If X is null → missing Y attribute"
+
+**Замість duplicate content - дай:**
+
+- ✅ Cross-reference: "See CODING-RULES-CORE.md section 14 for UniqueId format"
+- ✅ Link: "Full API reference in docs/api/EVENTS-API.md"
+- ✅ Summary: "3 strategies: Source (20pts), Medium (15pts), Service (25pts)"
 
 ---
 
@@ -1636,3 +1847,4 @@ npm run format:check        # Перевірити перед комітом
 
 **Last Updated:** 2025-12-19
 **Theme Version:** 2.0.0
+````
