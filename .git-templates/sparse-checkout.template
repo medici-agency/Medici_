@@ -1,0 +1,56 @@
+# Git Sparse Checkout Configuration
+# Оптимізація для Dev workflow - виключення непотрібних директорій
+#
+# USAGE:
+#   git sparse-checkout init --no-cone
+#   git sparse-checkout set --stdin < .git/info/sparse-checkout
+#   git checkout
+#
+# Включаємо ВСЕ за замовчуванням
+/*
+
+# ВИКЛЮЧАЄМО непотрібні директорії (префікс !)
+!assets/
+!bot/
+!docs/
+!fonts/
+!scripts/
+!skills/
+
+# ЗАЛИШАЄМО критичні файли в root (явно включаємо)
+# Config files
+/.eslintrc.json
+/.prettierrc.json
+/.stylelintrc.json
+/package.json
+/package-lock.json
+/composer.json
+/composer.lock
+/theme.json
+
+# Documentation (мінімум)
+/README.md
+/CHANGELOG.md
+/CLAUDE.md
+/CODING-RULES.md
+/TODO.md
+
+# ВАЖЛИВО: Залишаємо docs/coding-rules/ (потрібні для LLM)
+!docs/
+docs/coding-rules/
+
+# GitHub Actions (потрібні для CI/CD)
+/.github/
+
+# WordPress Core
+/functions.php
+/style.css
+/screenshot.png
+/inc/
+/css/
+/js/
+/templates/
+/gutenberg/
+/plugins/
+
+# ПРИМІТКА: Python та інші JSON виключені автоматично через !scripts/, !bot/
