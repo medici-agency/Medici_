@@ -3,7 +3,7 @@
  * Plugin Name: Medici Cookie Notice
  * Plugin URI: https://www.medici.agency
  * Description: Повноцінне рішення для управління згодою на cookies з підтримкою GDPR, CCPA, категорій згоди, блокування скриптів, аналітики та Twemoji іконок.
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: Medici Agency
  * Author URI: https://www.medici.agency
  * License: GPL-2.0+
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Константи плагіну
-define( 'MCN_VERSION', '1.1.0' );
+define( 'MCN_VERSION', '1.2.0' );
 define( 'MCN_PLUGIN_FILE', __FILE__ );
 define( 'MCN_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MCN_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -87,6 +87,20 @@ final class Cookie_Notice {
 	 * @var Geo_Detection|null
 	 */
 	public ?Geo_Detection $geo_detection = null;
+
+	/**
+	 * Об'єкт bot detection
+	 *
+	 * @var Bot_Detect|null
+	 */
+	public ?Bot_Detect $bot_detect = null;
+
+	/**
+	 * Об'єкт shortcodes
+	 *
+	 * @var Shortcodes|null
+	 */
+	public ?Shortcodes $shortcodes = null;
 
 	/**
 	 * Loader для централізованого управління hooks
@@ -335,6 +349,9 @@ final class Cookie_Notice {
 			'amp_support'            => false,
 			'wpml_support'           => true,
 
+			// Bot Detection
+			'bot_detection'          => true,
+
 			// Кастомний CSS/JS
 			'custom_css'             => '',
 			'custom_js'              => '',
@@ -381,6 +398,8 @@ final class Cookie_Notice {
 		require_once MCN_PLUGIN_DIR . 'includes/class-consent-logs.php';
 		require_once MCN_PLUGIN_DIR . 'includes/class-analytics.php';
 		require_once MCN_PLUGIN_DIR . 'includes/class-geo-detection.php';
+		require_once MCN_PLUGIN_DIR . 'includes/class-bot-detect.php';
+		require_once MCN_PLUGIN_DIR . 'includes/class-shortcodes.php';
 	}
 
 	/**
@@ -457,6 +476,11 @@ final class Cookie_Notice {
 		$this->consent_logs   = new Consent_Logs( $this );
 		$this->analytics      = new Analytics( $this );
 		$this->geo_detection  = new Geo_Detection( $this );
+		$this->bot_detect     = new Bot_Detect( $this );
+		$this->shortcodes     = new Shortcodes( $this );
+
+		// Ініціалізація bot detection на after_setup_theme
+		add_action( 'after_setup_theme', [ $this->bot_detect, 'init' ] );
 
 		// AJAX handlers
 		add_action( 'wp_ajax_mcn_save_consent', [ $this, 'ajax_save_consent' ] );

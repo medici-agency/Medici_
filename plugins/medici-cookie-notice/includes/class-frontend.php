@@ -359,33 +359,26 @@ class Frontend {
 	}
 
 	/**
-	 * Перевірка чи це бот
+	 * Перевірка чи це бот/crawler
 	 *
+	 * Використовує Bot_Detect клас для покращеного визначення ботів
+	 *
+	 * @since 1.2.0
 	 * @return bool
 	 */
 	private function is_bot(): bool {
-		if ( empty( $_SERVER['HTTP_USER_AGENT'] ) ) {
+		// Перевірка чи увімкнено bot detection
+		if ( ! $this->plugin->get_option( 'bot_detection' ) ) {
 			return false;
 		}
 
-		$user_agent = sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) );
-
-		$bots = [
-			'googlebot', 'bingbot', 'slurp', 'duckduckbot', 'baiduspider',
-			'yandexbot', 'sogou', 'exabot', 'facebot', 'ia_archiver',
-			'mj12bot', 'semrushbot', 'ahrefsbot', 'dotbot', 'rogerbot',
-			'screaming frog', 'uptimerobot', 'pingdom', 'gtmetrix',
-		];
-
-		$user_agent_lower = strtolower( $user_agent );
-
-		foreach ( $bots as $bot ) {
-			if ( str_contains( $user_agent_lower, $bot ) ) {
-				return true;
-			}
+		// Перевірка чи ініціалізовано Bot_Detect
+		if ( null === $this->plugin->bot_detect ) {
+			return false;
 		}
 
-		return false;
+		// Використовуємо Bot_Detect для визначення бота
+		return $this->plugin->bot_detect->is_crawler();
 	}
 
 	/**
