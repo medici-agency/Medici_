@@ -17,6 +17,10 @@ dist/
 wp-admin/
 wp-includes/
 
+# Third-party plugins (not our code)
+plugins/wp-mail-smtp/
+plugins/cookie-notice/
+
 # Minified files
 *.min.js
 *.min.css
