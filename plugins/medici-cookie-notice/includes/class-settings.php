@@ -881,6 +881,90 @@ class Settings {
 			]
 		);
 
+		// Bot Detection
+		add_settings_section(
+			'mcn_bot_detection_section',
+			__( '🤖 Детекція ботів', 'medici-cookie-notice' ),
+			function () {
+				echo '<p>' . esc_html__( 'Автоматична детекція ботів/crawlers для покращення performance.', 'medici-cookie-notice' ) . '</p>';
+			},
+			'mcn_advanced'
+		);
+
+		add_settings_field(
+			'bot_detection',
+			__( 'Увімкнути детекцію ботів', 'medici-cookie-notice' ),
+			[ $this, 'render_checkbox_field' ],
+			'mcn_advanced',
+			'mcn_bot_detection_section',
+			[
+				'id'          => 'bot_detection',
+				'description' => __( 'Не показувати банер для crawlers (Google, Bing, Facebook bot, тощо)', 'medici-cookie-notice' ),
+			]
+		);
+
+		// Conditional Display
+		add_settings_section(
+			'mcn_conditional_display_section',
+			__( '🎯 Умовний показ', 'medici-cookie-notice' ),
+			function () {
+				echo '<p>' . esc_html__( 'Налаштуйте правила показу банера на основі типу користувача, ролей та сторінок.', 'medici-cookie-notice' ) . '</p>';
+			},
+			'mcn_advanced'
+		);
+
+		add_settings_field(
+			'user_type',
+			__( 'Тип користувача', 'medici-cookie-notice' ),
+			[ $this, 'render_select_field' ],
+			'mcn_advanced',
+			'mcn_conditional_display_section',
+			[
+				'id'      => 'user_type',
+				'options' => [
+					'all'        => __( 'Всі користувачі', 'medici-cookie-notice' ),
+					'logged_in'  => __( 'Тільки залогінені', 'medici-cookie-notice' ),
+					'guest'      => __( 'Тільки гості', 'medici-cookie-notice' ),
+				],
+			]
+		);
+
+		add_settings_field(
+			'excluded_roles',
+			__( 'Виключити ролі', 'medici-cookie-notice' ),
+			[ $this, 'render_multiselect_field' ],
+			'mcn_advanced',
+			'mcn_conditional_display_section',
+			[
+				'id'          => 'excluded_roles',
+				'description' => __( 'Не показувати банер для цих ролей користувачів', 'medici-cookie-notice' ),
+			]
+		);
+
+		add_settings_field(
+			'excluded_page_types',
+			__( 'Виключити типи сторінок', 'medici-cookie-notice' ),
+			[ $this, 'render_multiselect_field' ],
+			'mcn_advanced',
+			'mcn_conditional_display_section',
+			[
+				'id'          => 'excluded_page_types',
+				'description' => __( 'Не показувати банер на цих типах сторінок', 'medici-cookie-notice' ),
+			]
+		);
+
+		add_settings_field(
+			'excluded_page_ids',
+			__( 'Виключити сторінки за ID', 'medici-cookie-notice' ),
+			[ $this, 'render_text_field' ],
+			'mcn_advanced',
+			'mcn_conditional_display_section',
+			[
+				'id'          => 'excluded_page_ids',
+				'description' => __( 'ID сторінок/постів через кому (напр. 1,2,3)', 'medici-cookie-notice' ),
+			]
+		);
+
 		// Debug
 		add_settings_section(
 			'mcn_debug_section',
@@ -989,6 +1073,60 @@ class Settings {
 				'<option value="%s" %s>%s</option>',
 				esc_attr( $key ),
 				selected( $value, $key, false ),
+				esc_html( $label )
+			);
+		}
+
+		echo '</select>';
+
+		if ( $desc ) {
+			printf( '<p class="description">%s</p>', esc_html( $desc ) );
+		}
+	}
+
+	/**
+	 * Рендер multiselect поля
+	 *
+	 * @param array<string, mixed> $args Аргументи
+	 * @return void
+	 */
+	public function render_multiselect_field( array $args ): void {
+		$id    = $args['id'];
+		$value = $this->plugin->get_option( $id );
+		$desc  = $args['description'] ?? '';
+
+		// Приводимо до масиву якщо не масив
+		if ( ! is_array( $value ) ) {
+			$value = [];
+		}
+
+		// Отримуємо опції залежно від id поля
+		$options = [];
+		if ( 'excluded_roles' === $id ) {
+			// Отримуємо ролі з Conditional_Display класу
+			if ( null !== $this->plugin->conditional_display ) {
+				$options = $this->plugin->conditional_display->get_user_roles();
+			}
+		} elseif ( 'excluded_page_types' === $id ) {
+			// Отримуємо типи сторінок з Conditional_Display класу
+			if ( null !== $this->plugin->conditional_display ) {
+				$options = $this->plugin->conditional_display->get_page_types();
+			}
+		}
+
+		if ( empty( $options ) ) {
+			echo '<p class="description">' . esc_html__( 'Немає доступних опцій', 'medici-cookie-notice' ) . '</p>';
+			return;
+		}
+
+		printf( '<select name="medici_cookie_notice[%s][]" multiple size="5" style="min-width: 300px;">', esc_attr( $id ) );
+
+		foreach ( $options as $key => $label ) {
+			$selected = in_array( $key, $value, true ) ? 'selected' : '';
+			printf(
+				'<option value="%s" %s>%s</option>',
+				esc_attr( $key ),
+				$selected,
 				esc_html( $label )
 			);
 		}
@@ -1269,7 +1407,6 @@ class Settings {
 				'checkboxes' => [ 'enabled', 'show_reject_button', 'show_settings_button', 'show_revoke_button', 'open_in_new_tab', 'enable_categories' ],
 				'text'       => [ 'message', 'accept_text', 'reject_text', 'settings_text', 'save_text', 'privacy_policy_text', 'revoke_text' ],
 				'select'     => [ 'position', 'layout' ],
-				'number'     => [ 'cookie_expiry', 'cookie_expiry_rejected' ],
 				'other'      => [ 'privacy_policy_page' ],
 			],
 			'appearance'  => [
@@ -1283,7 +1420,9 @@ class Settings {
 				'complex' => [ 'categories' ],
 			],
 			'blocking'    => [
-				'checkboxes' => [ 'enable_script_blocking' ],
+				'checkboxes' => [ 'enable_script_blocking', 'enable_gcm' ],
+				'select'     => [ 'gcm_default_analytics', 'gcm_default_ads' ],
+				'number'     => [ 'gcm_wait_for_update' ],
 				'complex'    => [ 'blocked_patterns' ],
 			],
 			'consent'     => [
@@ -1300,14 +1439,14 @@ class Settings {
 				'complex'    => [ 'geo_rules' ],
 			],
 			'integration' => [
-				'checkboxes' => [ 'enable_gcm' ],
-				'select'     => [ 'gcm_default_analytics', 'gcm_default_ads' ],
-				'number'     => [ 'gcm_wait_for_update' ],
+				'checkboxes' => [ 'wpml_support', 'cache_compatibility', 'amp_support' ],
 			],
 			'advanced'    => [
-				'checkboxes' => [ 'wpml_support', 'cache_compatibility', 'amp_support', 'accept_on_scroll', 'accept_on_click', 'reload_on_change', 'debug_mode' ],
-				'text'       => [ 'cookie_path', 'custom_css', 'custom_js' ],
-				'number'     => [ 'scroll_offset' ],
+				'checkboxes' => [ 'bot_detection', 'accept_on_scroll', 'accept_on_click', 'reload_on_change', 'debug_mode' ],
+				'text'       => [ 'cookie_path', 'custom_css', 'custom_js', 'excluded_page_ids' ],
+				'select'     => [ 'user_type' ],
+				'number'     => [ 'cookie_expiry', 'cookie_expiry_rejected', 'scroll_offset' ],
+				'multiselect' => [ 'excluded_roles', 'excluded_page_types' ],
 			],
 		];
 
@@ -1323,6 +1462,7 @@ class Settings {
 			'gcm_default_analytics' => [ 'denied', 'granted' ],
 			'gcm_default_ads'      => [ 'denied', 'granted' ],
 			'geo_api_provider'     => [ 'ipapi', 'geojs', 'cloudflare' ],
+			'user_type'            => [ 'all', 'logged_in', 'guest' ],
 		];
 
 		// Ranges для number полів
@@ -1429,6 +1569,17 @@ class Settings {
 							$output['geo_rules'][ $safe_region ] = $mode;
 						}
 					}
+				}
+			}
+		}
+
+		// Обробляємо multiselect поля
+		if ( ! empty( $fields['multiselect'] ) ) {
+			foreach ( $fields['multiselect'] as $key ) {
+				if ( isset( $input[ $key ] ) && is_array( $input[ $key ] ) ) {
+					$output[ $key ] = array_map( 'sanitize_key', $input[ $key ] );
+				} else {
+					$output[ $key ] = [];
 				}
 			}
 		}
