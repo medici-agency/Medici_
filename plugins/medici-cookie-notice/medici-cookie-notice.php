@@ -159,6 +159,7 @@ final class Cookie_Notice {
 	 */
 	private function define_core_hooks(): void {
 		$this->loader->add_action( 'init', $this, 'load_textdomain', 1 ); // WordPress 6.7+ requires init
+		$this->loader->add_action( 'init', $this, 'translate_defaults', 5 ); // After textdomain loaded
 		$this->loader->add_action( 'init', $this, 'init' );
 		$this->loader->add_action( 'rest_api_init', $this, 'register_rest_routes' );
 	}
@@ -196,14 +197,14 @@ final class Cookie_Notice {
 			'layout'                 => 'bar', // bar, box, modal
 			'animation'              => 'slide', // slide, fade, none
 
-			// Тексти
-			'message'                => __( 'Ми використовуємо файли cookie для покращення вашого досвіду на сайті.', 'medici-cookie-notice' ),
-			'accept_text'            => __( 'Прийняти всі', 'medici-cookie-notice' ),
-			'reject_text'            => __( 'Відхилити всі', 'medici-cookie-notice' ),
-			'settings_text'          => __( 'Налаштування', 'medici-cookie-notice' ),
-			'save_text'              => __( 'Зберегти налаштування', 'medici-cookie-notice' ),
-			'privacy_policy_text'    => __( 'Політика конфіденційності', 'medici-cookie-notice' ),
-			'revoke_text'            => __( 'Керування cookies', 'medici-cookie-notice' ),
+			// Тексти (переклади застосовуються в translate_defaults())
+			'message'                => 'We use cookies to improve your experience on our website.',
+			'accept_text'            => 'Accept All',
+			'reject_text'            => 'Reject All',
+			'settings_text'          => 'Settings',
+			'save_text'              => 'Save Settings',
+			'privacy_policy_text'    => 'Privacy Policy',
+			'revoke_text'            => 'Manage Cookies',
 
 			// Кнопки
 			'show_reject_button'     => true,
@@ -239,35 +240,35 @@ final class Cookie_Notice {
 			'privacy_policy_page'    => 0,
 			'open_in_new_tab'        => true,
 
-			// Категорії cookies
+			// Категорії cookies (переклади застосовуються в translate_defaults())
 			'enable_categories'      => true,
 			'categories'             => [
 				'necessary'   => [
 					'enabled'     => true,
 					'required'    => true,
-					'name'        => __( 'Необхідні', 'medici-cookie-notice' ),
-					'description' => __( 'Ці файли cookie необхідні для роботи сайту і не можуть бути вимкнені.', 'medici-cookie-notice' ),
+					'name'        => 'Necessary',
+					'description' => 'These cookies are essential for the website to function and cannot be disabled.',
 					'icon'        => '🔒',
 				],
 				'analytics'   => [
 					'enabled'     => true,
 					'required'    => false,
-					'name'        => __( 'Аналітика', 'medici-cookie-notice' ),
-					'description' => __( 'Допомагають нам зрозуміти, як відвідувачі взаємодіють з сайтом.', 'medici-cookie-notice' ),
+					'name'        => 'Analytics',
+					'description' => 'Help us understand how visitors interact with the website.',
 					'icon'        => '📊',
 				],
 				'marketing'   => [
 					'enabled'     => true,
 					'required'    => false,
-					'name'        => __( 'Маркетинг', 'medici-cookie-notice' ),
-					'description' => __( 'Використовуються для показу релевантної реклами.', 'medici-cookie-notice' ),
+					'name'        => 'Marketing',
+					'description' => 'Used to display relevant advertising.',
 					'icon'        => '🎯',
 				],
 				'preferences' => [
 					'enabled'     => true,
 					'required'    => false,
-					'name'        => __( 'Вподобання', 'medici-cookie-notice' ),
-					'description' => __( 'Дозволяють сайту запам\'ятовувати ваші налаштування.', 'medici-cookie-notice' ),
+					'name'        => 'Preferences',
+					'description' => 'Allow the website to remember your settings.',
 					'icon'        => '⚙️',
 				],
 			],
@@ -393,6 +394,54 @@ final class Cookie_Notice {
 			false,
 			dirname( MCN_PLUGIN_BASENAME ) . '/languages'
 		);
+	}
+
+	/**
+	 * Застосування перекладів до defaults після завантаження textdomain
+	 *
+	 * Викликається на init hook з пріоритетом 5 (після load_textdomain з пріоритетом 1).
+	 * WordPress 6.7+ вимагає завантаження перекладів на init або пізніше.
+	 *
+	 * @since 1.1.1
+	 * @return void
+	 */
+	public function translate_defaults(): void {
+		// Застосовуємо переклади до текстових полів
+		$this->defaults['message']             = __( 'Ми використовуємо файли cookie для покращення вашого досвіду на сайті.', 'medici-cookie-notice' );
+		$this->defaults['accept_text']         = __( 'Прийняти всі', 'medici-cookie-notice' );
+		$this->defaults['reject_text']         = __( 'Відхилити всі', 'medici-cookie-notice' );
+		$this->defaults['settings_text']       = __( 'Налаштування', 'medici-cookie-notice' );
+		$this->defaults['save_text']           = __( 'Зберегти налаштування', 'medici-cookie-notice' );
+		$this->defaults['privacy_policy_text'] = __( 'Політика конфіденційності', 'medici-cookie-notice' );
+		$this->defaults['revoke_text']         = __( 'Керування cookies', 'medici-cookie-notice' );
+
+		// Застосовуємо переклади до категорій
+		$this->defaults['categories']['necessary']['name']        = __( 'Необхідні', 'medici-cookie-notice' );
+		$this->defaults['categories']['necessary']['description'] = __( 'Ці файли cookie необхідні для роботи сайту і не можуть бути вимкнені.', 'medici-cookie-notice' );
+
+		$this->defaults['categories']['analytics']['name']        = __( 'Аналітика', 'medici-cookie-notice' );
+		$this->defaults['categories']['analytics']['description'] = __( 'Допомагають нам зрозуміти, як відвідувачі взаємодіють з сайтом.', 'medici-cookie-notice' );
+
+		$this->defaults['categories']['marketing']['name']        = __( 'Маркетинг', 'medici-cookie-notice' );
+		$this->defaults['categories']['marketing']['description'] = __( 'Використовуються для показу релевантної реклами.', 'medici-cookie-notice' );
+
+		$this->defaults['categories']['preferences']['name']        = __( 'Вподобання', 'medici-cookie-notice' );
+		$this->defaults['categories']['preferences']['description'] = __( 'Дозволяють сайту запам\'ятовувати ваші налаштування.', 'medici-cookie-notice' );
+
+		// Оновлюємо options якщо вони ще не збережені або використовують дефолтні англійські тексти
+		$saved_options = get_option( 'medici_cookie_notice', [] );
+
+		// Якщо options порожні або мають англійські тексти - застосовуємо переклади
+		if ( empty( $saved_options ) || ( isset( $saved_options['message'] ) && 'We use cookies' === substr( $saved_options['message'], 0, 15 ) ) ) {
+			$this->options = wp_parse_args( $saved_options, $this->defaults );
+		}
+
+		// Оновлюємо категорії
+		if ( ! empty( $this->options['categories'] ) ) {
+			$this->cookie_categories = $this->options['categories'];
+		} else {
+			$this->cookie_categories = $this->defaults['categories'];
+		}
 	}
 
 	/**
