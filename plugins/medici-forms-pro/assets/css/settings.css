@@ -1,0 +1,97 @@
+/**
+ * Medici Forms - Settings Page Styles
+ *
+ * @package MediciForms
+ * @version 1.0.0
+ */
+
+.medici-forms-settings {
+  max-width: 800px;
+}
+
+.medici-forms-settings h1 {
+  margin-bottom: 20px;
+}
+
+.medici-forms-settings .nav-tab-wrapper {
+  border-bottom: 1px solid #c3c4c7;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.medici-forms-settings .nav-tab {
+  margin-left: 0;
+  margin-bottom: -1px;
+  padding: 8px 15px;
+  font-size: 14px;
+  border-radius: 3px 3px 0 0;
+}
+
+.medici-forms-settings .nav-tab-active {
+  background: #fff;
+  border-bottom: 1px solid #fff;
+}
+
+.medici-forms-settings form {
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-top: none;
+  padding: 20px;
+}
+
+.medici-forms-settings .form-table {
+  margin-top: 0;
+}
+
+.medici-forms-settings .form-table th {
+  padding: 15px 10px 15px 0;
+  font-weight: 600;
+}
+
+.medici-forms-settings .form-table td {
+  padding: 10px 10px 10px 0;
+}
+
+.medici-forms-settings .description {
+  font-size: 12px;
+  color: #646970;
+  margin-top: 5px;
+}
+
+/* Input styling */
+.medici-forms-settings input[type="text"],
+.medici-forms-settings input[type="email"],
+.medici-forms-settings input[type="url"],
+.medici-forms-settings input[type="password"],
+.medici-forms-settings input[type="number"],
+.medici-forms-settings select,
+.medici-forms-settings textarea {
+  max-width: 100%;
+}
+
+.medici-forms-settings .regular-text {
+  width: 350px;
+  max-width: 100%;
+}
+
+.medici-forms-settings .large-text {
+  width: 100%;
+}
+
+/* Color picker */
+.wp-picker-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wp-picker-container .wp-color-result.button {
+  margin: 0;
+}
+
+/* Submit button */
+.medici-forms-settings .submit {
+  padding-top: 20px;
+  border-top: 1px solid #dcdcde;
+  margin-top: 20px;
+}

@@ -1,0 +1,70 @@
+/**
+ * Medici Forms - Admin Styles
+ *
+ * @package MediciForms
+ * @version 1.0.0
+ */
+
+/* Settings Page */
+.medici-forms-settings .nav-tab-wrapper {
+  margin-bottom: 20px;
+}
+
+.medici-forms-settings .form-table th {
+  width: 200px;
+  padding: 20px 10px 20px 0;
+}
+
+.medici-forms-settings .form-table td {
+  padding: 15px 10px;
+}
+
+.medici-forms-settings .description {
+  color: #646970;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* Shortcode Copy */
+.mf-shortcode-copy {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #f0f0f1;
+  border-radius: 4px;
+  font-family: monospace;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mf-shortcode-copy:hover {
+  background: #e0e0e1;
+}
+
+/* Shortcode Box */
+.mf-shortcode-box {
+  text-align: center;
+}
+
+.mf-shortcode-box code {
+  display: block;
+  padding: 10px;
+  background: #f6f7f7;
+  border: 1px solid #c3c4c7;
+  border-radius: 4px;
+  margin: 10px 0;
+  word-break: break-all;
+}
+
+/* Color Picker */
+.medici-color-picker {
+  width: 100px;
+}
+
+/* Form List Columns */
+.column-shortcode {
+  width: 200px;
+}
+
+.column-entries {
+  width: 80px;
+}
