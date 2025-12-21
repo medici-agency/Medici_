@@ -106,7 +106,11 @@ final class Medici_Forms_Advanced {
 	 * @since 1.0.0
 	 */
 	private function __construct() {
-		$this->check_dependencies();
+		// CRITICAL: Do NOT initialize if WPForms is missing!
+		if ( ! $this->check_dependencies() ) {
+			return;
+		}
+
 		$this->load_dependencies();
 		$this->init();
 	}
@@ -120,6 +124,7 @@ final class Medici_Forms_Advanced {
 	private function check_dependencies(): bool {
 		if ( ! function_exists( 'wpforms' ) ) {
 			add_action( 'admin_notices', [ $this, 'wpforms_missing_notice' ] );
+			// CRITICAL: Return early - do NOT load module if WPForms missing!
 			return false;
 		}
 
