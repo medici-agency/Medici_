@@ -1013,7 +1013,7 @@ const MediciApp = {
 			'color: #FFD700; font-size: 14px; font-weight: bold; margin-top: 10px;'
 		);
 		console.log(
-			'%cMEDICI AGENCY | МЕДИЧНИЙ МАРКЕТИНГ - ЗАКОННО І ЕТИЧНО',
+			'%cMEDICI AGENCY | МЕДИЧНИЙ МАРКЕТИНГ - ЗАКОННО ТА ЕТИЧНО',
 			'color: #666; font-size: 12px;'
 		);
 		console.log('%chttps://medici.agency', 'color: #0099FF; font-size: 12px;');
