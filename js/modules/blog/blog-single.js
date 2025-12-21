@@ -214,22 +214,28 @@
 
 		// Update active link
 		function updateActiveLink() {
-			const scrollPosition = window.pageYOffset;
-
 			// Знайти поточний активний заголовок
 			let currentHeading = null;
+			let closestDistance = Infinity;
 
 			headings.forEach((heading) => {
-				const headingTop = heading.offsetTop - headerHeight;
+				// Використовуємо getBoundingClientRect() для точного визначення позиції
+				const rect = heading.getBoundingClientRect();
+				const headingTop = rect.top;
 
-				if (scrollPosition >= headingTop) {
+				// Відстань від верху viewport (з урахуванням header offset)
+				const distanceFromTop = Math.abs(headingTop - headerHeight);
+
+				// Заголовок вважається активним якщо він пройшов header offset
+				// і є найближчим до header offset
+				if (headingTop <= headerHeight && distanceFromTop < closestDistance) {
 					currentHeading = heading;
+					closestDistance = distanceFromTop;
 				}
 			});
 
-			// Якщо scroll position близько до верху (< 100px), завжди активувати першу секцію
-			// Це виправляє проблему коли користувач натискає scroll-to-top
-			if (scrollPosition < 100 && headings.length > 0) {
+			// Якщо жоден заголовок не активний (scroll зверху), активувати перший
+			if (!currentHeading && headings.length > 0) {
 				currentHeading = headings[0];
 			}
 
@@ -271,14 +277,28 @@
 
 			// Якщо елемент не видимий - прокрутити контейнер
 			if (!isLinkVisible) {
-				const linkOffsetTop = activeLink.offsetTop;
+				// Рахуємо offset відносно батьківського UL елемента (.toc-list)
+				const tocList = activeLink.closest('.toc-list');
+				if (!tocList) {
+					return;
+				}
+
+				// Позиція активного елемента відносно .toc-list
+				let linkOffsetTop = 0;
+				let element = activeLink.parentElement; // li елемент
+				while (element && element !== tocList) {
+					linkOffsetTop += element.offsetTop;
+					element = element.offsetParent;
+				}
+
 				const containerHeight = tocContainer.clientHeight;
+				const linkHeight = activeLink.offsetHeight;
 
 				// Прокрутити так щоб активний елемент був посередині (з невеликим offset)
-				const scrollTo = linkOffsetTop - containerHeight / 2 + activeLink.offsetHeight / 2;
+				const scrollTo = linkOffsetTop - containerHeight / 2 + linkHeight / 2;
 
 				tocContainer.scrollTo({
-					top: scrollTo,
+					top: Math.max(0, scrollTo),
 					behavior: 'smooth',
 				});
 			}
