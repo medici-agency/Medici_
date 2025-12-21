@@ -481,6 +481,18 @@ class Settings {
 				'description' => __( 'Заокруглення кутів полів форми.', 'medici-forms-pro' ),
 			)
 		);
+
+		add_settings_field(
+			'enable_autogrow_textarea',
+			__( 'Автозбільшення textarea', 'medici-forms-pro' ),
+			array( $this, 'render_checkbox_field' ),
+			'medici_forms_styling',
+			'medici_forms_styling',
+			array(
+				'id'          => 'enable_autogrow_textarea',
+				'description' => __( 'Textarea автоматично збільшується при введенні тексту.', 'medici-forms-pro' ),
+			)
+		);
 	}
 
 	/**
@@ -565,6 +577,10 @@ class Settings {
 			<form method="post" action="options.php">
 				<?php
 				settings_fields( 'medici_forms_settings' );
+				// Hidden field to track current tab for proper checkbox handling.
+				?>
+				<input type="hidden" name="<?php echo esc_attr( self::OPTION_NAME ); ?>[_current_tab]" value="<?php echo esc_attr( $current_tab ); ?>">
+				<?php
 
 				switch ( $current_tab ) {
 					case 'email':
@@ -746,22 +762,27 @@ class Settings {
 			return get_option( self::OPTION_NAME, array() );
 		}
 
-		$sanitized = array();
+		// Get existing options to merge with.
+		$existing = get_option( self::OPTION_NAME, array() );
 
-		// Checkboxes.
-		$checkboxes = array(
-			'enable_ajax',
-			'load_styles',
-			'load_scripts',
-			'enable_honeypot',
-			'enable_time_check',
-			'enable_recaptcha',
-			'webhook_enabled',
-			'log_entries',
-			'delete_data_on_uninstall',
+		// Start with existing values to preserve other tabs' settings.
+		$sanitized = $existing;
+
+		// Get current tab to determine which checkboxes to update.
+		$current_tab = $input['_current_tab'] ?? 'general';
+
+		// Define checkboxes per tab.
+		$checkboxes_by_tab = array(
+			'general'      => array( 'enable_ajax', 'load_styles', 'load_scripts' ),
+			'antispam'     => array( 'enable_honeypot', 'enable_time_check', 'enable_recaptcha' ),
+			'integrations' => array( 'webhook_enabled' ),
+			'styling'      => array( 'enable_autogrow_textarea' ),
+			'advanced'     => array( 'log_entries', 'delete_data_on_uninstall' ),
 		);
 
-		foreach ( $checkboxes as $key ) {
+		// Only update checkboxes from the current tab.
+		$current_checkboxes = $checkboxes_by_tab[ $current_tab ] ?? array();
+		foreach ( $current_checkboxes as $key ) {
 			$sanitized[ $key ] = ! empty( $input[ $key ] );
 		}
 
@@ -843,8 +864,6 @@ class Settings {
 			}
 		}
 
-		// Merge with existing options.
-		$existing = get_option( self::OPTION_NAME, array() );
-		return wp_parse_args( $sanitized, $existing );
+		return $sanitized;
 	}
 }

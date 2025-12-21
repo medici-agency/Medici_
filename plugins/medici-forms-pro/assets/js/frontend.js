@@ -18,6 +18,7 @@
 		init: function () {
 			this.bindEvents();
 			this.initPhoneMask();
+			this.initAutoGrowTextarea();
 		},
 
 		/**
@@ -283,6 +284,29 @@
 				}
 
 				$(this).val(value.trim());
+			});
+		},
+
+		/**
+		 * Initialize auto-growing textarea
+		 * Uses CSS Grid technique for seamless height adjustment
+		 */
+		initAutoGrowTextarea: function () {
+			// Handle textareas with auto-grow wrapper
+			$(document).on('input', '.medici-form-textarea-wrapper > .medici-form-textarea', function () {
+				const $textarea = $(this);
+				const $wrapper = $textarea.parent('.medici-form-textarea-wrapper');
+
+				// Update the data attribute with the current value
+				// The CSS ::after pseudo-element will use this to calculate height
+				$wrapper.attr('data-cloned-val', $textarea.val());
+			});
+
+			// Initialize existing textareas on page load
+			$('.medici-form-textarea-wrapper > .medici-form-textarea').each(function () {
+				const $textarea = $(this);
+				const $wrapper = $textarea.parent('.medici-form-textarea-wrapper');
+				$wrapper.attr('data-cloned-val', $textarea.val());
 			});
 		},
 	};
