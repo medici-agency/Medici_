@@ -20,7 +20,8 @@
  *
  * @return {Object} The preview module object.
  */
-export default function( generator, $ ) { // eslint-disable-line max-lines-per-function
+export default function (generator, $) {
+	// eslint-disable-line max-lines-per-function
 	/**
 	 * Localized strings.
 	 *
@@ -56,9 +57,11 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 * @since 1.9.2
 		 */
 		init() {
-			preview.el.$contentWrap = generator.main.el.$generatorPanel.find( '.wpforms-panel-content-wrap' );
-			preview.el.$content = preview.el.$contentWrap.find( '.wpforms-panel-content' );
-			preview.el.$emptyState = preview.el.$content.find( '.wpforms-panel-empty-state' );
+			preview.el.$contentWrap = generator.main.el.$generatorPanel.find(
+				'.wpforms-panel-content-wrap'
+			);
+			preview.el.$content = preview.el.$contentWrap.find('.wpforms-panel-content');
+			preview.el.$emptyState = preview.el.$content.find('.wpforms-panel-empty-state');
 
 			preview.events();
 		},
@@ -70,12 +73,12 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 */
 		events() {
 			// Track mouse coordinates.
-			$( document ).on( 'mousemove', ( e ) => {
+			$(document).on('mousemove', (e) => {
 				preview.mouse.x = e.pageX;
 				preview.mouse.y = e.pageY;
-			} );
+			});
 
-			preview.el.$contentWrap.on( 'scroll', preview.closeTooltips );
+			preview.el.$contentWrap.on('scroll', preview.closeTooltips);
 		},
 
 		/**
@@ -83,14 +86,15 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 *
 		 * @since 1.9.2
 		 */
-		update() { // eslint-disable-line complexity
+		update() {
+			// eslint-disable-line complexity
 			/**
 			 * @param response.fieldsOrder.length
 			 * @param response.settings.submit_text
 			 */
 			const response = generator.state.aiResponse;
 
-			if ( ! response || ! response.fields ) {
+			if (!response || !response.fields) {
 				return;
 			}
 
@@ -101,25 +105,25 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 			generator.state.previewFields = [];
 
 			// Remove existing fields and hide empty state.
-			preview.clear( false );
+			preview.clear(false);
 
 			// Display the form header.
-			preview.displayHeader( response );
+			preview.displayHeader(response);
 
-			for ( const key in response.fieldsOrder ) {
-				const fieldId = response.fieldsOrder[ key ];
-				preview.field( response.fields[ fieldId ], key );
+			for (const key in response.fieldsOrder) {
+				const fieldId = response.fieldsOrder[key];
+				preview.field(response.fields[fieldId], key);
 			}
 
 			// Add submit button.
-			if ( response.fieldsOrder?.length ) {
-				preview.displaySubmit( response.settings?.submit_text || strings.panel.submitButton );
+			if (response.fieldsOrder?.length) {
+				preview.displaySubmit(response.settings?.submit_text || strings.panel.submitButton);
 
 				return;
 			}
 
 			// Show the empty state if there are no fields.
-			preview.el.$emptyState.removeClass( 'wpforms-hidden-strict' );
+			preview.el.$emptyState.removeClass('wpforms-hidden-strict');
 
 			generator.state.isPreviewUpdate = false;
 		},
@@ -132,16 +136,16 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 * @param {Object} fieldSettings Field settings.
 		 * @param {number} key           Field key.
 		 */
-		async field( fieldSettings, key ) {
+		async field(fieldSettings, key) {
 			// Add a field placeholder to the preview.
 			const html = `
-				<div id="wpforms-generator-field-${ fieldSettings.id ?? '' }" class="wpforms-ai-form-generator-preview-field">
+				<div id="wpforms-generator-field-${fieldSettings.id ?? ''}" class="wpforms-ai-form-generator-preview-field">
 					<div class="placeholder"></div>
-					<div class="wpforms-field wpforms-field-${ fieldSettings.type ?? '' }"></div>
+					<div class="wpforms-field wpforms-field-${fieldSettings.type ?? ''}"></div>
 				</div>
 			`;
 
-			preview.el.$content.append( html );
+			preview.el.$content.append(html);
 
 			const data = {
 				action: 'wpforms_get_ai_form_field_preview',
@@ -150,21 +154,21 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 			};
 
 			// Delay the AJAX request to simulate one-by-one field loading.
-			await preview.delay( 300 * key );
+			await preview.delay(300 * key);
 
 			// Field preview AJAX request.
-			$.post( strings.ajaxUrl, data )
-				.done( function( res ) {
-					if ( ! res.success ) {
-						wpf.debug( 'Form Generator AJAX error:', res.data.error ?? res.data );
+			$.post(strings.ajaxUrl, data)
+				.done(function (res) {
+					if (!res.success) {
+						wpf.debug('Form Generator AJAX error:', res.data.error ?? res.data);
 						return;
 					}
 
-					preview.displayField( res.data ?? '', fieldSettings );
-				} )
-				.fail( function( xhr ) {
-					wpf.debug( 'Form Generator AJAX error:', xhr.responseText ?? xhr.statusText );
-				} );
+					preview.displayField(res.data ?? '', fieldSettings);
+				})
+				.fail(function (xhr) {
+					wpf.debug('Form Generator AJAX error:', xhr.responseText ?? xhr.statusText);
+				});
 		},
 
 		/**
@@ -175,32 +179,34 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 * @param {string} fieldHtml     Field HTML.
 		 * @param {Object} fieldSettings Field settings.
 		 */
-		displayField( fieldHtml, fieldSettings ) {
-			if ( ! fieldSettings.id && fieldSettings.id !== 0 ) {
+		displayField(fieldHtml, fieldSettings) {
+			if (!fieldSettings.id && fieldSettings.id !== 0) {
 				return;
 			}
 
-			const $fieldBlock = preview.el.$content.find( '#wpforms-generator-field-' + fieldSettings.id );
-			const $field = $fieldBlock.find( '.wpforms-field' );
-			const $placeholder = $fieldBlock.find( '.placeholder' );
+			const $fieldBlock = preview.el.$content.find('#wpforms-generator-field-' + fieldSettings.id);
+			const $field = $fieldBlock.find('.wpforms-field');
+			const $placeholder = $fieldBlock.find('.placeholder');
 
-			$placeholder
-				.addClass( 'fade-out' );
+			$placeholder.addClass('fade-out');
 
 			$field
-				.html( fieldHtml ?? '' )
-				.addClass( 'fade-in' )
-				.toggleClass( 'wpforms-hidden', ! fieldHtml ) // Hide preview if the field is empty.
-				.toggleClass( 'required', fieldSettings.required === '1' ) // Display the required field mark (asterisk) on the field label.
-				.toggleClass( 'label_empty', ! fieldSettings.label ); // The field with an empty label.
+				.html(fieldHtml ?? '')
+				.addClass('fade-in')
+				.toggleClass('wpforms-hidden', !fieldHtml) // Hide preview if the field is empty.
+				.toggleClass('required', fieldSettings.required === '1') // Display the required field mark (asterisk) on the field label.
+				.toggleClass('label_empty', !fieldSettings.label); // The field with an empty label.
 
-			preview.initTooltip( $field );
-			preview.initPageBreak( $field, fieldSettings );
+			preview.initTooltip($field);
+			preview.initPageBreak($field, fieldSettings);
 
-			generator.state.previewFields.push( fieldSettings.id );
+			generator.state.previewFields.push(fieldSettings.id);
 
 			// Detect whether all the fields are loaded.
-			if ( generator.state.previewFields.length !== Object.keys( generator.state.aiResponse?.fields ).length ) {
+			if (
+				generator.state.previewFields.length !==
+				Object.keys(generator.state.aiResponse?.fields).length
+			) {
 				return;
 			}
 
@@ -214,32 +220,35 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 *
 		 * @return {string} Addons used in the response.
 		 */
-		getAddonsUsedInResponse() { // eslint-disable-line complexity
+		getAddonsUsedInResponse() {
+			// eslint-disable-line complexity
 			const response = generator.state.aiResponse;
 
-			if ( ! response || ! response.fields ) {
+			if (!response || !response.fields) {
 				return '';
 			}
 
 			const addons = [];
 
-			for ( const key in response.fields ) {
-				const addon = wpforms_ai_form_generator.addonFields[ response.fields[ key ].type ];
+			for (const key in response.fields) {
+				const addon = wpforms_ai_form_generator.addonFields[response.fields[key].type];
 
-				if ( ! addon ) {
+				if (!addon) {
 					continue;
 				}
 
-				const addonName = wpforms_addons[ 'wpforms-' + addon ]?.title.replace( strings.addons.addon, '' ).trim();
+				const addonName = wpforms_addons['wpforms-' + addon]?.title
+					.replace(strings.addons.addon, '')
+					.trim();
 
-				if ( ! addonName || addons.includes( addonName ) ) {
+				if (!addonName || addons.includes(addonName)) {
 					continue;
 				}
 
-				addons.push( addonName );
+				addons.push(addonName);
 			}
 
-			if ( ! addons.length ) {
+			if (!addons.length) {
 				return '';
 			}
 
@@ -247,7 +256,9 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 
 			lastAddon += ' ' + strings.addons.addon;
 
-			return addons.length ? addons.join( ', ' ) + ', ' + strings.addons.and + ' ' + lastAddon : lastAddon;
+			return addons.length
+				? addons.join(', ') + ', ' + strings.addons.and + ' ' + lastAddon
+				: lastAddon;
 		},
 
 		/**
@@ -258,9 +269,12 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 * @param {jQuery} $field        Field jQuery object.
 		 * @param {Object} fieldSettings Field settings.
 		 */
-		initPageBreak( $field, fieldSettings ) {
-			if ( fieldSettings.type === 'pagebreak' && ! [ 'top', 'bottom' ].includes( fieldSettings.position ) ) {
-				$field.addClass( 'wpforms-pagebreak-normal' );
+		initPageBreak($field, fieldSettings) {
+			if (
+				fieldSettings.type === 'pagebreak' &&
+				!['top', 'bottom'].includes(fieldSettings.position)
+			) {
+				$field.addClass('wpforms-pagebreak-normal');
 			}
 		},
 
@@ -271,7 +285,7 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 *
 		 * @param {jQuery} $field Field jQuery object.
 		 */
-		initTooltip( $field ) {
+		initTooltip($field) {
 			const width = 260;
 			const args = {
 				content: strings.panel.tooltipTitle + '<br>' + strings.panel.tooltipText,
@@ -279,20 +293,20 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 				interactive: true,
 				animationDuration: 100,
 				delay: 0,
-				side: [ 'top' ],
+				side: ['top'],
 				contentAsHTML: true,
-				functionPosition: ( instance, helper, position ) => {
+				functionPosition: (instance, helper, position) => {
 					// Set the tooltip position based on the mouse coordinates.
 					position.coord.top = preview.mouse.y - 57;
-					position.coord.left = preview.mouse.x - ( width / 2 );
+					position.coord.left = preview.mouse.x - width / 2;
 
 					return position;
 				},
 			};
 
 			// Initialize.
-			$field.tooltipster( args );
-			preview.toggleTooltipOnClick( $field );
+			$field.tooltipster(args);
+			preview.toggleTooltipOnClick($field);
 		},
 
 		/**
@@ -302,35 +316,35 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 *
 		 * @param {jQuery} $field Field jQuery object.
 		 */
-		toggleTooltipOnClick( $field ) {
-			$field.on( 'click', () => {
+		toggleTooltipOnClick($field) {
+			$field.on('click', () => {
 				// Close opened tooltips on other fields.
 				preview.closeTooltips();
 
-				const status = $field.tooltipster( 'status' );
+				const status = $field.tooltipster('status');
 
-				$field.tooltipster( status.state === 'closed' ? 'open' : 'close' );
+				$field.tooltipster(status.state === 'closed' ? 'open' : 'close');
 
-				if ( status.state !== 'closed' ) {
+				if (status.state !== 'closed') {
 					return;
 				}
 
-				const instance = $field.tooltipster( 'instance' );
+				const instance = $field.tooltipster('instance');
 
 				// Adjust tooltip styling.
-				instance._$tooltip.css( {
+				instance._$tooltip.css({
 					height: 'auto',
-				} );
+				});
 
-				instance._$tooltip.find( '.tooltipster-arrow' ).css( {
+				instance._$tooltip.find('.tooltipster-arrow').css({
 					left: '50%',
-				} );
+				});
 
 				// Close the tooltip after 5 seconds.
-				setTimeout( function() {
+				setTimeout(function () {
 					preview.closeTooltips();
-				}, 5000 );
-			} );
+				}, 5000);
+			});
 		},
 
 		/**
@@ -339,13 +353,13 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 * @since 1.9.2
 		 */
 		closeTooltips() {
-			preview.el.$content.find( '.wpforms-field' ).each( function() {
-				const $this = $( this );
+			preview.el.$content.find('.wpforms-field').each(function () {
+				const $this = $(this);
 
-				if ( $this.hasClass( 'tooltipstered' ) && $this.parent().length ) {
-					$this.tooltipster( 'close' );
+				if ($this.hasClass('tooltipstered') && $this.parent().length) {
+					$this.tooltipster('close');
 				}
-			} );
+			});
 		},
 
 		/**
@@ -355,11 +369,11 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 *
 		 * @param {Object} response Button text.
 		 */
-		displayHeader( response ) {
-			const title = `<h2 class="wpforms-ai-form-generator-preview-title">${ response.form_title ?? '' }</h2>`;
+		displayHeader(response) {
+			const title = `<h2 class="wpforms-ai-form-generator-preview-title">${response.form_title ?? ''}</h2>`;
 
 			// Add form title.
-			preview.el.$content.prepend( title );
+			preview.el.$content.prepend(title);
 		},
 
 		/**
@@ -369,9 +383,10 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 *
 		 * @param {string} label Button text.
 		 */
-		displaySubmit( label ) {
-			preview.el.$content
-				.append( `<button type="button" value="${ label }" class="wpforms-ai-form-generator-preview-submit">${ label }</button>` );
+		displaySubmit(label) {
+			preview.el.$content.append(
+				`<button type="button" value="${label}" class="wpforms-ai-form-generator-preview-submit">${label}</button>`
+			);
 		},
 
 		/**
@@ -381,13 +396,13 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 *
 		 * @param {boolean} isEmptyState Whether to show the empty state or not.
 		 */
-		clear( isEmptyState = true ) {
-			preview.el.$content.find( '.wpforms-ai-form-generator-preview-field' ).remove();
-			preview.el.$content.find( '.wpforms-ai-form-generator-preview-placeholder' ).remove();
-			preview.el.$content.find( '.wpforms-ai-form-generator-preview-title' ).remove();
-			preview.el.$content.find( '.wpforms-ai-form-generator-preview-addons-notice' ).remove();
-			preview.el.$content.find( '.wpforms-ai-form-generator-preview-submit' ).remove();
-			preview.el.$emptyState.toggleClass( 'wpforms-hidden-strict', ! isEmptyState );
+		clear(isEmptyState = true) {
+			preview.el.$content.find('.wpforms-ai-form-generator-preview-field').remove();
+			preview.el.$content.find('.wpforms-ai-form-generator-preview-placeholder').remove();
+			preview.el.$content.find('.wpforms-ai-form-generator-preview-title').remove();
+			preview.el.$content.find('.wpforms-ai-form-generator-preview-addons-notice').remove();
+			preview.el.$content.find('.wpforms-ai-form-generator-preview-submit').remove();
+			preview.el.$emptyState.toggleClass('wpforms-hidden-strict', !isEmptyState);
 		},
 
 		/**
@@ -399,10 +414,10 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 *
 		 * @return {Promise} Promise.
 		 */
-		delay( time ) {
-			return new Promise( ( res ) => {
-				setTimeout( res, time );
-			} );
+		delay(time) {
+			return new Promise((res) => {
+				setTimeout(res, time);
+			});
 		},
 	};
 

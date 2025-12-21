@@ -19,7 +19,8 @@
  *
  * @return {Object} Forms helpers object.
  */
-export default function( chat ) { // eslint-disable-line no-unused-vars, max-lines-per-function
+export default function (chat) {
+	// eslint-disable-line no-unused-vars, max-lines-per-function
 	/**
 	 * The default `forms` mode helpers object.
 	 *
@@ -33,12 +34,11 @@ export default function( chat ) { // eslint-disable-line no-unused-vars, max-lin
 		 */
 		init() {
 			// Set the initial form generator state.
-			if ( chat.sessionId ) {
+			if (chat.sessionId) {
 				WPFormsAIFormGenerator.state.chatStart = true;
 
 				// Remove the selected state from the current template card.
-				WPFormsAIFormGenerator.main.el.$templateCard
-					.next( '.selected' ).removeClass( 'selected' );
+				WPFormsAIFormGenerator.main.el.$templateCard.next('.selected').removeClass('selected');
 			}
 		},
 
@@ -60,18 +60,18 @@ export default function( chat ) { // eslint-disable-line no-unused-vars, max-lin
 		 *
 		 * @return {string} HTML markup.
 		 */
-		getAnswer( response ) {
-			if ( ! response ) {
+		getAnswer(response) {
+			if (!response) {
 				return '';
 			}
 
-			const rnd = Math.floor( Math.random() * chat.modeStrings.footer.length );
-			const footer = chat.modeStrings.footer[ rnd ];
-			const answer = response.explanation || ( response.form_title ?? '' );
+			const rnd = Math.floor(Math.random() * chat.modeStrings.footer.length);
+			const footer = chat.modeStrings.footer[rnd];
+			const answer = response.explanation || (response.form_title ?? '');
 
 			return `
-				<h4>${ answer }</h4>
-				<span>${ footer }</span>
+				<h4>${answer}</h4>
+				<span>${footer}</span>
 			`;
 		},
 
@@ -85,7 +85,7 @@ export default function( chat ) { // eslint-disable-line no-unused-vars, max-lin
 		getAnswerButtonsPre() {
 			return `
 				<button type="button" class="wpforms-ai-chat-use-form wpforms-ai-chat-answer-action wpforms-btn-sm wpforms-btn-orange" >
-					<span>${ chat.modeStrings.useForm }</span>
+					<span>${chat.modeStrings.useForm}</span>
 				</button>
 			`;
 		},
@@ -97,7 +97,8 @@ export default function( chat ) { // eslint-disable-line no-unused-vars, max-lin
 		 *
 		 * @param {HTMLElement} element The answer element.
 		 */
-		addedAnswer( element ) { // eslint-disable-line no-unused-vars
+		addedAnswer(element) {
+			// eslint-disable-line no-unused-vars
 			forms.updateInactiveAnswers();
 		},
 
@@ -108,10 +109,10 @@ export default function( chat ) { // eslint-disable-line no-unused-vars, max-lin
 		 *
 		 * @param {HTMLElement} element The answer element.
 		 */
-		setActiveAnswer( element ) {
+		setActiveAnswer(element) {
 			forms.updateInactiveAnswers();
 
-			element.querySelector( '.wpforms-chat-item-content' ).setAttribute( 'title', '' );
+			element.querySelector('.wpforms-chat-item-content').setAttribute('title', '');
 		},
 
 		/**
@@ -120,11 +121,12 @@ export default function( chat ) { // eslint-disable-line no-unused-vars, max-lin
 		 * @since 1.9.2
 		 */
 		updateInactiveAnswers() {
-			chat.messageList.querySelectorAll( '.wpforms-chat-item-answer:not(.active) .wpforms-chat-item-content' )
-				.forEach( ( el ) => {
+			chat.messageList
+				.querySelectorAll('.wpforms-chat-item-answer:not(.active) .wpforms-chat-item-content')
+				.forEach((el) => {
 					// Set title attribute for inactive answers.
-					el.setAttribute( 'title', chat.modeStrings.inactiveAnswerTitle );
-				} );
+					el.setAttribute('title', chat.modeStrings.inactiveAnswerTitle);
+				});
 		},
 
 		/**
@@ -147,13 +149,16 @@ export default function( chat ) { // eslint-disable-line no-unused-vars, max-lin
 		 *
 		 * @return {Object} The sanitized response.
 		 */
-		sanitizeResponse( response ) {
-			if ( ! response.explanation ) {
+		sanitizeResponse(response) {
+			if (!response.explanation) {
 				return response;
 			}
 
 			// Sanitize explanation string.
-			response.explanation = wpf.sanitizeHTML( response.explanation, wpforms_builder.allowed_label_html_tags );
+			response.explanation = wpf.sanitizeHTML(
+				response.explanation,
+				wpforms_builder.allowed_label_html_tags
+			);
 
 			return response;
 		},

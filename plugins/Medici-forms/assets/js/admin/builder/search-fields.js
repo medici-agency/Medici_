@@ -11,197 +11,194 @@ var WPForms = window.WPForms || {};
 WPForms.Admin = WPForms.Admin || {};
 WPForms.Admin.Builder = WPForms.Admin.Builder || {};
 
-WPForms.Admin.Builder.Search = WPForms.Admin.Builder.Search || ( function( document, window, $ ) {
-
-	/**
-	 * Elements holder.
-	 *
-	 * @since 1.8.3
-	 *
-	 * @type {object}
-	 */
-	const el = {};
-
-	/**
-	 * Public functions and properties.
-	 *
-	 * @since 1.8.3
-	 *
-	 * @type {object}
-	 */
-	const app = {
-
+WPForms.Admin.Builder.Search =
+	WPForms.Admin.Builder.Search ||
+	(function (document, window, $) {
 		/**
-		 * Start the engine. DOM is not ready yet, use only to init something.
+		 * Elements holder.
 		 *
 		 * @since 1.8.3
+		 *
+		 * @type {object}
 		 */
-		init: function() {
-
-			$( app.ready );
-		},
+		const el = {};
 
 		/**
-		 * DOM is fully loaded.
+		 * Public functions and properties.
 		 *
 		 * @since 1.8.3
-		 */
-		ready: function() {
-
-			app.setup();
-			app.events();
-			app.scrollSidebar();
-		},
-
-		/**
-		 * Scroll the sidebar to the height of the search.
 		 *
-		 * @since 1.8.3
+		 * @type {object}
 		 */
-		scrollSidebar: function() {
+		const app = {
+			/**
+			 * Start the engine. DOM is not ready yet, use only to init something.
+			 *
+			 * @since 1.8.3
+			 */
+			init: function () {
+				$(app.ready);
+			},
 
-			el.$sidebar.scrollTop( el.$searchWrapper.height() + 20 );
-		},
+			/**
+			 * DOM is fully loaded.
+			 *
+			 * @since 1.8.3
+			 */
+			ready: function () {
+				app.setup();
+				app.events();
+				app.scrollSidebar();
+			},
 
-		/**
-		 * Setup. Prepare some variables.
-		 *
-		 * @since 1.8.3
-		 */
-		setup: function() {
+			/**
+			 * Scroll the sidebar to the height of the search.
+			 *
+			 * @since 1.8.3
+			 */
+			scrollSidebar: function () {
+				el.$sidebar.scrollTop(el.$searchWrapper.height() + 20);
+			},
 
-			// Cache DOM elements
-			el.$document            = $( document );
-			el.$builder             = $( '#wpforms-builder' );
-			el.$searchInput         = $( '#wpforms-search-fields-input' );
-			el.$searchInputCloseBtn = $( '.wpforms-search-fields-input-close' );
-			el.$searchWrapper       = $( '.wpforms-search-fields-wrapper' );
-			el.$noResults           = $( '.wpforms-search-fields-no-results' );
-			el.$listWrapper         = $( '.wpforms-search-fields-list' );
-			el.$list                = $( '.wpforms-search-fields-list .wpforms-add-fields-buttons' );
-			el.$groups              = $( '.wpforms-tab-content > .wpforms-add-fields-group' );
-			el.$sidebar             = $( '#wpforms-panel-fields .wpforms-add-fields' );
-		},
+			/**
+			 * Setup. Prepare some variables.
+			 *
+			 * @since 1.8.3
+			 */
+			setup: function () {
+				// Cache DOM elements
+				el.$document = $(document);
+				el.$builder = $('#wpforms-builder');
+				el.$searchInput = $('#wpforms-search-fields-input');
+				el.$searchInputCloseBtn = $('.wpforms-search-fields-input-close');
+				el.$searchWrapper = $('.wpforms-search-fields-wrapper');
+				el.$noResults = $('.wpforms-search-fields-no-results');
+				el.$listWrapper = $('.wpforms-search-fields-list');
+				el.$list = $('.wpforms-search-fields-list .wpforms-add-fields-buttons');
+				el.$groups = $('.wpforms-tab-content > .wpforms-add-fields-group');
+				el.$sidebar = $('#wpforms-panel-fields .wpforms-add-fields');
+			},
 
-		/**
-		 * Bind events.
-		 *
-		 * @since 1.8.3
-		 */
-		events: function() {
+			/**
+			 * Bind events.
+			 *
+			 * @since 1.8.3
+			 */
+			events: function () {
+				el.$searchInput.on('keyup', app.searchAction);
+				el.$searchInputCloseBtn.on('click', app.clearSearch);
+				el.$document.on('wpformsFieldAdd', app.clearSearch);
+				el.$document.on('wpformsFieldDelete', app.refreshSearchResults);
+			},
 
-			el.$searchInput.on( 'keyup', app.searchAction );
-			el.$searchInputCloseBtn.on( 'click', app.clearSearch );
-			el.$document.on( 'wpformsFieldAdd', app.clearSearch );
-			el.$document.on( 'wpformsFieldDelete', app.refreshSearchResults );
-		},
+			/**
+			 * Search action.
+			 *
+			 * @since 1.8.3
+			 */
+			searchAction: function () {
+				const $fields = el.$builder.find(
+					'.wpforms-tab-content > .wpforms-add-fields-group .wpforms-add-fields-button'
+				);
+				const searchValue = el.$searchInput.val().toLowerCase();
 
-		/**
-		 * Search action.
-		 *
-		 * @since 1.8.3
-		 */
-		searchAction: function() {
+				el.$list.empty();
 
-			const $fields = el.$builder.find( '.wpforms-tab-content > .wpforms-add-fields-group .wpforms-add-fields-button' );
-			const searchValue = el.$searchInput.val().toLowerCase();
+				if (searchValue) {
+					el.$groups.hide();
+					el.$listWrapper.show();
+					el.$searchInputCloseBtn.addClass('active');
 
-			el.$list.empty();
+					$fields.each(function () {
+						const $item = $(this);
+						const titleText = $item.text().toLowerCase();
+						const keywords = $item.data('field-keywords')
+							? $item.data('field-keywords').toLowerCase()
+							: '';
 
-			if ( searchValue ) {
-				el.$groups.hide();
-				el.$listWrapper.show();
-				el.$searchInputCloseBtn.addClass( 'active' );
+						if (
+							titleText.indexOf(searchValue) >= 0 ||
+							(keywords && keywords.indexOf(searchValue) >= 0)
+						) {
+							const $clone = $item.clone();
 
-				$fields.each( function() {
+							$clone.attr('data-target', $clone.attr('id'));
+							$clone.removeAttr('id');
+							$clone.addClass('wpforms-add-fields-button-clone');
 
-					const $item     = $( this );
-					const titleText = $item.text().toLowerCase();
-					const keywords  = $item.data( 'field-keywords' ) ? $item.data( 'field-keywords' ).toLowerCase() : '';
+							el.$list.append($clone);
+						}
+					});
 
-					if ( titleText.indexOf( searchValue ) >= 0 || ( keywords && keywords.indexOf( searchValue ) >= 0 ) ) {
-						const $clone = $item.clone();
+					const $matchingItems = el.$list.find('.wpforms-add-fields-button');
+					const hasMatchingItems = $matchingItems.length > 0;
 
-						$clone.attr( 'data-target', $clone.attr( 'id' ) );
-						$clone.removeAttr( 'id' );
-						$clone.addClass( 'wpforms-add-fields-button-clone' );
-
-						el.$list.append( $clone );
+					if (hasMatchingItems) {
+						el.$noResults.hide();
+					} else {
+						el.$noResults.show();
+						el.$listWrapper.hide();
 					}
-				} );
-
-				const $matchingItems = el.$list.find( '.wpforms-add-fields-button' );
-				const hasMatchingItems = $matchingItems.length > 0;
-
-				if ( hasMatchingItems ) {
-					el.$noResults.hide();
 				} else {
-					el.$noResults.show();
+					el.$groups.show();
 					el.$listWrapper.hide();
+					el.$noResults.hide();
+					el.$searchInputCloseBtn.removeClass('active');
 				}
-			} else {
-				el.$groups.show();
+
+				WPForms.Admin.Builder.DragFields.setup();
+				WPForms.Admin.Builder.DragFields.initSortableFields();
+				app.cloneClickAction();
+			},
+
+			/**
+			 * Clear search.
+			 *
+			 * @since 1.8.3
+			 */
+			clearSearch: function () {
+				if (!el.$searchInput.val()) {
+					return;
+				}
+
+				el.$list.empty();
 				el.$listWrapper.hide();
+				el.$groups.show();
 				el.$noResults.hide();
-				el.$searchInputCloseBtn.removeClass( 'active' );
-			}
+				el.$searchInput.val('').focus();
+				el.$searchInputCloseBtn.removeClass('active');
+			},
 
-			WPForms.Admin.Builder.DragFields.setup();
-			WPForms.Admin.Builder.DragFields.initSortableFields();
-			app.cloneClickAction();
-		},
+			/**
+			 * Refresh search results.
+			 *
+			 * @since 1.8.3
+			 */
+			refreshSearchResults: function () {
+				// We need to wait for the original field to be unlocked.
+				setTimeout(app.searchAction, 0);
+			},
 
-		/**
-		 * Clear search.
-		 *
-		 * @since 1.8.3
-		 */
-		clearSearch: function() {
+			/**
+			 * Clone click action.
+			 *
+			 * @since 1.8.3
+			 */
+			cloneClickAction() {
+				$('.wpforms-add-fields-button-clone').on('click', function (e) {
+					e.preventDefault();
+					e.stopPropagation();
 
-			if ( ! el.$searchInput.val() ) {
-				return;
-			}
+					const target = $(this).attr('data-target');
 
-			el.$list.empty();
-			el.$listWrapper.hide();
-			el.$groups.show();
-			el.$noResults.hide();
-			el.$searchInput.val( '' ).focus();
-			el.$searchInputCloseBtn.removeClass( 'active' );
-		},
+					$('#' + target).trigger('click');
+				});
+			},
+		};
 
-		/**
-		 * Refresh search results.
-		 *
-		 * @since 1.8.3
-		 */
-		refreshSearchResults: function() {
-
-			// We need to wait for the original field to be unlocked.
-			setTimeout( app.searchAction, 0 );
-		},
-
-		/**
-		 * Clone click action.
-		 *
-		 * @since 1.8.3
-		 */
-		cloneClickAction() {
-			$( '.wpforms-add-fields-button-clone' ).on( 'click', function( e ) {
-				e.preventDefault();
-				e.stopPropagation();
-
-				const target = $( this ).attr( 'data-target' );
-
-				$( '#' + target ).trigger( 'click' );
-			} );
-		},
-	};
-
-	// Provide access to public functions/properties.
-	return app;
-
-}( document, window, jQuery ) );
+		// Provide access to public functions/properties.
+		return app;
+	})(document, window, jQuery);
 
 // Initialize.
 WPForms.Admin.Builder.Search.init();

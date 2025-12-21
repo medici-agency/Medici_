@@ -41,7 +41,7 @@
  *
  * @since 1.8.8
  */
-export default ( function( document, window, $ ) {
+export default (function (document, window, $) {
 	/**
 	 * WP core components.
 	 *
@@ -60,7 +60,8 @@ export default ( function( document, window, $ ) {
 	 *
 	 * @since 1.8.8
 	 */
-	const { strings, defaults, sizes, urls, isPro, isLicenseActive, isAdmin } = wpforms_gutenberg_form_selector;
+	const { strings, defaults, sizes, urls, isPro, isLicenseActive, isAdmin } =
+		wpforms_gutenberg_form_selector;
 	const defaultStyleSettings = defaults;
 
 	// noinspection JSUnusedLocalSymbols
@@ -236,7 +237,6 @@ export default ( function( document, window, $ ) {
 	 * @type {Object}
 	 */
 	const app = {
-
 		/**
 		 * Panel modules.
 		 *
@@ -253,17 +253,17 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @param {Object} blockOptions Block options.
 		 */
-		init( blockOptions ) {
-			el.$window = $( window );
+		init(blockOptions) {
+			el.$window = $(window);
 			app.panels = blockOptions.panels;
 			app.education = blockOptions.education;
 
-			app.initDefaults( blockOptions );
-			app.registerBlock( blockOptions );
+			app.initDefaults(blockOptions);
+			app.registerBlock(blockOptions);
 
 			app.initJConfirm();
 
-			$( app.ready );
+			$(app.ready);
 		},
 
 		/**
@@ -282,8 +282,8 @@ export default ( function( document, window, $ ) {
 		 */
 		events() {
 			el.$window
-				.on( 'wpformsFormSelectorEdit', _.debounce( app.blockEdit, 250 ) )
-				.on( 'wpformsFormSelectorFormLoaded', app.formLoaded );
+				.on('wpformsFormSelectorEdit', _.debounce(app.blockEdit, 250))
+				.on('wpformsFormSelectorFormLoaded', app.formLoaded);
 		},
 
 		/**
@@ -314,7 +314,7 @@ export default ( function( document, window, $ ) {
 		 */
 		async getForms() {
 			// If a fetch is already in progress, exit the function.
-			if ( isFetching ) {
+			if (isFetching) {
 				return;
 			}
 
@@ -323,14 +323,14 @@ export default ( function( document, window, $ ) {
 
 			try {
 				// Fetch forms.
-				formList = await wp.apiFetch( {
+				formList = await wp.apiFetch({
 					path: wpforms_gutenberg_form_selector.route_namespace + 'forms/',
 					method: 'GET',
 					cache: 'no-cache',
-				} );
-			} catch ( error ) {
+				});
+			} catch (error) {
 				// eslint-disable-next-line no-console
-				console.error( error );
+				console.error(error);
 			} finally {
 				isFetching = false;
 			}
@@ -343,23 +343,25 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @param {string} clientID Block Client ID.
 		 */
-		openBuilderPopup( clientID ) {
-			if ( $.isEmptyObject( $popup ) ) {
-				const parent = $( '#wpwrap' );
-				const canvasIframe = $( 'iframe[name="editor-canvas"]' );
-				const isFseMode = Boolean( canvasIframe.length );
-				const tmpl = isFseMode ? canvasIframe.contents().find( '#wpforms-gutenberg-popup' ) : $( '#wpforms-gutenberg-popup' );
+		openBuilderPopup(clientID) {
+			if ($.isEmptyObject($popup)) {
+				const parent = $('#wpwrap');
+				const canvasIframe = $('iframe[name="editor-canvas"]');
+				const isFseMode = Boolean(canvasIframe.length);
+				const tmpl = isFseMode
+					? canvasIframe.contents().find('#wpforms-gutenberg-popup')
+					: $('#wpforms-gutenberg-popup');
 
-				parent.after( tmpl );
+				parent.after(tmpl);
 
-				$popup = parent.siblings( '#wpforms-gutenberg-popup' );
+				$popup = parent.siblings('#wpforms-gutenberg-popup');
 			}
 
 			const url = wpforms_gutenberg_form_selector.get_started_url,
-				$iframe = $popup.find( 'iframe' );
+				$iframe = $popup.find('iframe');
 
-			app.builderCloseButtonEvent( clientID );
-			$iframe.attr( 'src', url );
+			app.builderCloseButtonEvent(clientID);
+			$iframe.attr('src', url);
 			$popup.fadeIn();
 		},
 
@@ -370,26 +372,26 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @param {string} clientID Block Client ID.
 		 */
-		builderCloseButtonEvent( clientID ) {
+		builderCloseButtonEvent(clientID) {
 			$popup
-				.off( 'wpformsBuilderInPopupClose' )
-				.on( 'wpformsBuilderInPopupClose', function( e, action, formId, formTitle ) {
-					if ( action !== 'saved' || ! formId ) {
+				.off('wpformsBuilderInPopupClose')
+				.on('wpformsBuilderInPopupClose', function (e, action, formId, formTitle) {
+					if (action !== 'saved' || !formId) {
 						return;
 					}
 
 					// Insert a new block when a new form is created from the popup to update the form list and attributes.
-					const newBlock = wp.blocks.createBlock( 'wpforms/form-selector', {
+					const newBlock = wp.blocks.createBlock('wpforms/form-selector', {
 						formId: formId.toString(), // Expects string value, make sure we insert string.
-					} );
+					});
 
 					// eslint-disable-next-line camelcase
-					formList = [ { ID: formId, post_title: formTitle } ];
+					formList = [{ ID: formId, post_title: formTitle }];
 
 					// Insert a new block.
-					wp.data.dispatch( 'core/block-editor' ).removeBlock( clientID );
-					wp.data.dispatch( 'core/block-editor' ).insertBlocks( newBlock );
-				} );
+					wp.data.dispatch('core/block-editor').removeBlock(clientID);
+					wp.data.dispatch('core/block-editor').insertBlocks(newBlock);
+				});
 		},
 
 		/**
@@ -400,8 +402,8 @@ export default ( function( document, window, $ ) {
 		 * @param {Object} blockOptions Additional block options.
 		 */
 		// eslint-disable-next-line max-lines-per-function
-		registerBlock( blockOptions ) {
-			registerBlockType( 'wpforms/form-selector', {
+		registerBlock(blockOptions) {
+			registerBlockType('wpforms/form-selector', {
 				title: strings.title,
 				description: strings.description,
 				icon: app.getIcon(),
@@ -417,15 +419,17 @@ export default ( function( document, window, $ ) {
 					},
 				},
 				// eslint-disable-next-line max-lines-per-function,complexity
-				edit( props ) {
+				edit(props) {
 					const { attributes } = props;
 					const formOptions = app.getFormOptions();
-					const handlers = app.getSettingsFieldsHandlers( props );
+					const handlers = app.getSettingsFieldsHandlers(props);
 
-					const [ isNotDisabled ] = useState( isPro && isLicenseActive ); // eslint-disable-line react-hooks/rules-of-hooks
-					const [ isProEnabled ] = useState( isPro ); // eslint-disable-line react-hooks/rules-of-hooks, no-unused-vars
-					const [ showBackgroundPreview, setShowBackgroundPreview ] = useState( blockOptions.panels.background._showBackgroundPreview( props ) ); // eslint-disable-line react-hooks/rules-of-hooks
-					const [ lastBgImage, setLastBgImage ] = useState( '' ); // eslint-disable-line react-hooks/rules-of-hooks
+					const [isNotDisabled] = useState(isPro && isLicenseActive); // eslint-disable-line react-hooks/rules-of-hooks
+					const [isProEnabled] = useState(isPro); // eslint-disable-line react-hooks/rules-of-hooks, no-unused-vars
+					const [showBackgroundPreview, setShowBackgroundPreview] = useState(
+						blockOptions.panels.background._showBackgroundPreview(props)
+					); // eslint-disable-line react-hooks/rules-of-hooks
+					const [lastBgImage, setLastBgImage] = useState(''); // eslint-disable-line react-hooks/rules-of-hooks
 
 					const uiState = {
 						isNotDisabled,
@@ -436,91 +440,86 @@ export default ( function( document, window, $ ) {
 						setLastBgImage,
 					};
 
-					useEffect( () => { // eslint-disable-line react-hooks/rules-of-hooks
-						if ( attributes.formId ) {
+					useEffect(() => {
+						// eslint-disable-line react-hooks/rules-of-hooks
+						if (attributes.formId) {
 							setShowBackgroundPreview(
 								props.attributes.backgroundImage !== 'none' &&
-								props.attributes.backgroundUrl &&
-								props.attributes.backgroundUrl !== 'url()'
+									props.attributes.backgroundUrl &&
+									props.attributes.backgroundUrl !== 'url()'
 							);
 						}
-					}, [ backgroundSelected, props.attributes.backgroundImage, props.attributes.backgroundUrl ] ); // eslint-disable-line react-hooks/exhaustive-deps
+					}, [
+						backgroundSelected,
+						props.attributes.backgroundImage,
+						props.attributes.backgroundUrl,
+					]); // eslint-disable-line react-hooks/exhaustive-deps
 
 					// Get block properties.
 					const blockProps = useBlockProps(); // eslint-disable-line react-hooks/rules-of-hooks, no-unused-vars
 
 					// Store block clientId in attributes.
-					if ( ! attributes.clientId || ! app.isClientIdAttrUnique( props ) ) {
+					if (!attributes.clientId || !app.isClientIdAttrUnique(props)) {
 						// We just want the client ID to update once.
 						// The block editor doesn't have a fixed block ID, so we need to get it on the initial load, but only once.
-						props.setAttributes( { clientId: props.clientId } );
+						props.setAttributes({ clientId: props.clientId });
 					}
 
 					// Main block settings.
-					const jsx = [
-						app.jsxParts.getMainSettings( attributes, handlers, formOptions ),
-					];
+					const jsx = [app.jsxParts.getMainSettings(attributes, handlers, formOptions)];
 
 					// Block preview picture.
-					if ( ! app.hasForms() ) {
-						jsx.push(
-							app.jsxParts.getEmptyFormsPreview( props ),
-						);
+					if (!app.hasForms()) {
+						jsx.push(app.jsxParts.getEmptyFormsPreview(props));
 
-						return <div { ...blockProps }>{ jsx }</div>;
+						return <div {...blockProps}>{jsx}</div>;
 					}
 
 					const sizeOptions = app.getSizeOptions();
 
 					// Show placeholder when form is not available (trashed, deleted etc.).
-					if ( attributes && attributes.formId && app.isFormAvailable( attributes.formId ) === false ) {
+					if (attributes && attributes.formId && app.isFormAvailable(attributes.formId) === false) {
 						// Block placeholder (form selector).
-						jsx.push(
-							app.jsxParts.getBlockPlaceholder( props.attributes, handlers, formOptions ),
-						);
+						jsx.push(app.jsxParts.getBlockPlaceholder(props.attributes, handlers, formOptions));
 
-						return <div { ...blockProps }>{ jsx }</div>;
+						return <div {...blockProps}>{jsx}</div>;
 					}
 
 					// Form style settings & block content.
-					if ( attributes.formId ) {
+					if (attributes.formId) {
 						// Subscribe to block events.
-						app.maybeSubscribeToBlockEvents( props, handlers, blockOptions );
+						app.maybeSubscribeToBlockEvents(props, handlers, blockOptions);
 
 						jsx.push(
-							app.jsxParts.getStyleSettings( props, handlers, sizeOptions, blockOptions, uiState ),
-							app.jsxParts.getBlockFormContent( props )
+							app.jsxParts.getStyleSettings(props, handlers, sizeOptions, blockOptions, uiState),
+							app.jsxParts.getBlockFormContent(props)
 						);
 
-						if ( ! isCopyPasteGeneratedOnEdit ) {
+						if (!isCopyPasteGeneratedOnEdit) {
 							handlers.updateCopyPasteContent();
 
 							isCopyPasteGeneratedOnEdit = true;
 						}
 
-						el.$window.trigger( 'wpformsFormSelectorEdit', [ props ] );
+						el.$window.trigger('wpformsFormSelectorEdit', [props]);
 
-						return <div { ...blockProps }>{ jsx }</div>;
+						return <div {...blockProps}>{jsx}</div>;
 					}
 
 					// Block preview picture.
-					if ( attributes.preview ) {
-						jsx.push(
-							app.jsxParts.getBlockPreview(),
-						);
+					if (attributes.preview) {
+						jsx.push(app.jsxParts.getBlockPreview());
 
-						return <div { ...blockProps }>{ jsx }</div>;
+						return <div {...blockProps}>{jsx}</div>;
 					}
 
 					// Block placeholder (form selector).
-					jsx.push(
-						app.jsxParts.getBlockPlaceholder( props.attributes, handlers, formOptions ),
-					);
+					jsx.push(app.jsxParts.getBlockPlaceholder(props.attributes, handlers, formOptions));
 
-					return <div { ...blockProps }>{ jsx }</div>;
+					return <div {...blockProps}>{jsx}</div>;
 				},
 				save: () => null,
-			} );
+			});
 		},
 
 		/**
@@ -531,14 +530,14 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @param {Object} blockOptions Additional block options.
 		 */
-		initDefaults( blockOptions = {} ) {
+		initDefaults(blockOptions = {}) {
 			commonAttributes = {
 				...commonAttributes,
 				...blockOptions.getCommonAttributes(),
 			};
 			customStylesHandlers = blockOptions.setStylesHandlers;
 
-			[ 'formId', 'copyPasteJsonValue' ].forEach( ( key ) => delete defaultStyleSettings[ key ] );
+			['formId', 'copyPasteJsonValue'].forEach((key) => delete defaultStyleSettings[key]);
 		},
 
 		/**
@@ -561,8 +560,8 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {boolean} Whether form is available.
 		 */
-		isFormAvailable( formId ) {
-			return formList.find( ( { ID } ) => ID === Number( formId ) ) !== undefined;
+		isFormAvailable(formId) {
+			return formList.find(({ ID }) => ID === Number(formId)) !== undefined;
 		},
 
 		/**
@@ -572,8 +571,8 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @param {boolean} $flag The value of the triggerServerRender flag.
 		 */
-		setTriggerServerRender( $flag ) {
-			triggerServerRender = Boolean( $flag );
+		setTriggerServerRender($flag) {
+			triggerServerRender = Boolean($flag);
 		},
 
 		/**
@@ -585,21 +584,30 @@ export default ( function( document, window, $ ) {
 		 * @param {Object} subscriberHandlers     Subscriber block event handlers.
 		 * @param {Object} subscriberBlockOptions Subscriber block options.
 		 */
-		maybeSubscribeToBlockEvents( subscriberProps, subscriberHandlers, subscriberBlockOptions ) {
+		maybeSubscribeToBlockEvents(subscriberProps, subscriberHandlers, subscriberBlockOptions) {
 			const id = subscriberProps.clientId;
 
 			// Unsubscribe from block events.
 			// This is needed to avoid multiple subscriptions when the block is re-rendered.
 			el.$window
-				.off( 'wpformsFormSelectorDeleteTheme.' + id )
-				.off( 'wpformsFormSelectorUpdateTheme.' + id )
-				.off( 'wpformsFormSelectorSetTheme.' + id );
+				.off('wpformsFormSelectorDeleteTheme.' + id)
+				.off('wpformsFormSelectorUpdateTheme.' + id)
+				.off('wpformsFormSelectorSetTheme.' + id);
 
 			// Subscribe to block events.
 			el.$window
-				.on( 'wpformsFormSelectorDeleteTheme.' + id, app.subscriberDeleteTheme( subscriberProps, subscriberBlockOptions ) )
-				.on( 'wpformsFormSelectorUpdateTheme.' + id, app.subscriberUpdateTheme( subscriberProps, subscriberBlockOptions ) )
-				.on( 'wpformsFormSelectorSetTheme.' + id, app.subscriberSetTheme( subscriberProps, subscriberBlockOptions ) );
+				.on(
+					'wpformsFormSelectorDeleteTheme.' + id,
+					app.subscriberDeleteTheme(subscriberProps, subscriberBlockOptions)
+				)
+				.on(
+					'wpformsFormSelectorUpdateTheme.' + id,
+					app.subscriberUpdateTheme(subscriberProps, subscriberBlockOptions)
+				)
+				.on(
+					'wpformsFormSelectorSetTheme.' + id,
+					app.subscriberSetTheme(subscriberProps, subscriberBlockOptions)
+				);
 		},
 
 		/**
@@ -612,22 +620,22 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {Function} Event handler.
 		 */
-		subscriberDeleteTheme( subscriberProps, subscriberBlockOptions ) {
-			return function( e, themeSlug, triggerProps ) {
-				if ( subscriberProps.clientId === triggerProps.clientId ) {
+		subscriberDeleteTheme(subscriberProps, subscriberBlockOptions) {
+			return function (e, themeSlug, triggerProps) {
+				if (subscriberProps.clientId === triggerProps.clientId) {
 					return;
 				}
 
-				if ( subscriberProps?.attributes?.theme !== themeSlug ) {
+				if (subscriberProps?.attributes?.theme !== themeSlug) {
 					return;
 				}
 
-				if ( ! subscriberBlockOptions?.panels?.themes ) {
+				if (!subscriberBlockOptions?.panels?.themes) {
 					return;
 				}
 
 				// Reset theme to default one.
-				subscriberBlockOptions.panels.themes.setBlockTheme( subscriberProps, 'default' );
+				subscriberBlockOptions.panels.themes.setBlockTheme(subscriberProps, 'default');
 			};
 		},
 
@@ -641,22 +649,22 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {Function} Event handler.
 		 */
-		subscriberUpdateTheme( subscriberProps, subscriberBlockOptions ) {
-			return function( e, themeSlug, themeData, triggerProps ) {
-				if ( subscriberProps.clientId === triggerProps.clientId ) {
+		subscriberUpdateTheme(subscriberProps, subscriberBlockOptions) {
+			return function (e, themeSlug, themeData, triggerProps) {
+				if (subscriberProps.clientId === triggerProps.clientId) {
 					return;
 				}
 
-				if ( subscriberProps?.attributes?.theme !== themeSlug ) {
+				if (subscriberProps?.attributes?.theme !== themeSlug) {
 					return;
 				}
 
-				if ( ! subscriberBlockOptions?.panels?.themes ) {
+				if (!subscriberBlockOptions?.panels?.themes) {
 					return;
 				}
 
 				// Reset theme to default one.
-				subscriberBlockOptions.panels.themes.setBlockTheme( subscriberProps, themeSlug );
+				subscriberBlockOptions.panels.themes.setBlockTheme(subscriberProps, themeSlug);
 			};
 		},
 
@@ -670,19 +678,20 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {Function} Event handler.
 		 */
-		subscriberSetTheme( subscriberProps, subscriberBlockOptions ) {
+		subscriberSetTheme(subscriberProps, subscriberBlockOptions) {
 			// noinspection JSUnusedLocalSymbols
-			return function( e, block, themeSlug, triggerProps ) { // eslint-disable-line no-unused-vars
-				if ( subscriberProps.clientId === triggerProps.clientId ) {
+			return function (e, block, themeSlug, triggerProps) {
+				// eslint-disable-line no-unused-vars
+				if (subscriberProps.clientId === triggerProps.clientId) {
 					return;
 				}
 
-				if ( ! subscriberBlockOptions?.panels?.themes ) {
+				if (!subscriberBlockOptions?.panels?.themes) {
 					return;
 				}
 
 				// Set theme.
-				app.onSetTheme( subscriberProps );
+				app.onSetTheme(subscriberProps);
 			};
 		},
 
@@ -694,7 +703,6 @@ export default ( function( document, window, $ ) {
 		 * @type {Object}
 		 */
 		jsxParts: {
-
 			/**
 			 * Get main settings JSX code.
 			 *
@@ -706,53 +714,65 @@ export default ( function( document, window, $ ) {
 			 *
 			 * @return {JSX.Element} Main setting JSX code.
 			 */
-			getMainSettings( attributes, handlers, formOptions ) { // eslint-disable-line max-lines-per-function
-				if ( ! app.hasForms() ) {
-					return app.jsxParts.printEmptyFormsNotice( attributes.clientId );
+			getMainSettings(attributes, handlers, formOptions) {
+				// eslint-disable-line max-lines-per-function
+				if (!app.hasForms()) {
+					return app.jsxParts.printEmptyFormsNotice(attributes.clientId);
 				}
 
 				return (
 					<InspectorControls key="wpforms-gutenberg-form-selector-inspector-main-settings">
-						<PanelBody className="wpforms-gutenberg-panel wpforms-gutenberg-panel-form-settings" title={ strings.form_settings }>
+						<PanelBody
+							className="wpforms-gutenberg-panel wpforms-gutenberg-panel-form-settings"
+							title={strings.form_settings}
+						>
 							<SelectControl
-								label={ strings.form_selected }
-								value={ attributes.formId }
-								options={ formOptions }
-								onChange={ ( value ) => handlers.attrChange( 'formId', value ) }
+								label={strings.form_selected}
+								value={attributes.formId}
+								options={formOptions}
+								onChange={(value) => handlers.attrChange('formId', value)}
 							/>
-							{ attributes.formId ? (
+							{attributes.formId ? (
 								<>
 									<p className="wpforms-gutenberg-form-selector-actions">
-										<a href={ urls.form_url.replace( '{ID}', attributes.formId ) } rel="noreferrer" target="_blank">
-											{ strings.form_edit }
+										<a
+											href={urls.form_url.replace('{ID}', attributes.formId)}
+											rel="noreferrer"
+											target="_blank"
+										>
+											{strings.form_edit}
 										</a>
-										{ isPro && isLicenseActive && (
+										{isPro && isLicenseActive && (
 											<>
 												&nbsp;&nbsp;|&nbsp;&nbsp;
 												<a
-													href={ urls.entries_url.replace( '{ID}', attributes.formId ) }
+													href={urls.entries_url.replace('{ID}', attributes.formId)}
 													rel="noreferrer"
 													target="_blank"
-												>{ strings.form_entries }</a>
+												>
+													{strings.form_entries}
+												</a>
 											</>
-										) }
+										)}
 									</p>
 									<ToggleControl
-										label={ strings.show_title }
-										checked={ attributes.displayTitle }
-										onChange={ ( value ) => handlers.attrChange( 'displayTitle', value ) }
+										label={strings.show_title}
+										checked={attributes.displayTitle}
+										onChange={(value) => handlers.attrChange('displayTitle', value)}
 									/>
 									<ToggleControl
-										label={ strings.show_description }
-										checked={ attributes.displayDesc }
-										onChange={ ( value ) => handlers.attrChange( 'displayDesc', value ) }
+										label={strings.show_description}
+										checked={attributes.displayDesc}
+										onChange={(value) => handlers.attrChange('displayDesc', value)}
 									/>
 								</>
-							) : null }
+							) : null}
 							<p className="wpforms-gutenberg-panel-notice">
-								<strong>{ strings.panel_notice_head }</strong>
-								{ strings.panel_notice_text }
-								<a href={ strings.panel_notice_link } rel="noreferrer" target="_blank">{ strings.panel_notice_link_text }</a>
+								<strong>{strings.panel_notice_head}</strong>
+								{strings.panel_notice_text}
+								<a href={strings.panel_notice_link} rel="noreferrer" target="_blank">
+									{strings.panel_notice_link_text}
+								</a>
 							</p>
 						</PanelBody>
 					</InspectorControls>
@@ -768,22 +788,25 @@ export default ( function( document, window, $ ) {
 			 *
 			 * @return {JSX.Element} Field styles JSX code.
 			 */
-			printEmptyFormsNotice( clientId ) {
+			printEmptyFormsNotice(clientId) {
 				return (
 					<InspectorControls key="wpforms-gutenberg-form-selector-inspector-main-settings">
-						<PanelBody className="wpforms-gutenberg-panel" title={ strings.form_settings }>
-							<p className="wpforms-gutenberg-panel-notice wpforms-warning wpforms-empty-form-notice" style={ { display: 'block' } }>
-								<strong>{ __( 'You haven’t created a form, yet!', 'wpforms-lite' ) }</strong>
-								{ __( 'What are you waiting for?', 'wpforms-lite' ) }
-							</p>
-							<button type="button" className="get-started-button components-button is-secondary"
-								onClick={
-									() => {
-										app.openBuilderPopup( clientId );
-									}
-								}
+						<PanelBody className="wpforms-gutenberg-panel" title={strings.form_settings}>
+							<p
+								className="wpforms-gutenberg-panel-notice wpforms-warning wpforms-empty-form-notice"
+								style={{ display: 'block' }}
 							>
-								{ __( 'Get Started', 'wpforms-lite' ) }
+								<strong>{__('You haven’t created a form, yet!', 'wpforms-lite')}</strong>
+								{__('What are you waiting for?', 'wpforms-lite')}
+							</p>
+							<button
+								type="button"
+								className="get-started-button components-button is-secondary"
+								onClick={() => {
+									app.openBuilderPopup(clientId);
+								}}
+							>
+								{__('Get Started', 'wpforms-lite')}
 							</button>
 						</PanelBody>
 					</InspectorControls>
@@ -801,41 +824,41 @@ export default ( function( document, window, $ ) {
 			 *
 			 * @return {Object} Label styles JSX code.
 			 */
-			getLabelStyles( props, handlers, sizeOptions ) {
+			getLabelStyles(props, handlers, sizeOptions) {
 				return (
-					<PanelBody className={ app.getPanelClass( props ) } title={ strings.label_styles }>
+					<PanelBody className={app.getPanelClass(props)} title={strings.label_styles}>
 						<SelectControl
-							label={ strings.size }
-							value={ props.attributes.labelSize }
+							label={strings.size}
+							value={props.attributes.labelSize}
 							className="wpforms-gutenberg-form-selector-fix-bottom-margin"
-							options={ sizeOptions }
-							onChange={ ( value ) => handlers.styleAttrChange( 'labelSize', value ) }
+							options={sizeOptions}
+							onChange={(value) => handlers.styleAttrChange('labelSize', value)}
 						/>
 
 						<div className="wpforms-gutenberg-form-selector-color-picker">
-							<div className="wpforms-gutenberg-form-selector-control-label">{ strings.colors }</div>
+							<div className="wpforms-gutenberg-form-selector-control-label">{strings.colors}</div>
 							<PanelColorSettings
 								__experimentalIsRenderedInSidebar
 								enableAlpha
-								showTitle={ false }
+								showTitle={false}
 								className="wpforms-gutenberg-form-selector-color-panel"
-								colorSettings={ [
+								colorSettings={[
 									{
 										value: props.attributes.labelColor,
-										onChange: ( value ) => handlers.styleAttrChange( 'labelColor', value ),
+										onChange: (value) => handlers.styleAttrChange('labelColor', value),
 										label: strings.label,
 									},
 									{
 										value: props.attributes.labelSublabelColor,
-										onChange: ( value ) => handlers.styleAttrChange( 'labelSublabelColor', value ),
-										label: strings.sublabel_hints.replace( '&amp;', '&' ),
+										onChange: (value) => handlers.styleAttrChange('labelSublabelColor', value),
+										label: strings.sublabel_hints.replace('&amp;', '&'),
 									},
 									{
 										value: props.attributes.labelErrorColor,
-										onChange: ( value ) => handlers.styleAttrChange( 'labelErrorColor', value ),
+										onChange: (value) => handlers.styleAttrChange('labelErrorColor', value),
 										label: strings.error_message,
 									},
-								] }
+								]}
 							/>
 						</div>
 					</PanelBody>
@@ -852,39 +875,41 @@ export default ( function( document, window, $ ) {
 			 *
 			 * @return {Object} Page Indicator styles JSX code.
 			 */
-			getPageIndicatorStyles( props, handlers ) { // eslint-disable-line complexity
-				const hasPageBreak = app.hasPageBreak( formList, props.attributes.formId );
-				const hasRating = app.hasRating( formList, props.attributes.formId );
+			getPageIndicatorStyles(props, handlers) {
+				// eslint-disable-line complexity
+				const hasPageBreak = app.hasPageBreak(formList, props.attributes.formId);
+				const hasRating = app.hasRating(formList, props.attributes.formId);
 
-				if ( ! hasPageBreak && ! hasRating ) {
+				if (!hasPageBreak && !hasRating) {
 					return null;
 				}
 
 				let label = '';
-				if ( hasPageBreak && hasRating ) {
-					label = `${ strings.page_break } / ${ strings.rating }`;
-				} else if ( hasPageBreak ) {
+				if (hasPageBreak && hasRating) {
+					label = `${strings.page_break} / ${strings.rating}`;
+				} else if (hasPageBreak) {
 					label = strings.page_break;
-				} else if ( hasRating ) {
+				} else if (hasRating) {
 					label = strings.rating;
 				}
 
 				return (
-					<PanelBody className={ app.getPanelClass( props ) } title={ strings.other_styles }>
+					<PanelBody className={app.getPanelClass(props)} title={strings.other_styles}>
 						<div className="wpforms-gutenberg-form-selector-color-picker">
-							<div className="wpforms-gutenberg-form-selector-control-label">{ strings.colors }</div>
+							<div className="wpforms-gutenberg-form-selector-control-label">{strings.colors}</div>
 							<PanelColorSettings
 								__experimentalIsRenderedInSidebar
 								enableAlpha
-								showTitle={ false }
+								showTitle={false}
 								className="wpforms-gutenberg-form-selector-color-panel"
-								colorSettings={ [
+								colorSettings={[
 									{
 										value: props.attributes.pageBreakColor,
-										onChange: ( value ) => handlers.styleAttrChange( 'pageBreakColor', value ),
+										onChange: (value) => handlers.styleAttrChange('pageBreakColor', value),
 										label,
 									},
-								] } />
+								]}
+							/>
 						</div>
 					</PanelBody>
 				);
@@ -903,16 +928,22 @@ export default ( function( document, window, $ ) {
 			 *
 			 * @return {Object} Inspector controls JSX code.
 			 */
-			getStyleSettings( props, handlers, sizeOptions, blockOptions, uiState ) {
+			getStyleSettings(props, handlers, sizeOptions, blockOptions, uiState) {
 				return (
 					<InspectorControls key="wpforms-gutenberg-form-selector-style-settings">
-						{ blockOptions.getThemesPanel( props, app, blockOptions.stockPhotos ) }
-						{ blockOptions.getFieldStyles( props, handlers, sizeOptions, app ) }
-						{ app.jsxParts.getLabelStyles( props, handlers, sizeOptions ) }
-						{ blockOptions.getButtonStyles( props, handlers, sizeOptions, app ) }
-						{ blockOptions.getContainerStyles( props, handlers, app, uiState ) }
-						{ blockOptions.getBackgroundStyles( props, handlers, app, blockOptions.stockPhotos, uiState ) }
-						{ app.jsxParts.getPageIndicatorStyles( props, handlers ) }
+						{blockOptions.getThemesPanel(props, app, blockOptions.stockPhotos)}
+						{blockOptions.getFieldStyles(props, handlers, sizeOptions, app)}
+						{app.jsxParts.getLabelStyles(props, handlers, sizeOptions)}
+						{blockOptions.getButtonStyles(props, handlers, sizeOptions, app)}
+						{blockOptions.getContainerStyles(props, handlers, app, uiState)}
+						{blockOptions.getBackgroundStyles(
+							props,
+							handlers,
+							app,
+							blockOptions.stockPhotos,
+							uiState
+						)}
+						{app.jsxParts.getPageIndicatorStyles(props, handlers)}
 					</InspectorControls>
 				);
 			},
@@ -926,35 +957,35 @@ export default ( function( document, window, $ ) {
 			 *
 			 * @return {JSX.Element} Block content JSX code.
 			 */
-			getBlockFormContent( props ) {
-				if ( triggerServerRender ) {
+			getBlockFormContent(props) {
+				if (triggerServerRender) {
 					return (
 						<ServerSideRender
 							key="wpforms-gutenberg-form-selector-server-side-renderer"
 							block="wpforms/form-selector"
-							attributes={ props.attributes }
+							attributes={props.attributes}
 						/>
 					);
 				}
 
 				const clientId = props.clientId;
-				const block = app.getBlockContainer( props );
+				const block = app.getBlockContainer(props);
 
 				// In the case of empty content, use server side renderer.
 				// This happens when the block is duplicated or converted to a reusable block.
-				if ( ! block?.innerHTML ) {
+				if (!block?.innerHTML) {
 					triggerServerRender = true;
 
-					return app.jsxParts.getBlockFormContent( props );
+					return app.jsxParts.getBlockFormContent(props);
 				}
 
-				blocks[ clientId ] = blocks[ clientId ] || {};
-				blocks[ clientId ].blockHTML = block.innerHTML;
-				blocks[ clientId ].loadedFormId = props.attributes.formId;
+				blocks[clientId] = blocks[clientId] || {};
+				blocks[clientId].blockHTML = block.innerHTML;
+				blocks[clientId].loadedFormId = props.attributes.formId;
 
 				return (
 					<Fragment key="wpforms-gutenberg-form-selector-fragment-form-html">
-						<div dangerouslySetInnerHTML={ { __html: blocks[ clientId ].blockHTML } } />
+						<div dangerouslySetInnerHTML={{ __html: blocks[clientId].blockHTML }} />
 					</Fragment>
 				);
 			},
@@ -968,9 +999,12 @@ export default ( function( document, window, $ ) {
 			 */
 			getBlockPreview() {
 				return (
-					<Fragment
-						key="wpforms-gutenberg-form-selector-fragment-block-preview">
-						<img src={ wpforms_gutenberg_form_selector.block_preview_url } style={ { width: '100%' } } alt="" />
+					<Fragment key="wpforms-gutenberg-form-selector-fragment-block-preview">
+						<img
+							src={wpforms_gutenberg_form_selector.block_preview_url}
+							style={{ width: '100%' }}
+							alt=""
+						/>
 					</Fragment>
 				);
 			},
@@ -983,54 +1017,58 @@ export default ( function( document, window, $ ) {
 			 * @param {Object} props Block properties.
 			 * @return {JSX.Element} Block empty JSX code.
 			 */
-			getEmptyFormsPreview( props ) {
+			getEmptyFormsPreview(props) {
 				const clientId = props.clientId;
 
 				return (
-					<Fragment
-						key="wpforms-gutenberg-form-selector-fragment-block-empty">
+					<Fragment key="wpforms-gutenberg-form-selector-fragment-block-empty">
 						<div className="wpforms-no-form-preview">
-							<img src={ wpforms_gutenberg_form_selector.block_empty_url } alt="" />
+							<img src={wpforms_gutenberg_form_selector.block_empty_url} alt="" />
 							<p>
-								{
-									createInterpolateElement(
-										__(
-											'You can use <b>WPForms</b> to build contact forms, surveys, payment forms, and more with just a few clicks.',
-											'wpforms-lite'
-										),
-										{
-											b: <strong />,
-										}
-									)
-								}
-							</p>
-							<button type="button" className="get-started-button components-button is-primary"
-								onClick={
-									() => {
-										app.openBuilderPopup( clientId );
+								{createInterpolateElement(
+									__(
+										'You can use <b>WPForms</b> to build contact forms, surveys, payment forms, and more with just a few clicks.',
+										'wpforms-lite'
+									),
+									{
+										b: <strong />,
 									}
-								}
+								)}
+							</p>
+							<button
+								type="button"
+								className="get-started-button components-button is-primary"
+								onClick={() => {
+									app.openBuilderPopup(clientId);
+								}}
 							>
-								{ __( 'Get Started', 'wpforms-lite' ) }
+								{__('Get Started', 'wpforms-lite')}
 							</button>
 							<p className="empty-desc">
-								{
-									createInterpolateElement(
-										__(
-											'Need some help? Check out our <a>comprehensive guide.</a>',
-											'wpforms-lite'
+								{createInterpolateElement(
+									__('Need some help? Check out our <a>comprehensive guide.</a>', 'wpforms-lite'),
+									{
+										// eslint-disable-next-line jsx-a11y/anchor-has-content
+										a: (
+											<a
+												href={wpforms_gutenberg_form_selector.wpforms_guide}
+												target="_blank"
+												rel="noopener noreferrer"
+											/>
 										),
-										{
-											// eslint-disable-next-line jsx-a11y/anchor-has-content
-											a: <a href={ wpforms_gutenberg_form_selector.wpforms_guide } target="_blank" rel="noopener noreferrer" />,
-										}
-									)
-								}
+									}
+								)}
 							</p>
 
-							{ /* Template for popup with builder iframe */ }
+							{/* Template for popup with builder iframe */}
 							<div id="wpforms-gutenberg-popup" className="wpforms-builder-popup">
-								<iframe src="about:blank" width="100%" height="100%" id="wpforms-builder-iframe" title="WPForms Builder Popup"></iframe>
+								<iframe
+									src="about:blank"
+									width="100%"
+									height="100%"
+									id="wpforms-builder-iframe"
+									title="WPForms Builder Popup"
+								></iframe>
 							</div>
 						</div>
 					</Fragment>
@@ -1048,24 +1086,25 @@ export default ( function( document, window, $ ) {
 			 *
 			 * @return {JSX.Element} Block placeholder JSX code.
 			 */
-			getBlockPlaceholder( attributes, handlers, formOptions ) {
-				const isFormNotAvailable = attributes.formId && ! app.isFormAvailable( attributes.formId );
+			getBlockPlaceholder(attributes, handlers, formOptions) {
+				const isFormNotAvailable = attributes.formId && !app.isFormAvailable(attributes.formId);
 
 				return (
 					<Placeholder
 						key="wpforms-gutenberg-form-selector-wrap"
-						className="wpforms-gutenberg-form-selector-wrap">
-						<img src={ wpforms_gutenberg_form_selector.logo_url } alt="" />
-						{ isFormNotAvailable && (
-							<p style={ { textAlign: 'center', marginTop: '0' } }>
-								{ strings.form_not_available_message }
+						className="wpforms-gutenberg-form-selector-wrap"
+					>
+						<img src={wpforms_gutenberg_form_selector.logo_url} alt="" />
+						{isFormNotAvailable && (
+							<p style={{ textAlign: 'center', marginTop: '0' }}>
+								{strings.form_not_available_message}
 							</p>
-						) }
+						)}
 						<SelectControl
 							key="wpforms-gutenberg-form-selector-select-control"
-							value={ attributes.formId }
-							options={ formOptions }
-							onChange={ ( value ) => handlers.attrChange( 'formId', value ) }
+							value={attributes.formId}
+							options={formOptions}
+							onChange={(value) => handlers.attrChange('formId', value)}
 						/>
 					</Placeholder>
 				);
@@ -1082,28 +1121,28 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {boolean} True when the form has a Page Break field, false otherwise.
 		 */
-		hasPageBreak( forms, formId ) {
-			const currentForm = forms.find( ( form ) => parseInt( form.ID, 10 ) === parseInt( formId, 10 ) );
+		hasPageBreak(forms, formId) {
+			const currentForm = forms.find((form) => parseInt(form.ID, 10) === parseInt(formId, 10));
 
-			if ( ! currentForm.post_content ) {
+			if (!currentForm.post_content) {
 				return false;
 			}
 
-			const fields = JSON.parse( currentForm.post_content )?.fields;
+			const fields = JSON.parse(currentForm.post_content)?.fields;
 
-			return Object.values( fields ).some( ( field ) => field.type === 'pagebreak' );
+			return Object.values(fields).some((field) => field.type === 'pagebreak');
 		},
 
-		hasRating( forms, formId ) {
-			const currentForm = forms.find( ( form ) => parseInt( form.ID, 10 ) === parseInt( formId, 10 ) );
+		hasRating(forms, formId) {
+			const currentForm = forms.find((form) => parseInt(form.ID, 10) === parseInt(formId, 10));
 
-			if ( ! currentForm.post_content || ! isPro || ! isLicenseActive ) {
+			if (!currentForm.post_content || !isPro || !isLicenseActive) {
 				return false;
 			}
 
-			const fields = JSON.parse( currentForm.post_content )?.fields;
+			const fields = JSON.parse(currentForm.post_content)?.fields;
 
-			return Object.values( fields ).some( ( field ) => field.type === 'rating' );
+			return Object.values(fields).some((field) => field.type === 'rating');
 		},
 
 		/**
@@ -1116,15 +1155,15 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {string} Style Settings panel class.
 		 */
-		getPanelClass( props, panel = '' ) {
+		getPanelClass(props, panel = '') {
 			let cssClass = 'wpforms-gutenberg-panel wpforms-block-settings-' + props.clientId;
 
-			if ( ! app.isFullStylingEnabled() ) {
+			if (!app.isFullStylingEnabled()) {
 				cssClass += ' disabled_panel';
 			}
 
 			// Restrict styling panel for non-admins.
-			if ( ! ( isAdmin || panel === 'themes' ) ) {
+			if (!(isAdmin || panel === 'themes')) {
 				cssClass += ' wpforms-gutenberg-panel-restricted';
 			}
 
@@ -1140,10 +1179,10 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {string} Style Settings panel class.
 		 */
-		getColorPanelClass( borderStyle ) {
+		getColorPanelClass(borderStyle) {
 			let cssClass = 'wpforms-gutenberg-form-selector-color-panel';
 
-			if ( borderStyle === 'none' ) {
+			if (borderStyle === 'none') {
 				cssClass += ' wpforms-gutenberg-form-selector-border-color-disabled';
 			}
 
@@ -1158,7 +1197,10 @@ export default ( function( document, window, $ ) {
 		 * @return {boolean} Whether the full styling is enabled.
 		 */
 		isFullStylingEnabled() {
-			return wpforms_gutenberg_form_selector.is_modern_markup && wpforms_gutenberg_form_selector.is_full_styling;
+			return (
+				wpforms_gutenberg_form_selector.is_modern_markup &&
+				wpforms_gutenberg_form_selector.is_full_styling
+			);
 		},
 
 		/**
@@ -1170,14 +1212,14 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {boolean} Whether the block has lead forms enabled
 		 */
-		isLeadFormsEnabled( block ) {
-			if ( ! block ) {
+		isLeadFormsEnabled(block) {
+			if (!block) {
 				return false;
 			}
 
-			const $form = $( block.querySelector( '.wpforms-container' ) );
+			const $form = $(block.querySelector('.wpforms-container'));
 
-			return $form.hasClass( 'wpforms-lead-forms-container' );
+			return $form.hasClass('wpforms-lead-forms-container');
 		},
 
 		/**
@@ -1189,15 +1231,15 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {Element} Block container.
 		 */
-		getBlockContainer( props ) {
-			const blockSelector = `#block-${ props.clientId } > div`;
-			let block = document.querySelector( blockSelector );
+		getBlockContainer(props) {
+			const blockSelector = `#block-${props.clientId} > div`;
+			let block = document.querySelector(blockSelector);
 
 			// For FSE / Gutenberg plugin, we need to take a look inside the iframe.
-			if ( ! block ) {
-				const editorCanvas = document.querySelector( 'iframe[name="editor-canvas"]' );
+			if (!block) {
+				const editorCanvas = document.querySelector('iframe[name="editor-canvas"]');
 
-				block = editorCanvas?.contentWindow.document.querySelector( blockSelector );
+				block = editorCanvas?.contentWindow.document.querySelector(blockSelector);
 			}
 
 			return block;
@@ -1212,12 +1254,15 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {Element|null} Form container.
 		 */
-		getFormBlock( formId ) {
+		getFormBlock(formId) {
 			// First, try to find the iframe for blocks version 3.
-			const editorCanvas = document.querySelector( 'iframe[name="editor-canvas"]' );
+			const editorCanvas = document.querySelector('iframe[name="editor-canvas"]');
 
 			// If the iframe is found, try to find the form.
-			return editorCanvas?.contentWindow.document.querySelector( `#wpforms-${ formId }` ) || $( `#wpforms-${ formId }` );
+			return (
+				editorCanvas?.contentWindow.document.querySelector(`#wpforms-${formId}`) ||
+				$(`#wpforms-${formId}`)
+			);
 		},
 
 		/**
@@ -1230,65 +1275,82 @@ export default ( function( document, window, $ ) {
 		 * @param {Element} container Form container.
 		 * @param {Object}  props     Block properties.
 		 */
-		updatePreviewCSSVarValue( attribute, value, container, props ) { // eslint-disable-line complexity, max-lines-per-function
-			if ( ! container || ! attribute ) {
+		updatePreviewCSSVarValue(attribute, value, container, props) {
+			// eslint-disable-line complexity, max-lines-per-function
+			if (!container || !attribute) {
 				return;
 			}
 
-			const property = attribute.replace(
-				/[A-Z]/g,
-				( letter ) => `-${ letter.toLowerCase() }`
-			);
+			const property = attribute.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 
-			if ( typeof customStylesHandlers[ property ] === 'function' ) {
-				customStylesHandlers[ property ]( container, value );
+			if (typeof customStylesHandlers[property] === 'function') {
+				customStylesHandlers[property](container, value);
 
 				return;
 			}
 
-			switch ( property ) {
+			switch (property) {
 				case 'field-size':
 				case 'label-size':
 				case 'button-size':
 				case 'container-shadow-size':
-					for ( const key in sizes[ property ][ value ] ) {
+					for (const key in sizes[property][value]) {
 						container.style.setProperty(
-							`--wpforms-${ property }-${ key }`,
-							sizes[ property ][ value ][ key ],
+							`--wpforms-${property}-${key}`,
+							sizes[property][value][key]
 						);
 					}
 
 					break;
 				case 'field-border-style':
-					if ( value === 'none' ) {
-						app.toggleFieldBorderNoneCSSVarValue( container, true );
+					if (value === 'none') {
+						app.toggleFieldBorderNoneCSSVarValue(container, true);
 					} else {
-						app.toggleFieldBorderNoneCSSVarValue( container, false );
-						container.style.setProperty( `--wpforms-${ property }`, value );
+						app.toggleFieldBorderNoneCSSVarValue(container, false);
+						container.style.setProperty(`--wpforms-${property}`, value);
 					}
 
 					break;
 				case 'button-background-color':
-					app.maybeUpdateAccentColor( props.attributes.buttonBorderColor, value, container );
-					value = app.maybeSetButtonAltBackgroundColor( value, props.attributes.buttonBorderColor, container );
-					app.maybeSetButtonAltTextColor( props.attributes.buttonTextColor, value, props.attributes.buttonBorderColor, container );
-					container.style.setProperty( `--wpforms-${ property }`, value );
+					app.maybeUpdateAccentColor(props.attributes.buttonBorderColor, value, container);
+					value = app.maybeSetButtonAltBackgroundColor(
+						value,
+						props.attributes.buttonBorderColor,
+						container
+					);
+					app.maybeSetButtonAltTextColor(
+						props.attributes.buttonTextColor,
+						value,
+						props.attributes.buttonBorderColor,
+						container
+					);
+					container.style.setProperty(`--wpforms-${property}`, value);
 
 					break;
 				case 'button-border-color':
-					app.maybeUpdateAccentColor( value, props.attributes.buttonBackgroundColor, container );
-					app.maybeSetButtonAltTextColor( props.attributes.buttonTextColor, props.attributes.buttonBackgroundColor, value, container );
-					container.style.setProperty( `--wpforms-${ property }`, value );
+					app.maybeUpdateAccentColor(value, props.attributes.buttonBackgroundColor, container);
+					app.maybeSetButtonAltTextColor(
+						props.attributes.buttonTextColor,
+						props.attributes.buttonBackgroundColor,
+						value,
+						container
+					);
+					container.style.setProperty(`--wpforms-${property}`, value);
 
 					break;
 				case 'button-text-color':
-					app.maybeSetButtonAltTextColor( value, props.attributes.buttonBackgroundColor, props.attributes.buttonBorderColor, container );
-					container.style.setProperty( `--wpforms-${ property }`, value );
+					app.maybeSetButtonAltTextColor(
+						value,
+						props.attributes.buttonBackgroundColor,
+						props.attributes.buttonBorderColor,
+						container
+					);
+					container.style.setProperty(`--wpforms-${property}`, value);
 
 					break;
 				default:
-					container.style.setProperty( `--wpforms-${ property }`, value );
-					container.style.setProperty( `--wpforms-${ property }-spare`, value );
+					container.style.setProperty(`--wpforms-${property}`, value);
+					container.style.setProperty(`--wpforms-${property}-spare`, value);
 			}
 		},
 
@@ -1300,20 +1362,20 @@ export default ( function( document, window, $ ) {
 		 * @param {Object}  container Form container.
 		 * @param {boolean} set       True when set, false when unset.
 		 */
-		toggleFieldBorderNoneCSSVarValue( container, set ) {
-			const cont = container.querySelector( 'form' );
+		toggleFieldBorderNoneCSSVarValue(container, set) {
+			const cont = container.querySelector('form');
 
-			if ( set ) {
-				cont.style.setProperty( '--wpforms-field-border-style', 'solid' );
-				cont.style.setProperty( '--wpforms-field-border-size', '1px' );
-				cont.style.setProperty( '--wpforms-field-border-color', 'transparent' );
+			if (set) {
+				cont.style.setProperty('--wpforms-field-border-style', 'solid');
+				cont.style.setProperty('--wpforms-field-border-size', '1px');
+				cont.style.setProperty('--wpforms-field-border-color', 'transparent');
 
 				return;
 			}
 
-			cont.style.setProperty( '--wpforms-field-border-style', null );
-			cont.style.setProperty( '--wpforms-field-border-size', null );
-			cont.style.setProperty( '--wpforms-field-border-color', null );
+			cont.style.setProperty('--wpforms-field-border-style', null);
+			cont.style.setProperty('--wpforms-field-border-size', null);
+			cont.style.setProperty('--wpforms-field-border-color', null);
 		},
 
 		/**
@@ -1327,14 +1389,16 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {string|*} New background color.
 		 */
-		maybeSetButtonAltBackgroundColor( value, buttonBorderColor, container ) {
+		maybeSetButtonAltBackgroundColor(value, buttonBorderColor, container) {
 			// Setting css property value to child `form` element overrides the parent property value.
-			const form = container.querySelector( 'form' );
+			const form = container.querySelector('form');
 
-			form.style.setProperty( '--wpforms-button-background-color-alt', value );
+			form.style.setProperty('--wpforms-button-background-color-alt', value);
 
-			if ( WPFormsUtils.cssColorsUtils.isTransparentColor( value ) ) {
-				return WPFormsUtils.cssColorsUtils.isTransparentColor( buttonBorderColor ) ? defaultStyleSettings.buttonBackgroundColor : buttonBorderColor;
+			if (WPFormsUtils.cssColorsUtils.isTransparentColor(value)) {
+				return WPFormsUtils.cssColorsUtils.isTransparentColor(buttonBorderColor)
+					? defaultStyleSettings.buttonBackgroundColor
+					: buttonBorderColor;
 			}
 
 			return value;
@@ -1350,26 +1414,24 @@ export default ( function( document, window, $ ) {
 		 * @param {string} buttonBorderColor     Button border color.
 		 * @param {Object} container             Form container.
 		 */
-		maybeSetButtonAltTextColor( value, buttonBackgroundColor, buttonBorderColor, container ) {
-			const form = container.querySelector( 'form' );
+		maybeSetButtonAltTextColor(value, buttonBackgroundColor, buttonBorderColor, container) {
+			const form = container.querySelector('form');
 
 			let altColor = null;
 
 			value = value.toLowerCase();
 
 			if (
-				WPFormsUtils.cssColorsUtils.isTransparentColor( value ) ||
+				WPFormsUtils.cssColorsUtils.isTransparentColor(value) ||
 				value === buttonBackgroundColor ||
-				(
-					WPFormsUtils.cssColorsUtils.isTransparentColor( buttonBackgroundColor ) &&
-					value === buttonBorderColor
-				)
+				(WPFormsUtils.cssColorsUtils.isTransparentColor(buttonBackgroundColor) &&
+					value === buttonBorderColor)
 			) {
-				altColor = WPFormsUtils.cssColorsUtils.getContrastColor( buttonBackgroundColor );
+				altColor = WPFormsUtils.cssColorsUtils.getContrastColor(buttonBackgroundColor);
 			}
 
-			container.style.setProperty( `--wpforms-button-text-color-alt`, value );
-			form.style.setProperty( `--wpforms-button-text-color-alt`, altColor );
+			container.style.setProperty(`--wpforms-button-text-color-alt`, value);
+			form.style.setProperty(`--wpforms-button-text-color-alt`, altColor);
 		},
 
 		/**
@@ -1381,20 +1443,22 @@ export default ( function( document, window, $ ) {
 		 * @param {string} buttonBackgroundColor Button background color.
 		 * @param {Object} container             Form container.
 		 */
-		maybeUpdateAccentColor( color, buttonBackgroundColor, container ) {
+		maybeUpdateAccentColor(color, buttonBackgroundColor, container) {
 			// Setting css property value to child `form` element overrides the parent property value.
-			const form = container.querySelector( 'form' );
+			const form = container.querySelector('form');
 
 			// Fallback to default color if the border color is transparent.
-			color = WPFormsUtils.cssColorsUtils.isTransparentColor( color ) ? defaultStyleSettings.buttonBackgroundColor : color;
+			color = WPFormsUtils.cssColorsUtils.isTransparentColor(color)
+				? defaultStyleSettings.buttonBackgroundColor
+				: color;
 
-			if ( WPFormsUtils.cssColorsUtils.isTransparentColor( buttonBackgroundColor ) ) {
-				form.style.setProperty( '--wpforms-button-background-color-alt', 'rgba( 0, 0, 0, 0 )' );
-				form.style.setProperty( '--wpforms-button-background-color', color );
+			if (WPFormsUtils.cssColorsUtils.isTransparentColor(buttonBackgroundColor)) {
+				form.style.setProperty('--wpforms-button-background-color-alt', 'rgba( 0, 0, 0, 0 )');
+				form.style.setProperty('--wpforms-button-background-color', color);
 			} else {
-				container.style.setProperty( '--wpforms-button-background-color-alt', buttonBackgroundColor );
-				form.style.setProperty( '--wpforms-button-background-color-alt', null );
-				form.style.setProperty( '--wpforms-button-background-color', null );
+				container.style.setProperty('--wpforms-button-background-color-alt', buttonBackgroundColor);
+				form.style.setProperty('--wpforms-button-background-color-alt', null);
+				form.style.setProperty('--wpforms-button-background-color', null);
 			}
 		},
 
@@ -1407,7 +1471,8 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {Object} Object that contains event handlers for the settings fields.
 		 */
-		getSettingsFieldsHandlers( props ) { // eslint-disable-line max-lines-per-function
+		getSettingsFieldsHandlers(props) {
+			// eslint-disable-line max-lines-per-function
 			return {
 				/**
 				 * Field style attribute change event handler.
@@ -1417,33 +1482,38 @@ export default ( function( document, window, $ ) {
 				 * @param {string} attribute Attribute name.
 				 * @param {string} value     New attribute value.
 				 */
-				styleAttrChange( attribute, value ) {
-					const block = app.getBlockContainer( props ),
-						container = block.querySelector( `#wpforms-${ props.attributes.formId }` ),
+				styleAttrChange(attribute, value) {
+					const block = app.getBlockContainer(props),
+						container = block.querySelector(`#wpforms-${props.attributes.formId}`),
 						setAttr = {};
 
 					// Unset the color means setting the transparent color.
-					if ( attribute.includes( 'Color' ) ) {
+					if (attribute.includes('Color')) {
 						value = value ?? 'rgba( 0, 0, 0, 0 )';
 					}
 
-					app.updatePreviewCSSVarValue( attribute, value, container, props );
+					app.updatePreviewCSSVarValue(attribute, value, container, props);
 
-					setAttr[ attribute ] = value;
+					setAttr[attribute] = value;
 
-					app.setBlockRuntimeStateVar( props.clientId, 'prevAttributesState', props.attributes );
-					props.setAttributes( setAttr );
+					app.setBlockRuntimeStateVar(props.clientId, 'prevAttributesState', props.attributes);
+					props.setAttributes(setAttr);
 
 					triggerServerRender = false;
 
 					this.updateCopyPasteContent();
 
-					app.panels.themes.updateCustomThemeAttribute( attribute, value, props );
+					app.panels.themes.updateCustomThemeAttribute(attribute, value, props);
 
-					this.maybeToggleDropdown( props, attribute );
+					this.maybeToggleDropdown(props, attribute);
 
 					// Trigger event for developers.
-					el.$window.trigger( 'wpformsFormSelectorStyleAttrChange', [ block, props, attribute, value ] );
+					el.$window.trigger('wpformsFormSelectorStyleAttrChange', [
+						block,
+						props,
+						attribute,
+						value,
+					]);
 				},
 
 				/**
@@ -1454,35 +1524,46 @@ export default ( function( document, window, $ ) {
 				 * @param {Object} props     The block properties.
 				 * @param {string} attribute The name of the attribute being changed.
 				 */
-				maybeToggleDropdown( props, attribute ) { // eslint-disable-line no-shadow
+				maybeToggleDropdown(props, attribute) {
+					// eslint-disable-line no-shadow
 					const formId = props.attributes.formId;
-					const menu = document.querySelector( `#wpforms-form-${ formId } .choices__list.choices__list--dropdown` );
-					const classicMenu = document.querySelector( `#wpforms-form-${ formId } .wpforms-field-select-style-classic select` );
+					const menu = document.querySelector(
+						`#wpforms-form-${formId} .choices__list.choices__list--dropdown`
+					);
+					const classicMenu = document.querySelector(
+						`#wpforms-form-${formId} .wpforms-field-select-style-classic select`
+					);
 
-					if ( attribute === 'fieldMenuColor' ) {
-						if ( menu ) {
-							menu.classList.add( 'is-active' );
-							menu.parentElement.classList.add( 'is-open' );
+					if (attribute === 'fieldMenuColor') {
+						if (menu) {
+							menu.classList.add('is-active');
+							menu.parentElement.classList.add('is-open');
 						} else {
-							this.showClassicMenu( classicMenu );
+							this.showClassicMenu(classicMenu);
 						}
 
-						clearTimeout( dropdownTimeout );
+						clearTimeout(dropdownTimeout);
 
-						dropdownTimeout = setTimeout( () => {
-							const toClose = document.querySelector( `#wpforms-form-${ formId } .choices__list.choices__list--dropdown` );
+						dropdownTimeout = setTimeout(() => {
+							const toClose = document.querySelector(
+								`#wpforms-form-${formId} .choices__list.choices__list--dropdown`
+							);
 
-							if ( toClose ) {
-								toClose.classList.remove( 'is-active' );
-								toClose.parentElement.classList.remove( 'is-open' );
+							if (toClose) {
+								toClose.classList.remove('is-active');
+								toClose.parentElement.classList.remove('is-open');
 							} else {
-								this.hideClassicMenu( document.querySelector( `#wpforms-form-${ formId } .wpforms-field-select-style-classic select` ) );
+								this.hideClassicMenu(
+									document.querySelector(
+										`#wpforms-form-${formId} .wpforms-field-select-style-classic select`
+									)
+								);
 							}
-						}, 5000 );
-					} else if ( menu ) {
-						menu.classList.remove( 'is-active' );
+						}, 5000);
+					} else if (menu) {
+						menu.classList.remove('is-active');
 					} else {
-						this.hideClassicMenu( classicMenu );
+						this.hideClassicMenu(classicMenu);
 					}
 				},
 
@@ -1493,17 +1574,20 @@ export default ( function( document, window, $ ) {
 				 *
 				 * @param {Object} classicMenu The classic menu.
 				 */
-				showClassicMenu( classicMenu ) {
-					if ( ! classicMenu ) {
+				showClassicMenu(classicMenu) {
+					if (!classicMenu) {
 						return;
 					}
 
 					classicMenu.size = 2;
-					classicMenu.style.cssText = 'padding-top: 40px; padding-inline-end: 0; padding-inline-start: 0; position: relative;';
-					classicMenu.querySelectorAll( 'option' ).forEach( ( option ) => {
-						option.style.cssText = 'border-left: 1px solid #8c8f94; border-right: 1px solid #8c8f94; padding: 0 10px; z-index: 999999; position: relative;';
-					} );
-					classicMenu.querySelector( 'option:last-child' ).style.cssText = 'border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; padding: 0 10px; border-left: 1px solid #8c8f94; border-right: 1px solid #8c8f94; border-bottom: 1px solid #8c8f94; z-index: 999999; position: relative;';
+					classicMenu.style.cssText =
+						'padding-top: 40px; padding-inline-end: 0; padding-inline-start: 0; position: relative;';
+					classicMenu.querySelectorAll('option').forEach((option) => {
+						option.style.cssText =
+							'border-left: 1px solid #8c8f94; border-right: 1px solid #8c8f94; padding: 0 10px; z-index: 999999; position: relative;';
+					});
+					classicMenu.querySelector('option:last-child').style.cssText =
+						'border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; padding: 0 10px; border-left: 1px solid #8c8f94; border-right: 1px solid #8c8f94; border-bottom: 1px solid #8c8f94; z-index: 999999; position: relative;';
 				},
 
 				/**
@@ -1513,16 +1597,17 @@ export default ( function( document, window, $ ) {
 				 *
 				 * @param {Object} classicMenu The classic menu.
 				 */
-				hideClassicMenu( classicMenu ) {
-					if ( ! classicMenu ) {
+				hideClassicMenu(classicMenu) {
+					if (!classicMenu) {
 						return;
 					}
 
 					classicMenu.size = 0;
-					classicMenu.style.cssText = 'padding-top: 0; padding-inline-end: 24px; padding-inline-start: 12px; position: relative;';
-					classicMenu.querySelectorAll( 'option' ).forEach( ( option ) => {
+					classicMenu.style.cssText =
+						'padding-top: 0; padding-inline-end: 24px; padding-inline-start: 12px; position: relative;';
+					classicMenu.querySelectorAll('option').forEach((option) => {
 						option.style.cssText = 'border: none;';
-					} );
+					});
 				},
 
 				/**
@@ -1533,13 +1618,13 @@ export default ( function( document, window, $ ) {
 				 * @param {string} attribute Attribute name.
 				 * @param {string} value     New attribute value.
 				 */
-				attrChange( attribute, value ) {
+				attrChange(attribute, value) {
 					const setAttr = {};
 
-					setAttr[ attribute ] = value;
+					setAttr[attribute] = value;
 
-					app.setBlockRuntimeStateVar( props.clientId, 'prevAttributesState', props.attributes );
-					props.setAttributes( setAttr );
+					app.setBlockRuntimeStateVar(props.clientId, 'prevAttributesState', props.attributes);
+					props.setAttributes(setAttr);
 
 					triggerServerRender = true;
 
@@ -1553,13 +1638,13 @@ export default ( function( document, window, $ ) {
 				 */
 				updateCopyPasteContent() {
 					const content = {};
-					const atts = wp.data.select( 'core/block-editor' ).getBlockAttributes( props.clientId );
+					const atts = wp.data.select('core/block-editor').getBlockAttributes(props.clientId);
 
-					for ( const key in defaultStyleSettings ) {
-						content[ key ] = atts[ key ];
+					for (const key in defaultStyleSettings) {
+						content[key] = atts[key];
 					}
 
-					props.setAttributes( { copyPasteJsonValue: JSON.stringify( content ) } );
+					props.setAttributes({ copyPasteJsonValue: JSON.stringify(content) });
 				},
 
 				/**
@@ -1569,17 +1654,16 @@ export default ( function( document, window, $ ) {
 				 *
 				 * @param {string} value New attribute value.
 				 */
-				pasteSettings( value ) {
+				pasteSettings(value) {
 					value = value.trim();
 
-					const pasteAttributes = app.parseValidateJson( value );
+					const pasteAttributes = app.parseValidateJson(value);
 
-					if ( ! pasteAttributes ) {
-						if ( value ) {
-							wp.data.dispatch( 'core/notices' ).createErrorNotice(
-								strings.copy_paste_error,
-								{ id: 'wpforms-json-parse-error' }
-							);
+					if (!pasteAttributes) {
+						if (value) {
+							wp.data
+								.dispatch('core/notices')
+								.createErrorNotice(strings.copy_paste_error, { id: 'wpforms-json-parse-error' });
 						}
 
 						this.updateCopyPasteContent();
@@ -1589,11 +1673,11 @@ export default ( function( document, window, $ ) {
 
 					pasteAttributes.copyPasteJsonValue = value;
 
-					const themeSlug = app.panels.themes.maybeCreateCustomThemeFromAttributes( pasteAttributes );
+					const themeSlug = app.panels.themes.maybeCreateCustomThemeFromAttributes(pasteAttributes);
 
-					app.setBlockRuntimeStateVar( props.clientId, 'prevAttributesState', props.attributes );
-					props.setAttributes( pasteAttributes );
-					app.panels.themes.setBlockTheme( props, themeSlug );
+					app.setBlockRuntimeStateVar(props.clientId, 'prevAttributesState', props.attributes);
+					props.setAttributes(pasteAttributes);
+					app.panels.themes.setBlockTheme(props, themeSlug);
 
 					triggerServerRender = false;
 				},
@@ -1609,16 +1693,16 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {boolean|object} Parsed JSON object OR false on error.
 		 */
-		parseValidateJson( value ) {
-			if ( typeof value !== 'string' ) {
+		parseValidateJson(value) {
+			if (typeof value !== 'string') {
 				return false;
 			}
 
 			let atts;
 
 			try {
-				atts = JSON.parse( value.trim() );
-			} catch ( error ) {
+				atts = JSON.parse(value.trim());
+			} catch (error) {
 				atts = false;
 			}
 
@@ -1636,13 +1720,10 @@ export default ( function( document, window, $ ) {
 			return createElement(
 				'svg',
 				{ width: 20, height: 20, viewBox: '0 0 612 612', className: 'dashicon' },
-				createElement(
-					'path',
-					{
-						fill: 'currentColor',
-						d: 'M544,0H68C30.445,0,0,30.445,0,68v476c0,37.556,30.445,68,68,68h476c37.556,0,68-30.444,68-68V68 C612,30.445,581.556,0,544,0z M464.44,68L387.6,120.02L323.34,68H464.44z M288.66,68l-64.26,52.02L147.56,68H288.66z M544,544H68 V68h22.1l136,92.14l79.9-64.6l79.56,64.6l136-92.14H544V544z M114.24,263.16h95.88v-48.28h-95.88V263.16z M114.24,360.4h95.88 v-48.62h-95.88V360.4z M242.76,360.4h255v-48.62h-255V360.4L242.76,360.4z M242.76,263.16h255v-48.28h-255V263.16L242.76,263.16z M368.22,457.3h129.54V408H368.22V457.3z',
-					},
-				),
+				createElement('path', {
+					fill: 'currentColor',
+					d: 'M544,0H68C30.445,0,0,30.445,0,68v476c0,37.556,30.445,68,68,68h476c37.556,0,68-30.444,68-68V68 C612,30.445,581.556,0,544,0z M464.44,68L387.6,120.02L323.34,68H464.44z M288.66,68l-64.26,52.02L147.56,68H288.66z M544,544H68 V68h22.1l136,92.14l79.9-64.6l79.56,64.6l136-92.14H544V544z M114.24,263.16h95.88v-48.28h-95.88V263.16z M114.24,360.4h95.88 v-48.62h-95.88V360.4z M242.76,360.4h255v-48.62h-255V360.4L242.76,360.4z M242.76,263.16h255v-48.28h-255V263.16L242.76,263.16z M368.22,457.3h129.54V408H368.22V457.3z',
+				})
 			);
 		},
 
@@ -1654,11 +1735,11 @@ export default ( function( document, window, $ ) {
 		 * @return {Array} Blocks array.
 		 */
 		getWPFormsBlocks() {
-			const wpformsBlocks = wp.data.select( 'core/block-editor' ).getBlocks();
+			const wpformsBlocks = wp.data.select('core/block-editor').getBlocks();
 
-			return wpformsBlocks.filter( ( props ) => {
+			return wpformsBlocks.filter((props) => {
 				return props.name === 'wpforms/form-selector';
-			} );
+			});
 		},
 
 		/**
@@ -1670,16 +1751,16 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {Object} Block attributes.
 		 */
-		isClientIdAttrUnique( props ) {
+		isClientIdAttrUnique(props) {
 			const wpformsBlocks = app.getWPFormsBlocks();
 
-			for ( const key in wpformsBlocks ) {
+			for (const key in wpformsBlocks) {
 				// Skip the current block.
-				if ( wpformsBlocks[ key ].clientId === props.clientId ) {
+				if (wpformsBlocks[key].clientId === props.clientId) {
 					continue;
 				}
 
-				if ( wpformsBlocks[ key ].attributes.clientId === props.attributes.clientId ) {
+				if (wpformsBlocks[key].attributes.clientId === props.attributes.clientId) {
 					return false;
 				}
 			}
@@ -1708,8 +1789,8 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {*} Block runtime state variable value.
 		 */
-		getBlockRuntimeStateVar( clientId, varName ) {
-			return blocks[ clientId ]?.[ varName ];
+		getBlockRuntimeStateVar(clientId, varName) {
+			return blocks[clientId]?.[varName];
 		},
 
 		/**
@@ -1723,17 +1804,18 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {boolean} True on success.
 		 */
-		setBlockRuntimeStateVar( clientId, varName, value ) { // eslint-disable-line complexity
-			if ( ! clientId || ! varName ) {
+		setBlockRuntimeStateVar(clientId, varName, value) {
+			// eslint-disable-line complexity
+			if (!clientId || !varName) {
 				return false;
 			}
 
-			blocks[ clientId ] = blocks[ clientId ] || {};
-			blocks[ clientId ][ varName ] = value;
+			blocks[clientId] = blocks[clientId] || {};
+			blocks[clientId][varName] = value;
 
 			// Prevent referencing to object.
-			if ( typeof value === 'object' && ! Array.isArray( value ) && value !== null ) {
-				blocks[ clientId ][ varName ] = { ...value };
+			if (typeof value === 'object' && !Array.isArray(value) && value !== null) {
+				blocks[clientId][varName] = { ...value };
 			}
 
 			return true;
@@ -1747,11 +1829,9 @@ export default ( function( document, window, $ ) {
 		 * @return {Array} Form options.
 		 */
 		getFormOptions() {
-			const formOptions = formList.map( ( value ) => (
-				{ value: value.ID, label: value.post_title }
-			) );
+			const formOptions = formList.map((value) => ({ value: value.ID, label: value.post_title }));
 
-			formOptions.unshift( { value: '', label: strings.form_select } );
+			formOptions.unshift({ value: '', label: strings.form_select });
 
 			return formOptions;
 		},
@@ -1788,14 +1868,14 @@ export default ( function( document, window, $ ) {
 		 * @param {Object} e     Event object.
 		 * @param {Object} props Block properties.
 		 */
-		blockEdit( e, props ) {
-			const block = app.getBlockContainer( props );
+		blockEdit(e, props) {
+			const block = app.getBlockContainer(props);
 
-			if ( ! block?.dataset ) {
+			if (!block?.dataset) {
 				return;
 			}
 
-			app.initLeadFormSettings( block );
+			app.initLeadFormSettings(block);
 		},
 
 		/**
@@ -1806,41 +1886,39 @@ export default ( function( document, window, $ ) {
 		 * @param {Element} block         Block element.
 		 * @param {Object}  block.dataset Block element.
 		 */
-		initLeadFormSettings( block ) {
-			if ( ! app.isFullStylingEnabled() ) {
+		initLeadFormSettings(block) {
+			if (!app.isFullStylingEnabled()) {
 				return;
 			}
 
-			if ( ! block?.dataset?.block ) {
+			if (!block?.dataset?.block) {
 				return;
 			}
 
 			const clientId = block.dataset.block;
-			const $panel = $( `.wpforms-block-settings-${ clientId }` );
-			const isLeadFormsEnabled = app.isLeadFormsEnabled( block );
+			const $panel = $(`.wpforms-block-settings-${clientId}`);
+			const isLeadFormsEnabled = app.isLeadFormsEnabled(block);
 
-			if ( isLeadFormsEnabled ) {
+			if (isLeadFormsEnabled) {
 				$panel
-					.addClass( 'disabled_panel' )
-					.find( '.wpforms-gutenberg-panel-notice.wpforms-lead-form-notice' )
-					.css( 'display', 'block' );
+					.addClass('disabled_panel')
+					.find('.wpforms-gutenberg-panel-notice.wpforms-lead-form-notice')
+					.css('display', 'block');
 
 				$panel
-					.find( '.wpforms-gutenberg-panel-notice.wpforms-use-modern-notice' )
-					.css( 'display', 'none' );
+					.find('.wpforms-gutenberg-panel-notice.wpforms-use-modern-notice')
+					.css('display', 'none');
 
 				return;
 			}
 
 			$panel
-				.removeClass( 'disabled_panel' )
-				.removeClass( 'wpforms-lead-forms-enabled' )
-				.find( '.wpforms-gutenberg-panel-notice.wpforms-lead-form-notice' )
-				.css( 'display', 'none' );
+				.removeClass('disabled_panel')
+				.removeClass('wpforms-lead-forms-enabled')
+				.find('.wpforms-gutenberg-panel-notice.wpforms-lead-form-notice')
+				.css('display', 'none');
 
-			$panel
-				.find( '.wpforms-gutenberg-panel-notice.wpforms-use-modern-notice' )
-				.css( 'display', null );
+			$panel.find('.wpforms-gutenberg-panel-notice.wpforms-use-modern-notice').css('display', null);
 		},
 
 		/**
@@ -1850,16 +1928,14 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @param {Object} e Event object.
 		 */
-		formLoaded( e ) {
-			app.initLeadFormSettings( e.detail.block );
-			app.updateAccentColors( e.detail );
-			app.loadChoicesJS( e.detail );
-			app.initRichTextField( e.detail.formId );
-			app.initRepeaterField( e.detail.formId );
+		formLoaded(e) {
+			app.initLeadFormSettings(e.detail.block);
+			app.updateAccentColors(e.detail);
+			app.loadChoicesJS(e.detail);
+			app.initRichTextField(e.detail.formId);
+			app.initRepeaterField(e.detail.formId);
 
-			$( e.detail.block )
-				.off( 'click' )
-				.on( 'click', app.blockClick );
+			$(e.detail.block).off('click').on('click', app.blockClick);
 		},
 
 		/**
@@ -1869,8 +1945,8 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @param {Object} e Event object.
 		 */
-		blockClick( e ) {
-			app.initLeadFormSettings( e.currentTarget );
+		blockClick(e) {
+			app.initLeadFormSettings(e.currentTarget);
 		},
 
 		/**
@@ -1880,21 +1956,21 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @param {Object} detail Event details object.
 		 */
-		updateAccentColors( detail ) {
+		updateAccentColors(detail) {
 			if (
-				! wpforms_gutenberg_form_selector.is_modern_markup ||
-				! window.WPForms?.FrontendModern ||
-				! detail?.block
+				!wpforms_gutenberg_form_selector.is_modern_markup ||
+				!window.WPForms?.FrontendModern ||
+				!detail?.block
 			) {
 				return;
 			}
 
-			const $form = $( detail.block.querySelector( `#wpforms-${ detail.formId }` ) ),
+			const $form = $(detail.block.querySelector(`#wpforms-${detail.formId}`)),
 				FrontendModern = window.WPForms.FrontendModern;
 
-			FrontendModern.updateGBBlockPageIndicatorColor( $form );
-			FrontendModern.updateGBBlockIconChoicesColor( $form );
-			FrontendModern.updateGBBlockRatingColor( $form );
+			FrontendModern.updateGBBlockPageIndicatorColor($form);
+			FrontendModern.updateGBBlockIconChoicesColor($form);
+			FrontendModern.updateGBBlockRatingColor($form);
 		},
 
 		/**
@@ -1904,61 +1980,61 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @param {Object} detail Event details object.
 		 */
-		loadChoicesJS( detail ) {
-			if ( typeof window.Choices !== 'function' ) {
+		loadChoicesJS(detail) {
+			if (typeof window.Choices !== 'function') {
 				return;
 			}
 
-			const $form = $( detail.block.querySelector( `#wpforms-${ detail.formId }` ) );
+			const $form = $(detail.block.querySelector(`#wpforms-${detail.formId}`));
 
-			$form.find( '.choicesjs-select' ).each( function( idx, selectEl ) {
-				const $el = $( selectEl );
+			$form.find('.choicesjs-select').each(function (idx, selectEl) {
+				const $el = $(selectEl);
 
-				if ( $el.data( 'choice' ) === 'active' ) {
+				if ($el.data('choice') === 'active') {
 					return;
 				}
 
 				const args = window.wpforms_choicesjs_config || {},
-					searchEnabled = $el.data( 'search-enabled' ),
-					$field = $el.closest( '.wpforms-field' );
+					searchEnabled = $el.data('search-enabled'),
+					$field = $el.closest('.wpforms-field');
 
 				args.searchEnabled = 'undefined' !== typeof searchEnabled ? searchEnabled : true;
-				args.callbackOnInit = function() {
+				args.callbackOnInit = function () {
 					const self = this,
-						$element = $( self.passedElement.element ),
-						$input = $( self.input.element ),
-						sizeClass = $element.data( 'size-class' );
+						$element = $(self.passedElement.element),
+						$input = $(self.input.element),
+						sizeClass = $element.data('size-class');
 
 					// Add CSS-class for size.
-					if ( sizeClass ) {
-						$( self.containerOuter.element ).addClass( sizeClass );
+					if (sizeClass) {
+						$(self.containerOuter.element).addClass(sizeClass);
 					}
 
 					/**
 					 * If a multiple select has selected choices - hide a placeholder text.
 					 * In case if select is empty - we return placeholder text.
 					 */
-					if ( $element.prop( 'multiple' ) ) {
+					if ($element.prop('multiple')) {
 						// On init event.
-						$input.data( 'placeholder', $input.attr( 'placeholder' ) );
+						$input.data('placeholder', $input.attr('placeholder'));
 
-						if ( self.getValue( true ).length ) {
+						if (self.getValue(true).length) {
 							$input.hide();
 						}
 					}
 
 					this.disable();
-					$field.find( '.is-disabled' ).removeClass( 'is-disabled' );
+					$field.find('.is-disabled').removeClass('is-disabled');
 				};
 
 				try {
-					if ( ! ( selectEl instanceof parent.HTMLSelectElement ) ) {
-						Object.setPrototypeOf( selectEl, parent.HTMLSelectElement.prototype );
+					if (!(selectEl instanceof parent.HTMLSelectElement)) {
+						Object.setPrototypeOf(selectEl, parent.HTMLSelectElement.prototype);
 					}
 
-					$el.data( 'choicesjs', new parent.Choices( selectEl, args ) );
-				} catch ( e ) {} // eslint-disable-line no-empty
-			} );
+					$el.data('choicesjs', new parent.Choices(selectEl, args));
+				} catch (e) {} // eslint-disable-line no-empty
+			});
 		},
 
 		/**
@@ -1968,15 +2044,15 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @param {number} formId Form ID.
 		 */
-		initRichTextField( formId ) {
-			const form = app.getFormBlock( formId );
+		initRichTextField(formId) {
+			const form = app.getFormBlock(formId);
 
-			if ( ! form ) {
+			if (!form) {
 				return;
 			}
 
 			// Set default tab to `Visual`.
-			$( form ).find( '.wp-editor-wrap' ).removeClass( 'html-active' ).addClass( 'tmce-active' );
+			$(form).find('.wp-editor-wrap').removeClass('html-active').addClass('tmce-active');
 		},
 
 		/**
@@ -1986,42 +2062,47 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @param {number} formId Form ID.
 		 */
-		initRepeaterField( formId ) {
-			const form = app.getFormBlock( formId );
+		initRepeaterField(formId) {
+			const form = app.getFormBlock(formId);
 
-			if ( ! form ) {
+			if (!form) {
 				return;
 			}
 
-			const $rowButtons = $( form ).find( '.wpforms-field-repeater > .wpforms-field-repeater-display-rows .wpforms-field-repeater-display-rows-buttons' );
+			const $rowButtons = $(form).find(
+				'.wpforms-field-repeater > .wpforms-field-repeater-display-rows .wpforms-field-repeater-display-rows-buttons'
+			);
 
 			// Get the label height and set the button position.
-			$rowButtons.each( function() {
-				const $cont = $( this );
-				const $labels = $cont.siblings( '.wpforms-layout-column' )
-					.find( '.wpforms-field' )
-					.find( '.wpforms-field-label' );
+			$rowButtons.each(function () {
+				const $cont = $(this);
+				const $labels = $cont
+					.siblings('.wpforms-layout-column')
+					.find('.wpforms-field')
+					.find('.wpforms-field-label');
 
-				if ( ! $labels.length ) {
+				if (!$labels.length) {
 					return;
 				}
 
 				const $label = $labels.first();
-				const labelStyle = window.getComputedStyle( $label.get( 0 ) );
-				const margin = labelStyle?.getPropertyValue( '--wpforms-field-size-input-spacing' ) || 0;
+				const labelStyle = window.getComputedStyle($label.get(0));
+				const margin = labelStyle?.getPropertyValue('--wpforms-field-size-input-spacing') || 0;
 				const height = $label.outerHeight() || 0;
-				const top = height + parseInt( margin, 10 ) + 10;
+				const top = height + parseInt(margin, 10) + 10;
 
-				$cont.css( { top } );
-			} );
+				$cont.css({ top });
+			});
 
 			// Init buttons and descriptions for each repeater in each form.
-			$( `.wpforms-form[data-formid="${ formId }"]` ).each( function() {
-				const $repeater = $( this ).find( '.wpforms-field-repeater' );
+			$(`.wpforms-form[data-formid="${formId}"]`).each(function () {
+				const $repeater = $(this).find('.wpforms-field-repeater');
 
-				$repeater.find( '.wpforms-field-repeater-display-rows-buttons' ).addClass( 'wpforms-init' );
-				$repeater.find( '.wpforms-field-repeater-display-rows:last .wpforms-field-description' ).addClass( 'wpforms-init' );
-			} );
+				$repeater.find('.wpforms-field-repeater-display-rows-buttons').addClass('wpforms-init');
+				$repeater
+					.find('.wpforms-field-repeater-display-rows:last .wpforms-field-description')
+					.addClass('wpforms-init');
+			});
 		},
 
 		/**
@@ -2031,11 +2112,11 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @param {Object} props Block properties.
 		 */
-		onSetTheme( props ) {
+		onSetTheme(props) {
 			backgroundSelected = props.attributes.backgroundImage !== 'url()';
 		},
 	};
 
 	// Provide access to public functions/properties.
 	return app;
-}( document, window, jQuery ) );
+})(document, window, jQuery);

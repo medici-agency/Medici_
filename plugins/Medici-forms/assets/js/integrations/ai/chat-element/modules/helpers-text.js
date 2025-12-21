@@ -11,7 +11,8 @@
  *
  * @return {Function} The app cloning function.
  */
-export default function( chat ) { // eslint-disable-line no-unused-vars
+export default function (chat) {
+	// eslint-disable-line no-unused-vars
 	/**
 	 * The default `text` mode helpers object.
 	 *
@@ -27,11 +28,11 @@ export default function( chat ) { // eslint-disable-line no-unused-vars
 		 *
 		 * @return {string} HTML markup.
 		 */
-		getAnswer( response ) {
+		getAnswer(response) {
 			return `
-				<h4>${ response?.heading ?? '' }</h4>
-				<p>${ response?.text ?? '' }</p>
-				<span>${ response?.footer ?? '' }</span>
+				<h4>${response?.heading ?? ''}</h4>
+				<p>${response?.text ?? ''}</p>
+				<span>${response?.footer ?? ''}</span>
 			`;
 		},
 

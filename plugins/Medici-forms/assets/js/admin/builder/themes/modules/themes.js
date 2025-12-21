@@ -11,7 +11,8 @@
  *
  * @return {Object} Public functions and properties.
  */
-export default function( document, window, $ ) { // eslint-disable-line max-lines-per-function
+export default function (document, window, $) {
+	// eslint-disable-line max-lines-per-function
 	const WPForms = window.WPForms || {};
 	const WPFormsBuilderThemes = WPForms.Admin.Builder.Themes || {};
 
@@ -20,7 +21,13 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 	 *
 	 * @since 1.9.7
 	 */
-	const { isAdmin, isPro, isLicenseActive, strings, route_namespace: routeNamespace } = wpforms_builder_themes;
+	const {
+		isAdmin,
+		isPro,
+		isLicenseActive,
+		strings,
+		route_namespace: routeNamespace,
+	} = wpforms_builder_themes;
 
 	/**
 	 * Runtime state.
@@ -67,7 +74,6 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 	 * @since 1.9.7
 	 */
 	const app = {
-
 		/**
 		 * Start the engine.
 		 *
@@ -85,11 +91,11 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 * @since 1.9.7
 		 */
 		setup() {
-			el.$builder = $( '#wpforms-builder' );
-			el.$themesControl = el.$builder.find( '.wpforms-builder-themes-control' );
-			el.$customThemeRenamer = el.$builder.find( '#wpforms-panel-field-themes-themeName-wrap' );
-			el.$customThemeRemover = el.$builder.find( '#wpforms-builder-themer-remove-theme' );
-			el.$window = $( window );
+			el.$builder = $('#wpforms-builder');
+			el.$themesControl = el.$builder.find('.wpforms-builder-themes-control');
+			el.$customThemeRenamer = el.$builder.find('#wpforms-panel-field-themes-themeName-wrap');
+			el.$customThemeRemover = el.$builder.find('#wpforms-builder-themer-remove-theme');
+			el.$window = $(window);
 		},
 
 		/**
@@ -98,8 +104,8 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 * @since 1.9.7
 		 */
 		events() {
-			el.$window.on( 'wpformsBuilderThemesDataLoaded', app.themesControlSetup );
-			el.$builder.on( 'wpformsSaved', app.saveCustomThemes );
+			el.$window.on('wpformsBuilderThemesDataLoaded', app.themesControlSetup);
+			el.$builder.on('wpformsSaved', app.saveCustomThemes);
 		},
 
 		/**
@@ -109,31 +115,31 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 */
 		themesControlSetup() {
 			// Debounce custom themes update and creation.
-			const debouncedMaybeCreate = _.debounce( ( key ) => {
+			const debouncedMaybeCreate = _.debounce((key) => {
 				app.maybeCreateCustomTheme();
-				app.maybeUpdateCustomTheme( key );
-			}, 300 );
+				app.maybeUpdateCustomTheme(key);
+			}, 300);
 
 			// Listen for all settings changes.
-			WPFormsBuilderThemes.store.subscribeAll( ( value, key ) => {
+			WPFormsBuilderThemes.store.subscribeAll((value, key) => {
 				const allowedKeys = WPFormsBuilderThemes.common.getStyleAttributesKeys();
-				if ( ! allowedKeys.includes( key ) ) {
+				if (!allowedKeys.includes(key)) {
 					return;
 				}
 
-				debouncedMaybeCreate( key );
-			} );
+				debouncedMaybeCreate(key);
+			});
 
 			// Listen for the theme name change.
-			WPFormsBuilderThemes.store.subscribe( 'themeName', ( value ) => {
-				app.changeThemeName( value );
+			WPFormsBuilderThemes.store.subscribe('themeName', (value) => {
+				app.changeThemeName(value);
 				app.updateThemesList();
-			} );
+			});
 
 			// Listen for the isCustomTheme setting change.
-			WPFormsBuilderThemes.store.subscribe( 'isCustomTheme', () => {
+			WPFormsBuilderThemes.store.subscribe('isCustomTheme', () => {
 				app.toggleCustomThemeSettings();
-			} );
+			});
 
 			// Check if the selected theme exists. If no, create a new one.
 			app.maybeCreateCustomTheme();
@@ -148,12 +154,12 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 * @since 1.9.7
 		 */
 		updateThemesList() {
-			const selectedTheme = WPFormsBuilderThemes.store.get( 'wpformsTheme' ) ?? 'default';
+			const selectedTheme = WPFormsBuilderThemes.store.get('wpformsTheme') ?? 'default';
 
 			// Get all themes.
-			const html = app.getThemesListMarkup( selectedTheme );
+			const html = app.getThemesListMarkup(selectedTheme);
 
-			el.$themesControl.html( html );
+			el.$themesControl.html(html);
 
 			app.addThemesEvents();
 		},
@@ -167,48 +173,52 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @return {string} Themes items HTML.
 		 */
-		getThemesListMarkup( selectedTheme ) {
-			if ( ! themesData.wpforms ) {
+		getThemesListMarkup(selectedTheme) {
+			if (!themesData.wpforms) {
 				app.fetchThemesData();
 
 				// Return markup with an error message if themes are not available.
-				return `<div class="wpforms-no-themes">${ strings.themes_error }</div>`;
+				return `<div class="wpforms-no-themes">${strings.themes_error}</div>`;
 			}
 
 			const allThemes = app.getAllThemes();
 
-			if ( ! allThemes ) {
+			if (!allThemes) {
 				return '';
 			}
 
-			const themes = Object.keys( allThemes );
+			const themes = Object.keys(allThemes);
 			let theme, firstThemeSlug;
 			let html = '';
 			let itemsHtml = '';
 
-			if ( ! app.isWPFormsTheme( selectedTheme ) ) {
+			if (!app.isWPFormsTheme(selectedTheme)) {
 				firstThemeSlug = selectedTheme;
 
-				itemsHtml += app.getThemesItemMarkup( app.getTheme( firstThemeSlug ), firstThemeSlug, firstThemeSlug );
+				itemsHtml += app.getThemesItemMarkup(
+					app.getTheme(firstThemeSlug),
+					firstThemeSlug,
+					firstThemeSlug
+				);
 			}
 
-			for ( const key in themes ) {
-				const slug = themes[ key ];
+			for (const key in themes) {
+				const slug = themes[key];
 
 				// Skip the first theme.
-				if ( firstThemeSlug && firstThemeSlug === slug ) {
+				if (firstThemeSlug && firstThemeSlug === slug) {
 					continue;
 				}
 
 				// Ensure that all the theme settings are present.
-				theme = { ...allThemes.default, ...( allThemes[ slug ] || {} ) };
-				theme.settings = { ...allThemes.default.settings, ...( theme.settings || {} ) };
+				theme = { ...allThemes.default, ...(allThemes[slug] || {}) };
+				theme.settings = { ...allThemes.default.settings, ...(theme.settings || {}) };
 
-				itemsHtml += app.getThemesItemMarkup( theme, slug, selectedTheme );
+				itemsHtml += app.getThemesItemMarkup(theme, slug, selectedTheme);
 			}
 
 			html = `<div role="radiogroup" class="wpforms-builder-themes-radio-group">
-						${ itemsHtml }
+						${itemsHtml}
 					</div>`;
 
 			return html;
@@ -225,8 +235,8 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @return {string} Theme item HTML.
 		 */
-		getThemesItemMarkup( theme, slug, selectedTheme ) {
-			if ( ! theme ) {
+		getThemesItemMarkup(theme, slug, selectedTheme) {
+			if (!theme) {
 				return '';
 			}
 
@@ -234,19 +244,21 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 			let radioClasses = 'wpforms-builder-themes-radio ';
 			const buttonClass = slug === selectedTheme ? 'is-active' : '';
 
-			radioClasses += app.isDisabledTheme( slug ) ? 'wpforms-builder-themes-radio-disabled' : ' wpforms-builder-themes-radio-enabled';
+			radioClasses += app.isDisabledTheme(slug)
+				? 'wpforms-builder-themes-radio-disabled'
+				: ' wpforms-builder-themes-radio-enabled';
 
-			return `<button type="button" class="${ buttonClass }" value="${ slug }" role="radio">
-						<div class="wpforms-builder-themes-radio ${ radioClasses }">
-							<div class="wpforms-builder-themes-radio-title">${ title }</div>
+			return `<button type="button" class="${buttonClass}" value="${slug}" role="radio">
+						<div class="wpforms-builder-themes-radio ${radioClasses}">
+							<div class="wpforms-builder-themes-radio-title">${title}</div>
 						</div>
 
 						<div class="wpforms-builder-themes-indicators">
-							<span class="component-color-indicator" title="${ strings.button_background }" style="background: ${ theme.settings.buttonBackgroundColor };" data-index="0"></span>
-							<span class="component-color-indicator" title="${ strings.button_text }" style="background: ${ theme.settings.buttonTextColor }" data-index="1"></span>
-							<span class="component-color-indicator" title="${ strings.field_label }" style="background: ${ theme.settings.labelColor };" data-index="2"></span>
-							<span class="component-color-indicator" title="${ strings.field_sublabel } " style="background: ${ theme.settings.labelSublabelColor };" data-index="3"></span>
-							<span class="component-color-indicator" title="${ strings.field_border }"  style="background: ${ theme.settings.fieldBorderColor };" data-index="4"></span>
+							<span class="component-color-indicator" title="${strings.button_background}" style="background: ${theme.settings.buttonBackgroundColor};" data-index="0"></span>
+							<span class="component-color-indicator" title="${strings.button_text}" style="background: ${theme.settings.buttonTextColor}" data-index="1"></span>
+							<span class="component-color-indicator" title="${strings.field_label}" style="background: ${theme.settings.labelColor};" data-index="2"></span>
+							<span class="component-color-indicator" title="${strings.field_sublabel} " style="background: ${theme.settings.labelSublabelColor};" data-index="3"></span>
+							<span class="component-color-indicator" title="${strings.field_border}"  style="background: ${theme.settings.fieldBorderColor};" data-index="4"></span>
 						</div>
 					</button>`;
 		},
@@ -257,15 +269,15 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 * @since 1.9.7
 		 */
 		toggleCustomThemeSettings() {
-			if ( ! isAdmin ) {
+			if (!isAdmin) {
 				return;
 			}
 
-			const value = WPFormsBuilderThemes.store.get( 'isCustomTheme' ) ?? '';
+			const value = WPFormsBuilderThemes.store.get('isCustomTheme') ?? '';
 			const shouldShow = value === 'true';
 
-			el.$customThemeRenamer.toggleClass( 'wpforms-hidden', ! shouldShow );
-			el.$customThemeRemover.toggleClass( 'wpforms-hidden', ! shouldShow );
+			el.$customThemeRenamer.toggleClass('wpforms-hidden', !shouldShow);
+			el.$customThemeRemover.toggleClass('wpforms-hidden', !shouldShow);
 		},
 
 		/**
@@ -274,23 +286,21 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 * @since 1.9.7
 		 */
 		addThemesEvents() {
-			const $radioButtons = el.$themesControl.find( '[role="radio"]' );
+			const $radioButtons = el.$themesControl.find('[role="radio"]');
 
 			// Add event listeners to the radio buttons.
-			$radioButtons.off( 'click' ).on( 'click', function() {
-				$radioButtons.removeClass( 'is-active' );
+			$radioButtons.off('click').on('click', function () {
+				$radioButtons.removeClass('is-active');
 
-				$( this ).addClass( 'is-active' );
+				$(this).addClass('is-active');
 
-				const selectedValue = $( this ).val();
+				const selectedValue = $(this).val();
 
-				app.selectTheme( selectedValue );
-			} );
+				app.selectTheme(selectedValue);
+			});
 
 			// Add event listeners to the theme delete button.
-			el.$customThemeRemover
-				.off( 'click' )
-				.on( 'click', app.deleteThemeModal );
+			el.$customThemeRemover.off('click').on('click', app.deleteThemeModal);
 		},
 
 		/**
@@ -300,12 +310,12 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @param {string} value New attribute value.
 		 */
-		selectTheme( value ) {
-			if ( ! app.setFormTheme( value ) ) {
+		selectTheme(value) {
+			if (!app.setFormTheme(value)) {
 				return;
 			}
 
-			app.onSelectThemeWithBG( value );
+			app.onSelectThemeWithBG(value);
 		},
 
 		/**
@@ -317,39 +327,40 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @return {boolean} True on success.
 		 */
-		setFormTheme( themeSlug ) {
-			if ( app.maybeDisplayUpgradeModal( themeSlug ) ) {
+		setFormTheme(themeSlug) {
+			if (app.maybeDisplayUpgradeModal(themeSlug)) {
 				return false;
 			}
 
-			const theme = app.getTheme( themeSlug );
+			const theme = app.getTheme(themeSlug);
 
-			if ( ! theme?.settings ) {
+			if (!theme?.settings) {
 				return false;
 			}
 
-			const attributes = Object.keys( theme.settings );
-			const isCustomTheme = !! themesData.custom[ themeSlug ];
+			const attributes = Object.keys(theme.settings);
+			const isCustomTheme = !!themesData.custom[themeSlug];
 
 			// Set the theme settings.
-			WPFormsBuilderThemes.store.set( 'wpformsTheme', themeSlug );
-			WPFormsBuilderThemes.store.set( 'isCustomTheme', isCustomTheme ? 'true' : '' );
-			WPFormsBuilderThemes.store.set( 'themeName', isCustomTheme ? themesData.custom[ themeSlug ].name : '' );
+			WPFormsBuilderThemes.store.set('wpformsTheme', themeSlug);
+			WPFormsBuilderThemes.store.set('isCustomTheme', isCustomTheme ? 'true' : '');
+			WPFormsBuilderThemes.store.set(
+				'themeName',
+				isCustomTheme ? themesData.custom[themeSlug].name : ''
+			);
 
 			// Clean up the settings.
 			const cleanSettings = {};
 
-			for ( const key in attributes ) {
-				const attr = attributes[ key ];
-				const value = theme.settings[ attr ];
+			for (const key in attributes) {
+				const attr = attributes[key];
+				const value = theme.settings[attr];
 
-				cleanSettings[ attr ] = typeof value === 'string'
-					? value.replace( /px$/, '' )
-					: value;
+				cleanSettings[attr] = typeof value === 'string' ? value.replace(/px$/, '') : value;
 			}
 
 			// Update the theme settings.
-			app.updateStylesAtts( cleanSettings );
+			app.updateStylesAtts(cleanSettings);
 
 			//Reinit color pickers.
 			WPFormsBuilderThemes.common.loadColorPickers();
@@ -364,13 +375,13 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @param {string} themeSlug The theme slug.
 		 */
-		onSelectThemeWithBG( themeSlug ) {
-			if ( WPFormsBuilderThemes.stockPhotos.isPicturesAvailable() ) {
+		onSelectThemeWithBG(themeSlug) {
+			if (WPFormsBuilderThemes.stockPhotos.isPicturesAvailable()) {
 				return;
 			}
 
 			// Check only WPForms themes.
-			if ( ! app.isWPFormsTheme( themeSlug ) ) {
+			if (!app.isWPFormsTheme(themeSlug)) {
 				return;
 			}
 
@@ -378,11 +389,11 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 			 * @type {Object|null}
 			 * @property {Object|null} settings Settings.
 			 */
-			const theme = app.getTheme( themeSlug );
+			const theme = app.getTheme(themeSlug);
 			const bgUrl = theme.settings?.backgroundUrl;
 
-			if ( bgUrl?.length && bgUrl !== 'url()' ) {
-				WPFormsBuilderThemes.stockPhotos.installModal( 'themes' );
+			if (bgUrl?.length && bgUrl !== 'url()') {
+				WPFormsBuilderThemes.stockPhotos.installModal('themes');
 			}
 		},
 
@@ -393,29 +404,29 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @param {Object} themeSettings Theme settings.
 		 */
-		updateStylesAtts( themeSettings ) {
+		updateStylesAtts(themeSettings) {
 			const allowedKeys = WPFormsBuilderThemes.common.getStyleAttributesKeys();
 			const validSettings = {};
 
-			for ( const key in themeSettings ) {
-				if ( ! allowedKeys.includes( key ) ) {
+			for (const key in themeSettings) {
+				if (!allowedKeys.includes(key)) {
 					continue;
 				}
 
-				let value = themeSettings[ key ];
+				let value = themeSettings[key];
 
-				if ( key === 'backgroundUrl' && typeof value === 'string' ) {
-					value = app.getBackgroundUrl( value );
+				if (key === 'backgroundUrl' && typeof value === 'string') {
+					value = app.getBackgroundUrl(value);
 				}
 
-				validSettings[ key ] = value;
+				validSettings[key] = value;
 			}
 
 			// Update the settings.
-			if ( Object.keys( validSettings ).length ) {
-				Object.entries( validSettings ).forEach( ( [ key, value ] ) => {
-					WPFormsBuilderThemes.store.set( key, value );
-				} );
+			if (Object.keys(validSettings).length) {
+				Object.entries(validSettings).forEach(([key, value]) => {
+					WPFormsBuilderThemes.store.set(key, value);
+				});
 			}
 		},
 
@@ -428,9 +439,9 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @return {string} Extracted background image url.
 		 */
-		getBackgroundUrl( value ) {
-			const match = value.match( /^url\(\s*['"]?(.*?)['"]?\s*\)$/i );
-			return match?.[ 1 ] || 'url()';
+		getBackgroundUrl(value) {
+			const match = value.match(/^url\(\s*['"]?(.*?)['"]?\s*\)$/i);
+			return match?.[1] || 'url()';
 		},
 
 		/**
@@ -441,7 +452,7 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 * @return {Object} Themes data.
 		 */
 		getAllThemes() {
-			return { ...( themesData.custom || {} ), ...( themesData.wpforms || {} ) };
+			return { ...(themesData.custom || {}), ...(themesData.wpforms || {}) };
 		},
 
 		/**
@@ -453,8 +464,8 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @return {Object|null} Theme settings.
 		 */
-		getTheme( slug ) {
-			return app.getAllThemes()[ slug ] || null;
+		getTheme(slug) {
+			return app.getAllThemes()[slug] || null;
 		},
 
 		/**
@@ -465,22 +476,22 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 * @return {Object} Themes data.
 		 */
 		getEnabledThemes() {
-			if ( enabledThemes ) {
+			if (enabledThemes) {
 				return enabledThemes;
 			}
 
 			const allThemes = app.getAllThemes();
 
-			if ( isPro && isLicenseActive ) {
+			if (isPro && isLicenseActive) {
 				return allThemes;
 			}
 
-			enabledThemes = Object.keys( allThemes ).reduce( ( acc, key ) => {
-				if ( allThemes[ key ].settings?.fieldSize && ! allThemes[ key ].disabled ) {
-					acc[ key ] = allThemes[ key ];
+			enabledThemes = Object.keys(allThemes).reduce((acc, key) => {
+				if (allThemes[key].settings?.fieldSize && !allThemes[key].disabled) {
+					acc[key] = allThemes[key];
 				}
 				return acc;
-			}, {} );
+			}, {});
 
 			return enabledThemes;
 		},
@@ -493,14 +504,14 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 * @param {string} slug  Theme slug.
 		 * @param {Object} theme Theme settings.
 		 */
-		updateEnabledThemes( slug, theme ) {
-			if ( ! enabledThemes ) {
+		updateEnabledThemes(slug, theme) {
+			if (!enabledThemes) {
 				return;
 			}
 
 			enabledThemes = {
 				...enabledThemes,
-				[ slug ]: theme,
+				[slug]: theme,
 			};
 		},
 
@@ -513,8 +524,8 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @return {boolean} True if the theme is disabled.
 		 */
-		isDisabledTheme( slug ) {
-			return ! app.getEnabledThemes()?.[ slug ];
+		isDisabledTheme(slug) {
+			return !app.getEnabledThemes()?.[slug];
 		},
 
 		/**
@@ -526,8 +537,8 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @return {boolean} True if the theme is one of the WPForms themes.
 		 */
-		isWPFormsTheme( slug ) {
-			return Boolean( themesData.wpforms[ slug ]?.settings );
+		isWPFormsTheme(slug) {
+			return Boolean(themesData.wpforms[slug]?.settings);
 		},
 
 		/**
@@ -537,7 +548,7 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 */
 		fetchThemesData() {
 			// If a fetch is already in progress, exit the function.
-			if ( state.isFetchingThemes || themesData.wpforms ) {
+			if (state.isFetchingThemes || themesData.wpforms) {
 				return;
 			}
 
@@ -546,27 +557,27 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 
 			try {
 				// Fetch themes data.
-				wp.apiFetch( {
+				wp.apiFetch({
 					path: routeNamespace + 'themes/',
 					method: 'GET',
 					cache: 'no-cache',
-				} )
-					.then( ( response ) => {
+				})
+					.then((response) => {
 						themesData.wpforms = response.wpforms || {};
 						themesData.custom = response.custom || {};
 
-						el.$window.trigger( 'wpformsBuilderThemesDataLoaded' );
-					} )
-					.catch( ( error ) => {
+						el.$window.trigger('wpformsBuilderThemesDataLoaded');
+					})
+					.catch((error) => {
 						// eslint-disable-next-line no-console
-						console.error( error?.message );
-					} )
-					.finally( () => {
+						console.error(error?.message);
+					})
+					.finally(() => {
 						state.isFetchingThemes = false;
-					} );
-			} catch ( error ) {
+					});
+			} catch (error) {
 				// eslint-disable-next-line no-console
-				console.error( error );
+				console.error(error);
 			}
 		},
 
@@ -577,7 +588,7 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 */
 		saveCustomThemes() {
 			// Custom themes do not exist.
-			if ( state.isSavingThemes || ! themesData.custom || ! isAdmin ) {
+			if (state.isSavingThemes || !themesData.custom || !isAdmin) {
 				return;
 			}
 
@@ -586,27 +597,27 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 
 			try {
 				// Save themes.
-				wp.apiFetch( {
+				wp.apiFetch({
 					path: routeNamespace + 'themes/custom/',
 					method: 'POST',
 					data: { customThemes: themesData.custom },
-				} )
-					.then( ( response ) => {
-						if ( ! response?.result ) {
+				})
+					.then((response) => {
+						if (!response?.result) {
 							// eslint-disable-next-line no-console
-							console.log( response?.error );
+							console.log(response?.error);
 						}
-					} )
-					.catch( ( error ) => {
+					})
+					.catch((error) => {
 						// eslint-disable-next-line no-console
-						console.error( error?.message );
-					} )
-					.finally( () => {
+						console.error(error?.message);
+					})
+					.finally(() => {
 						state.isSavingThemes = false;
-					} );
-			} catch ( error ) {
+					});
+			} catch (error) {
 				// eslint-disable-next-line no-console
-				console.error( error );
+				console.error(error);
 			}
 		},
 
@@ -619,14 +630,15 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @return {Array} Current style attributes.
 		 */
-		getCurrentStyleAttributes( settings ) {
-			const defaultAttributes = Object.keys( themesData.wpforms.default?.settings );
+		getCurrentStyleAttributes(settings) {
+			const defaultAttributes = Object.keys(themesData.wpforms.default?.settings);
 			const currentStyleAttributes = {};
 
-			for ( const key in defaultAttributes ) {
-				const attr = defaultAttributes[ key ];
+			for (const key in defaultAttributes) {
+				const attr = defaultAttributes[key];
 
-				currentStyleAttributes[ attr ] = WPFormsBuilderThemes.common.prepareComplexAttrValues( settings[ attr ], attr ) ?? '';
+				currentStyleAttributes[attr] =
+					WPFormsBuilderThemes.common.prepareComplexAttrValues(settings[attr], attr) ?? '';
 			}
 
 			return currentStyleAttributes;
@@ -642,21 +654,22 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 */
 		maybeCreateCustomTheme() {
 			const settings = WPFormsBuilderThemes.getSettings();
-			const currentStyles = app.getCurrentStyleAttributes( settings );
-			const isWPFormsTheme = !! themesData.wpforms[ settings.wpformsTheme ];
-			const isCustomTheme = !! themesData.custom[ settings.wpformsTheme ];
+			const currentStyles = app.getCurrentStyleAttributes(settings);
+			const isWPFormsTheme = !!themesData.wpforms[settings.wpformsTheme];
+			const isCustomTheme = !!themesData.custom[settings.wpformsTheme];
 
 			// It is one of the default themes without any changes.
 			if (
 				isWPFormsTheme &&
-				app.getPreparedDefaultThemeSettings( themesData.wpforms[ settings.wpformsTheme ]?.settings ) === JSON.stringify( currentStyles )
+				app.getPreparedDefaultThemeSettings(themesData.wpforms[settings.wpformsTheme]?.settings) ===
+					JSON.stringify(currentStyles)
 			) {
 				return false;
 			}
 
 			// It is a modified default theme OR unknown custom theme.
-			if ( isWPFormsTheme || ! isCustomTheme ) {
-				app.createCustomTheme( settings, currentStyles );
+			if (isWPFormsTheme || !isCustomTheme) {
+				app.createCustomTheme(settings, currentStyles);
 			}
 
 			return true;
@@ -671,14 +684,14 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @return {string} Whether the custom theme is created.
 		 */
-		getPreparedDefaultThemeSettings( settings ) {
+		getPreparedDefaultThemeSettings(settings) {
 			const preparedSettings = {};
 
-			Object.keys( settings ).forEach( ( key ) => {
-				preparedSettings[ key ] = WPFormsBuilderThemes.common.removeRgbaSpaces( settings[ key ] );
-			} );
+			Object.keys(settings).forEach((key) => {
+				preparedSettings[key] = WPFormsBuilderThemes.common.removeRgbaSpaces(settings[key]);
+			});
 
-			return JSON.stringify( preparedSettings );
+			return JSON.stringify(preparedSettings);
 		},
 
 		/**
@@ -691,11 +704,11 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @return {boolean} Whether the custom theme is created.
 		 */
-		createCustomTheme( settings, currentStyles = null ) {
+		createCustomTheme(settings, currentStyles = null) {
 			let counter = 0;
 			let themeSlug = settings.wpformsTheme;
 
-			const baseTheme = app.getTheme( settings.wpformsTheme ) || themesData.wpforms.default;
+			const baseTheme = app.getTheme(settings.wpformsTheme) || themesData.wpforms.default;
 			let themeName = baseTheme.name;
 
 			themesData.custom = themesData.custom || {};
@@ -704,24 +717,24 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 			do {
 				counter++;
 				themeSlug = themeSlug + '-copy-' + counter;
-			} while ( themesData.custom[ themeSlug ] && counter < 10000 );
+			} while (themesData.custom[themeSlug] && counter < 10000);
 
 			const copyStr = counter < 2 ? strings.theme_copy : strings.theme_copy + ' ' + counter;
 
 			themeName += ' (' + copyStr + ')';
 
 			// Add the new custom theme.
-			themesData.custom[ themeSlug ] = {
+			themesData.custom[themeSlug] = {
 				name: themeName,
-				settings: currentStyles || app.getCurrentStyleAttributes( settings ),
+				settings: currentStyles || app.getCurrentStyleAttributes(settings),
 			};
 
-			app.updateEnabledThemes( themeSlug, themesData.custom[ themeSlug ] );
+			app.updateEnabledThemes(themeSlug, themesData.custom[themeSlug]);
 
 			// Update the settings with the new custom theme settings.
-			WPFormsBuilderThemes.store.set( 'wpformsTheme', themeSlug );
-			WPFormsBuilderThemes.store.set( 'isCustomTheme', 'true' );
-			WPFormsBuilderThemes.store.set( 'themeName', themeName );
+			WPFormsBuilderThemes.store.set('wpformsTheme', themeSlug);
+			WPFormsBuilderThemes.store.set('isCustomTheme', 'true');
+			WPFormsBuilderThemes.store.set('themeName', themeName);
 
 			app.updateThemesList();
 
@@ -736,34 +749,32 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 * @param {string} attribute Attribute name.
 		 * @param {string} value     New attribute value.
 		 */
-		updateCustomThemeAttribute( attribute, value ) {
+		updateCustomThemeAttribute(attribute, value) {
 			const settings = WPFormsBuilderThemes.getSettings();
 			const themeSlug = settings.wpformsTheme;
 
 			// Skip if it is one of the WPForms themes OR the attribute is not in the theme settings.
 			if (
-				themesData.wpforms[ themeSlug ] ||
-				(
-					attribute !== 'themeName' &&
-					! themesData.wpforms.default.settings[ attribute ]
-				)
+				themesData.wpforms[themeSlug] ||
+				(attribute !== 'themeName' && !themesData.wpforms.default.settings[attribute])
 			) {
 				return;
 			}
 
 			// Skip if the custom theme doesn't exist in some rare cases.
-			if ( ! themesData.custom[ themeSlug ] ) {
+			if (!themesData.custom[themeSlug]) {
 				return;
 			}
 
 			// Update the theme data.
-			if ( attribute === 'themeName' ) {
-				themesData.custom[ themeSlug ].name = value;
+			if (attribute === 'themeName') {
+				themesData.custom[themeSlug].name = value;
 			} else {
-				themesData.custom[ themeSlug ].settings = themesData.custom[ themeSlug ].settings || themesData.wpforms.default.settings;
-				themesData.custom[ themeSlug ].settings[ attribute ] = value;
+				themesData.custom[themeSlug].settings =
+					themesData.custom[themeSlug].settings || themesData.wpforms.default.settings;
+				themesData.custom[themeSlug].settings[attribute] = value;
 
-				app.maybeUpdateColorIndicator( attribute, value );
+				app.maybeUpdateColorIndicator(attribute, value);
 			}
 		},
 
@@ -774,17 +785,17 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @since 1.9.7
 		 */
-		maybeUpdateCustomTheme( key ) {
+		maybeUpdateCustomTheme(key) {
 			const settings = WPFormsBuilderThemes.getSettings();
 			const isCustomTheme = settings.isCustomTheme === 'true';
 
-			if ( ! isCustomTheme ) {
+			if (!isCustomTheme) {
 				return;
 			}
 
-			const attrValue = WPFormsBuilderThemes.common.prepareComplexAttrValues( settings[ key ], key );
+			const attrValue = WPFormsBuilderThemes.common.prepareComplexAttrValues(settings[key], key);
 
-			app.updateCustomThemeAttribute( key, attrValue );
+			app.updateCustomThemeAttribute(key, attrValue);
 		},
 
 		/**
@@ -795,19 +806,29 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @since 1.9.7
 		 */
-		maybeUpdateColorIndicator( settingKey, settingValue ) {
-			const colorSettingKeys = [ 'buttonBackgroundColor', 'buttonTextColor', 'labelColor', 'labelSublabelColor', 'fieldBorderColor' ];
+		maybeUpdateColorIndicator(settingKey, settingValue) {
+			const colorSettingKeys = [
+				'buttonBackgroundColor',
+				'buttonTextColor',
+				'labelColor',
+				'labelSublabelColor',
+				'fieldBorderColor',
+			];
 
-			if ( ! colorSettingKeys.includes( settingKey ) ) {
+			if (!colorSettingKeys.includes(settingKey)) {
 				return;
 			}
 
-			const $indicators = el.$themesControl.find( 'button.is-active .wpforms-builder-themes-indicators' );
-			const indicatorIndex = colorSettingKeys.indexOf( settingKey );
-			const $indicator = $indicators.find( `.component-color-indicator[data-index="${ indicatorIndex }"]` );
+			const $indicators = el.$themesControl.find(
+				'button.is-active .wpforms-builder-themes-indicators'
+			);
+			const indicatorIndex = colorSettingKeys.indexOf(settingKey);
+			const $indicator = $indicators.find(
+				`.component-color-indicator[data-index="${indicatorIndex}"]`
+			);
 
-			if ( $indicator.length ) {
-				$indicator.css( 'background-color', settingValue );
+			if ($indicator.length) {
+				$indicator.css('background-color', settingValue);
 			}
 		},
 
@@ -820,19 +841,23 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @return {boolean} True if modal was displayed.
 		 */
-		maybeDisplayUpgradeModal( themeSlug ) {
-			if ( ! app.isDisabledTheme( themeSlug ) ) {
+		maybeDisplayUpgradeModal(themeSlug) {
+			if (!app.isDisabledTheme(themeSlug)) {
 				return false;
 			}
 
-			if ( ! isPro ) {
-				WPFormsBuilderThemes.common.showProModal( 'themes', strings.pro_sections.themes );
+			if (!isPro) {
+				WPFormsBuilderThemes.common.showProModal('themes', strings.pro_sections.themes);
 
 				return true;
 			}
 
-			if ( ! isLicenseActive ) {
-				WPFormsBuilderThemes.common.showLicenseModal( 'themes', strings.pro_sections.themes, 'select-theme' );
+			if (!isLicenseActive) {
+				WPFormsBuilderThemes.common.showLicenseModal(
+					'themes',
+					strings.pro_sections.themes,
+					'select-theme'
+				);
 
 				return true;
 			}
@@ -847,8 +872,8 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @param {string} value New attribute value.
 		 */
-		changeThemeName( value ) {
-			app.updateCustomThemeAttribute( 'themeName', value );
+		changeThemeName(value) {
+			app.updateCustomThemeAttribute('themeName', value);
 		},
 
 		/**
@@ -858,9 +883,9 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @since 1.9.7
 		 */
-		deleteTheme( deleteThemeSlug ) {
+		deleteTheme(deleteThemeSlug) {
 			// Remove theme from the theme storage.
-			delete themesData.custom[ deleteThemeSlug ];
+			delete themesData.custom[deleteThemeSlug];
 		},
 
 		/**
@@ -870,16 +895,19 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 		 *
 		 * @param {Object} e Event object.
 		 */
-		deleteThemeModal( e ) {
+		deleteThemeModal(e) {
 			e.preventDefault();
 
 			const settings = WPFormsBuilderThemes.getSettings();
 			const selectedThemeSlug = settings.wpformsTheme;
-			const selectedThemeName = app.getTheme( selectedThemeSlug )?.name;
-			const confirm = strings.theme_delete_confirm.replace( '%1$s', `<b>${ _.escape( selectedThemeName ) }</b>` );
-			const content = `<p class="wpforms-theme-delete-text">${ confirm } ${ strings.theme_delete_cant_undone }</p>`;
+			const selectedThemeName = app.getTheme(selectedThemeSlug)?.name;
+			const confirm = strings.theme_delete_confirm.replace(
+				'%1$s',
+				`<b>${_.escape(selectedThemeName)}</b>`
+			);
+			const content = `<p class="wpforms-theme-delete-text">${confirm} ${strings.theme_delete_cant_undone}</p>`;
 
-			$.confirm( {
+			$.confirm({
 				title: strings.theme_delete_title,
 				content,
 				icon: 'wpforms-exclamation-circle',
@@ -888,19 +916,19 @@ export default function( document, window, $ ) { // eslint-disable-line max-line
 					confirm: {
 						text: strings.theme_delete_yes,
 						btnClass: 'btn-confirm',
-						keys: [ 'enter' ],
+						keys: ['enter'],
 						action() {
 							// Delete the theme and switch to the default theme.
-							app.deleteTheme( selectedThemeSlug );
-							app.selectTheme( 'default' );
+							app.deleteTheme(selectedThemeSlug);
+							app.selectTheme('default');
 						},
 					},
 					cancel: {
 						text: strings.cancel,
-						keys: [ 'esc' ],
+						keys: ['esc'],
 					},
 				},
-			} );
+			});
 		},
 	};
 

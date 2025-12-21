@@ -26,7 +26,7 @@
  *
  * @since 1.8.8
  */
-export default ( function( document, window, $ ) {
+export default (function (document, window, $) {
 	/**
 	 * WP core components.
 	 *
@@ -40,7 +40,13 @@ export default ( function( document, window, $ ) {
 	 *
 	 * @since 1.8.8
 	 */
-	const { isAdmin, isPro, isLicenseActive, strings, route_namespace: routeNamespace } = wpforms_gutenberg_form_selector;
+	const {
+		isAdmin,
+		isPro,
+		isLicenseActive,
+		strings,
+		route_namespace: routeNamespace,
+	} = wpforms_gutenberg_form_selector;
 
 	/**
 	 * Form selector common module.
@@ -104,11 +110,11 @@ export default ( function( document, window, $ ) {
 		 * @since 1.8.8
 		 */
 		init() {
-			el.$window = $( window );
+			el.$window = $(window);
 
 			app.fetchThemesData();
 
-			$( app.ready );
+			$(app.ready);
 		},
 
 		/**
@@ -126,30 +132,32 @@ export default ( function( document, window, $ ) {
 		 * @since 1.8.8
 		 */
 		events() {
-			wp.data.subscribe( function() { // eslint-disable-line complexity
-				if ( ! isAdmin ) {
+			wp.data.subscribe(function () {
+				// eslint-disable-line complexity
+				if (!isAdmin) {
 					return;
 				}
 
-				const isSavingPost = wp.data.select( 'core/editor' )?.isSavingPost();
-				const isAutosavingPost = wp.data.select( 'core/editor' )?.isAutosavingPost();
-				const isSavingWidget = wp.data.select( 'core/edit-widgets' )?.isSavingWidgetAreas();
-				const currentPost = wp.data.select( 'core/editor' )?.getCurrentPost();
-				const isBlockOrTemplate = currentPost?.type?.includes( 'wp_template' ) || currentPost?.type?.includes( 'wp_block' );
+				const isSavingPost = wp.data.select('core/editor')?.isSavingPost();
+				const isAutosavingPost = wp.data.select('core/editor')?.isAutosavingPost();
+				const isSavingWidget = wp.data.select('core/edit-widgets')?.isSavingWidgetAreas();
+				const currentPost = wp.data.select('core/editor')?.getCurrentPost();
+				const isBlockOrTemplate =
+					currentPost?.type?.includes('wp_template') || currentPost?.type?.includes('wp_block');
 
-				if ( ( ! isSavingPost && ! isSavingWidget && ! isBlockOrTemplate ) || isAutosavingPost ) {
+				if ((!isSavingPost && !isSavingWidget && !isBlockOrTemplate) || isAutosavingPost) {
 					return;
 				}
 
-				if ( isBlockOrTemplate ) {
+				if (isBlockOrTemplate) {
 					// Delay saving if this is FSE for better performance.
-					_.debounce( app.saveCustomThemes, 500 )();
+					_.debounce(app.saveCustomThemes, 500)();
 
 					return;
 				}
 
 				app.saveCustomThemes();
-			} );
+			});
 		},
 
 		/**
@@ -160,7 +168,7 @@ export default ( function( document, window, $ ) {
 		 * @return {Object} Themes data.
 		 */
 		getAllThemes() {
-			return { ...( themesData.custom || {} ), ...( themesData.wpforms || {} ) };
+			return { ...(themesData.custom || {}), ...(themesData.wpforms || {}) };
 		},
 
 		/**
@@ -172,8 +180,8 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {Object|null} Theme settings.
 		 */
-		getTheme( slug ) {
-			return app.getAllThemes()[ slug ] || null;
+		getTheme(slug) {
+			return app.getAllThemes()[slug] || null;
 		},
 
 		/**
@@ -184,22 +192,22 @@ export default ( function( document, window, $ ) {
 		 * @return {Object} Themes data.
 		 */
 		getEnabledThemes() {
-			if ( enabledThemes ) {
+			if (enabledThemes) {
 				return enabledThemes;
 			}
 
 			const allThemes = app.getAllThemes();
 
-			if ( isPro && isLicenseActive ) {
+			if (isPro && isLicenseActive) {
 				return allThemes;
 			}
 
-			enabledThemes = Object.keys( allThemes ).reduce( ( acc, key ) => {
-				if ( allThemes[ key ].settings?.fieldSize && ! allThemes[ key ].disabled ) {
-					acc[ key ] = allThemes[ key ];
+			enabledThemes = Object.keys(allThemes).reduce((acc, key) => {
+				if (allThemes[key].settings?.fieldSize && !allThemes[key].disabled) {
+					acc[key] = allThemes[key];
 				}
 				return acc;
-			}, {} );
+			}, {});
 
 			return enabledThemes;
 		},
@@ -212,14 +220,14 @@ export default ( function( document, window, $ ) {
 		 * @param {string} slug  Theme slug.
 		 * @param {Object} theme Theme settings.
 		 */
-		updateEnabledThemes( slug, theme ) {
-			if ( ! enabledThemes ) {
+		updateEnabledThemes(slug, theme) {
+			if (!enabledThemes) {
 				return;
 			}
 
 			enabledThemes = {
 				...enabledThemes,
-				[ slug ]: theme,
+				[slug]: theme,
 			};
 		},
 
@@ -232,8 +240,8 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {boolean} True if the theme is disabled.
 		 */
-		isDisabledTheme( slug ) {
-			return ! app.getEnabledThemes()?.[ slug ];
+		isDisabledTheme(slug) {
+			return !app.getEnabledThemes()?.[slug];
 		},
 
 		/**
@@ -245,8 +253,8 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {boolean} True if the theme is one of the WPForms themes.
 		 */
-		isWPFormsTheme( slug ) {
-			return Boolean( themesData.wpforms[ slug ]?.settings );
+		isWPFormsTheme(slug) {
+			return Boolean(themesData.wpforms[slug]?.settings);
 		},
 
 		/**
@@ -256,7 +264,7 @@ export default ( function( document, window, $ ) {
 		 */
 		fetchThemesData() {
 			// If a fetch is already in progress, exit the function.
-			if ( state.isFetchingThemes || themesData.wpforms ) {
+			if (state.isFetchingThemes || themesData.wpforms) {
 				return;
 			}
 
@@ -265,25 +273,25 @@ export default ( function( document, window, $ ) {
 
 			try {
 				// Fetch themes data.
-				wp.apiFetch( {
+				wp.apiFetch({
 					path: routeNamespace + 'themes/',
 					method: 'GET',
 					cache: 'no-cache',
-				} )
-					.then( ( response ) => {
+				})
+					.then((response) => {
 						themesData.wpforms = response.wpforms || {};
 						themesData.custom = response.custom || {};
-					} )
-					.catch( ( error ) => {
+					})
+					.catch((error) => {
 						// eslint-disable-next-line no-console
-						console.error( error?.message );
-					} )
-					.finally( () => {
+						console.error(error?.message);
+					})
+					.finally(() => {
 						state.isFetchingThemes = false;
-					} );
-			} catch ( error ) {
+					});
+			} catch (error) {
 				// eslint-disable-next-line no-console
-				console.error( error );
+				console.error(error);
 			}
 		},
 
@@ -294,7 +302,7 @@ export default ( function( document, window, $ ) {
 		 */
 		saveCustomThemes() {
 			// Custom themes do not exist.
-			if ( state.isSavingThemes || ! themesData.custom ) {
+			if (state.isSavingThemes || !themesData.custom) {
 				return;
 			}
 
@@ -303,27 +311,27 @@ export default ( function( document, window, $ ) {
 
 			try {
 				// Save themes.
-				wp.apiFetch( {
+				wp.apiFetch({
 					path: routeNamespace + 'themes/custom/',
 					method: 'POST',
 					data: { customThemes: themesData.custom },
-				} )
-					.then( ( response ) => {
-						if ( ! response?.result ) {
+				})
+					.then((response) => {
+						if (!response?.result) {
 							// eslint-disable-next-line no-console
-							console.log( response?.error );
+							console.log(response?.error);
 						}
-					} )
-					.catch( ( error ) => {
+					})
+					.catch((error) => {
 						// eslint-disable-next-line no-console
-						console.error( error?.message );
-					} )
-					.finally( () => {
+						console.error(error?.message);
+					})
+					.finally(() => {
 						state.isSavingThemes = false;
-					} );
-			} catch ( error ) {
+					});
+			} catch (error) {
 				// eslint-disable-next-line no-console
-				console.error( error );
+				console.error(error);
 			}
 		},
 
@@ -336,14 +344,14 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {boolean} Whether the custom theme is created.
 		 */
-		getCurrentStyleAttributes( props ) {
-			const defaultAttributes = Object.keys( themesData.wpforms.default?.settings );
+		getCurrentStyleAttributes(props) {
+			const defaultAttributes = Object.keys(themesData.wpforms.default?.settings);
 			const currentStyleAttributes = {};
 
-			for ( const key in defaultAttributes ) {
-				const attr = defaultAttributes[ key ];
+			for (const key in defaultAttributes) {
+				const attr = defaultAttributes[key];
 
-				currentStyleAttributes[ attr ] = props.attributes[ attr ] ?? '';
+				currentStyleAttributes[attr] = props.attributes[attr] ?? '';
 			}
 
 			return currentStyleAttributes;
@@ -358,32 +366,41 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {boolean} Whether the custom theme is created.
 		 */
-		maybeCreateCustomTheme( props ) { // eslint-disable-line complexity
-			const currentStyles = app.getCurrentStyleAttributes( props );
-			const isWPFormsTheme = !! themesData.wpforms[ props.attributes.theme ];
-			const isCustomTheme = !! themesData.custom[ props.attributes.theme ];
+		maybeCreateCustomTheme(props) {
+			// eslint-disable-line complexity
+			const currentStyles = app.getCurrentStyleAttributes(props);
+			const isWPFormsTheme = !!themesData.wpforms[props.attributes.theme];
+			const isCustomTheme = !!themesData.custom[props.attributes.theme];
 
 			let migrateToCustomTheme = false;
 
 			// It is one of the default themes without any changes.
 			if (
 				isWPFormsTheme &&
-				JSON.stringify( themesData.wpforms[ props.attributes.theme ]?.settings ) === JSON.stringify( currentStyles )
+				JSON.stringify(themesData.wpforms[props.attributes.theme]?.settings) ===
+					JSON.stringify(currentStyles)
 			) {
 				return false;
 			}
 
-			const prevAttributes = formSelectorCommon.getBlockRuntimeStateVar( props.clientId, 'prevAttributesState' );
+			const prevAttributes = formSelectorCommon.getBlockRuntimeStateVar(
+				props.clientId,
+				'prevAttributesState'
+			);
 
 			// It is a block added in FS 1.0, so it doesn't have a theme.
 			// The `prevAttributes` is `undefined` means that we are in the first render of the existing block.
-			if ( props.attributes.theme === 'default' && props.attributes.themeName === '' && ! prevAttributes ) {
+			if (
+				props.attributes.theme === 'default' &&
+				props.attributes.themeName === '' &&
+				!prevAttributes
+			) {
 				migrateToCustomTheme = true;
 			}
 
 			// It is a modified default theme OR unknown custom theme.
-			if ( isWPFormsTheme || ! isCustomTheme || migrateToCustomTheme ) {
-				app.createCustomTheme( props, currentStyles, migrateToCustomTheme );
+			if (isWPFormsTheme || !isCustomTheme || migrateToCustomTheme) {
+				app.createCustomTheme(props, currentStyles, migrateToCustomTheme);
 			}
 
 			return true;
@@ -400,16 +417,17 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {boolean} Whether the custom theme is created.
 		 */
-		createCustomTheme( props, currentStyles = null, migrateToCustomTheme = false ) { // eslint-disable-line complexity
+		createCustomTheme(props, currentStyles = null, migrateToCustomTheme = false) {
+			// eslint-disable-line complexity
 			let counter = 0;
 			let themeSlug = props.attributes.theme;
 
-			const baseTheme = app.getTheme( props.attributes.theme ) || themesData.wpforms.default;
+			const baseTheme = app.getTheme(props.attributes.theme) || themesData.wpforms.default;
 			let themeName = baseTheme.name;
 
 			themesData.custom = themesData.custom || {};
 
-			if ( migrateToCustomTheme ) {
+			if (migrateToCustomTheme) {
 				themeSlug = 'custom';
 				themeName = strings.theme_custom;
 			}
@@ -418,7 +436,7 @@ export default ( function( document, window, $ ) {
 			do {
 				counter++;
 				themeSlug = themeSlug + '-copy-' + counter;
-			} while ( themesData.custom[ themeSlug ] && counter < 10000 );
+			} while (themesData.custom[themeSlug] && counter < 10000);
 
 			const copyStr = counter < 2 ? strings.theme_copy : strings.theme_copy + ' ' + counter;
 
@@ -428,18 +446,18 @@ export default ( function( document, window, $ ) {
 			themeName = migrateToCustomTheme && counter < 2 ? strings.theme_custom : themeName;
 
 			// Add the new custom theme.
-			themesData.custom[ themeSlug ] = {
+			themesData.custom[themeSlug] = {
 				name: themeName,
-				settings: currentStyles || app.getCurrentStyleAttributes( props ),
+				settings: currentStyles || app.getCurrentStyleAttributes(props),
 			};
 
-			app.updateEnabledThemes( themeSlug, themesData.custom[ themeSlug ] );
+			app.updateEnabledThemes(themeSlug, themesData.custom[themeSlug]);
 
 			// Update the block attributes with the new custom theme settings.
-			props.setAttributes( {
+			props.setAttributes({
 				theme: themeSlug,
 				themeName,
-			} );
+			});
 
 			return true;
 		},
@@ -453,19 +471,20 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {string} New theme's slug.
 		 */
-		maybeCreateCustomThemeFromAttributes( attributes ) { // eslint-disable-line complexity
+		maybeCreateCustomThemeFromAttributes(attributes) {
+			// eslint-disable-line complexity
 			const newThemeSlug = attributes.theme;
-			const existingTheme = app.getTheme( attributes.theme );
-			const keys = Object.keys( attributes );
+			const existingTheme = app.getTheme(attributes.theme);
+			const keys = Object.keys(attributes);
 
-			let isExistingTheme = Boolean( existingTheme?.settings );
+			let isExistingTheme = Boolean(existingTheme?.settings);
 
 			// Check if the theme already exists and has the same settings.
-			if ( isExistingTheme ) {
-				for ( const i in keys ) {
-					const key = keys[ i ];
+			if (isExistingTheme) {
+				for (const i in keys) {
+					const key = keys[i];
 
-					if ( ! existingTheme.settings[ key ] || existingTheme.settings[ key ] !== attributes[ key ] ) {
+					if (!existingTheme.settings[key] || existingTheme.settings[key] !== attributes[key]) {
 						isExistingTheme = false;
 
 						break;
@@ -474,28 +493,28 @@ export default ( function( document, window, $ ) {
 			}
 
 			// The theme exists and has the same settings.
-			if ( isExistingTheme ) {
+			if (isExistingTheme) {
 				return newThemeSlug;
 			}
 
 			// The theme doesn't exist.
 			// Normalize the attributes to the default theme settings.
-			const defaultAttributes = Object.keys( themesData.wpforms.default.settings );
+			const defaultAttributes = Object.keys(themesData.wpforms.default.settings);
 			const newSettings = {};
 
-			for ( const i in defaultAttributes ) {
-				const attr = defaultAttributes[ i ];
+			for (const i in defaultAttributes) {
+				const attr = defaultAttributes[i];
 
-				newSettings[ attr ] = attributes[ attr ] ?? '';
+				newSettings[attr] = attributes[attr] ?? '';
 			}
 
 			// Create a new custom theme.
-			themesData.custom[ newThemeSlug ] = {
+			themesData.custom[newThemeSlug] = {
 				name: attributes.themeName ?? strings.theme_custom,
 				settings: newSettings,
 			};
 
-			app.updateEnabledThemes( newThemeSlug, themesData.custom[ newThemeSlug ] );
+			app.updateEnabledThemes(newThemeSlug, themesData.custom[newThemeSlug]);
 
 			return newThemeSlug;
 		},
@@ -509,36 +528,39 @@ export default ( function( document, window, $ ) {
 		 * @param {string} value     New attribute value.
 		 * @param {Object} props     Block properties.
 		 */
-		updateCustomThemeAttribute( attribute, value, props ) { // eslint-disable-line complexity
+		updateCustomThemeAttribute(attribute, value, props) {
+			// eslint-disable-line complexity
 			const themeSlug = props.attributes.theme;
 
 			// Skip if it is one of the WPForms themes OR the attribute is not in the theme settings.
 			if (
-				themesData.wpforms[ themeSlug ] ||
-				(
-					attribute !== 'themeName' &&
-					! themesData.wpforms.default.settings[ attribute ]
-				)
+				themesData.wpforms[themeSlug] ||
+				(attribute !== 'themeName' && !themesData.wpforms.default.settings[attribute])
 			) {
 				return;
 			}
 
 			// Skip if the custom theme doesn't exist.
 			// It should never happen, only in some unique circumstances.
-			if ( ! themesData.custom[ themeSlug ] ) {
+			if (!themesData.custom[themeSlug]) {
 				return;
 			}
 
 			// Update theme data.
-			if ( attribute === 'themeName' ) {
-				themesData.custom[ themeSlug ].name = value;
+			if (attribute === 'themeName') {
+				themesData.custom[themeSlug].name = value;
 			} else {
-				themesData.custom[ themeSlug ].settings = themesData.custom[ themeSlug ].settings || themesData.wpforms.default.settings;
-				themesData.custom[ themeSlug ].settings[ attribute ] = value;
+				themesData.custom[themeSlug].settings =
+					themesData.custom[themeSlug].settings || themesData.wpforms.default.settings;
+				themesData.custom[themeSlug].settings[attribute] = value;
 			}
 
 			// Trigger event for developers.
-			el.$window.trigger( 'wpformsFormSelectorUpdateTheme', [ themeSlug, themesData.custom[ themeSlug ], props ] );
+			el.$window.trigger('wpformsFormSelectorUpdateTheme', [
+				themeSlug,
+				themesData.custom[themeSlug],
+				props,
+			]);
 		},
 
 		/**
@@ -552,73 +574,91 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {Object} Themes panel JSX code.
 		 */
-		getThemesPanel( props, formSelectorCommonModule, stockPhotosModule ) { // eslint-disable-line max-lines-per-function, complexity
+		getThemesPanel(props, formSelectorCommonModule, stockPhotosModule) {
+			// eslint-disable-line max-lines-per-function, complexity
 			// Store common module in app.
 			formSelectorCommon = formSelectorCommonModule;
 			state.stockPhotos = stockPhotosModule;
 
 			// If there are no themes data, it is necessary to fetch it first.
-			if ( ! themesData.wpforms ) {
+			if (!themesData.wpforms) {
 				app.fetchThemesData();
 
 				// Return empty JSX code.
-				return ( <></> );
+				return <></>;
 			}
 
-			app.maybeAdjustTheme( props );
+			app.maybeAdjustTheme(props);
 
 			// Get event handlers.
-			const handlers = app.getEventHandlers( props );
-			const showCustomThemeOptions = isAdmin && formSelectorCommonModule.isFullStylingEnabled() && app.maybeCreateCustomTheme( props );
-			const checked = formSelectorCommonModule.isFullStylingEnabled() ? props.attributes.theme : 'classic';
-			const isLeadFormsEnabled = formSelectorCommonModule.isLeadFormsEnabled( formSelectorCommonModule.getBlockContainer( props ) );
+			const handlers = app.getEventHandlers(props);
+			const showCustomThemeOptions =
+				isAdmin &&
+				formSelectorCommonModule.isFullStylingEnabled() &&
+				app.maybeCreateCustomTheme(props);
+			const checked = formSelectorCommonModule.isFullStylingEnabled()
+				? props.attributes.theme
+				: 'classic';
+			const isLeadFormsEnabled = formSelectorCommonModule.isLeadFormsEnabled(
+				formSelectorCommonModule.getBlockContainer(props)
+			);
 			const displayLeadFormNotice = isLeadFormsEnabled ? 'block' : 'none';
 			const modernNoticeStyles = displayLeadFormNotice === 'block' ? { display: 'none' } : {};
 
-			let classes = formSelectorCommon.getPanelClass( props, 'themes' );
+			let classes = formSelectorCommon.getPanelClass(props, 'themes');
 
 			classes += isLeadFormsEnabled ? ' wpforms-lead-forms-enabled' : '';
 			classes += app.isMac() ? ' wpforms-is-mac' : '';
 
 			return (
-				<PanelBody className={ classes } title={ strings.themes }>
-					<p className="wpforms-gutenberg-panel-notice wpforms-warning wpforms-use-modern-notice" style={ modernNoticeStyles }>
-						<strong>{ strings.use_modern_notice_head }</strong>
-						{ strings.use_modern_notice_text } <a href={ strings.use_modern_notice_link } rel="noreferrer" target="_blank">{ strings.learn_more }</a>
+				<PanelBody className={classes} title={strings.themes}>
+					<p
+						className="wpforms-gutenberg-panel-notice wpforms-warning wpforms-use-modern-notice"
+						style={modernNoticeStyles}
+					>
+						<strong>{strings.use_modern_notice_head}</strong>
+						{strings.use_modern_notice_text}{' '}
+						<a href={strings.use_modern_notice_link} rel="noreferrer" target="_blank">
+							{strings.learn_more}
+						</a>
 					</p>
 
-					<p className="wpforms-gutenberg-panel-notice wpforms-warning wpforms-lead-form-notice" style={ { display: displayLeadFormNotice } }>
-						<strong>{ strings.lead_forms_panel_notice_head }</strong>
-						{ strings.lead_forms_panel_notice_text }
+					<p
+						className="wpforms-gutenberg-panel-notice wpforms-warning wpforms-lead-form-notice"
+						style={{ display: displayLeadFormNotice }}
+					>
+						<strong>{strings.lead_forms_panel_notice_head}</strong>
+						{strings.lead_forms_panel_notice_text}
 					</p>
 
 					<RadioGroup
 						className="wpforms-gutenberg-form-selector-themes-radio-group"
-						label={ strings.themes }
-						checked={ checked }
-						defaultChecked={ props.attributes.theme }
-						onChange={ ( value ) => handlers.selectTheme( value ) }
+						label={strings.themes}
+						checked={checked}
+						defaultChecked={props.attributes.theme}
+						onChange={(value) => handlers.selectTheme(value)}
 					>
-						{ app.getThemesItemsJSX( props ) }
+						{app.getThemesItemsJSX(props)}
 					</RadioGroup>
-					{ showCustomThemeOptions && (
+					{showCustomThemeOptions && (
 						<>
 							<TextControl
 								className="wpforms-gutenberg-form-selector-themes-theme-name"
-								label={ strings.theme_name }
-								value={ props.attributes.themeName }
-								onChange={ ( value ) => handlers.changeThemeName( value ) }
+								label={strings.theme_name}
+								value={props.attributes.themeName}
+								onChange={(value) => handlers.changeThemeName(value)}
 							/>
 
-							<Button isSecondary
+							<Button
+								isSecondary
 								className="wpforms-gutenberg-form-selector-themes-delete"
-								onClick={ handlers.deleteTheme }
+								onClick={handlers.deleteTheme}
 								buttonSettings=""
 							>
-								{ strings.theme_delete }
+								{strings.theme_delete}
 							</Button>
 						</>
-					) }
+					)}
 				</PanelBody>
 			);
 		},
@@ -630,16 +670,16 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @param {Object} props Block properties.
 		 */
-		maybeAdjustTheme( props ) {
+		maybeAdjustTheme(props) {
 			const prevTheme = props.attributes.theme;
-			const formData = app.getFormData( props );
-			const newTheme = props.attributes.theme || app.getThemeFromFormSettings( formData );
+			const formData = app.getFormData(props);
+			const newTheme = props.attributes.theme || app.getThemeFromFormSettings(formData);
 
 			props.attributes.theme = newTheme;
 
-			if ( prevTheme !== newTheme ) {
-				app.updateThemeSettings( props );
-				props.setAttributes( { themeName: app.getThemeNameFromFormSettings( formData ) } );
+			if (prevTheme !== newTheme) {
+				app.updateThemeSettings(props);
+				props.setAttributes({ themeName: app.getThemeNameFromFormSettings(formData) });
 			}
 		},
 
@@ -654,8 +694,8 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {string} Theme slug.
 		 */
-		getThemeFromFormSettings( formData ) {
-			if ( ! formData.settings?.themes || ! formData.settings.themes.wpformsTheme ) {
+		getThemeFromFormSettings(formData) {
+			if (!formData.settings?.themes || !formData.settings.themes.wpformsTheme) {
 				return 'default';
 			}
 
@@ -671,8 +711,8 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {string} Theme name.
 		 */
-		getThemeNameFromFormSettings( formData ) {
-			if ( ! formData.settings?.themes || ! formData.settings.themes.themeName ) {
+		getThemeNameFromFormSettings(formData) {
+			if (!formData.settings?.themes || !formData.settings.themes.themeName) {
 				return 'Default';
 			}
 
@@ -688,22 +728,22 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {Object} Form data.
 		 */
-		getFormData( props ) {
+		getFormData(props) {
 			const formList = wpforms_gutenberg_form_selector.forms;
 
 			// Narrow formList to the one that has an element with key 'ID' and value equal to props.attributes.formId (changed to number from string).
-			const form = formList.find( ( singleForm ) => singleForm.ID === Number( props.attributes.formId ) );
+			const form = formList.find((singleForm) => singleForm.ID === Number(props.attributes.formId));
 
-			if ( ! form || ! form.post_content ) {
+			if (!form || !form.post_content) {
 				return {};
 			}
 
 			let formData = {};
 			try {
-				formData = JSON.parse( form.post_content );
-			} catch ( error ) {
+				formData = JSON.parse(form.post_content);
+			} catch (error) {
 				// eslint-disable-next-line no-console
-				console.error( 'Invalid JSON in form.post_content:', error );
+				console.error('Invalid JSON in form.post_content:', error);
 
 				return {};
 			}
@@ -720,20 +760,22 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @param {Object} props Block properties.
 		 */
-		updateThemeSettings( props ) {
-			const themeSettings = themesData.wpforms[ props.attributes.theme ]?.settings || themesData.custom[ props.attributes.theme ]?.settings;
-			const commonHandlers = formSelectorCommon.getSettingsFieldsHandlers( props );
+		updateThemeSettings(props) {
+			const themeSettings =
+				themesData.wpforms[props.attributes.theme]?.settings ||
+				themesData.custom[props.attributes.theme]?.settings;
+			const commonHandlers = formSelectorCommon.getSettingsFieldsHandlers(props);
 
-			if ( themeSettings ) {
+			if (themeSettings) {
 				// For each themeSettings, if props.attributes with the same key exists, update the value.
-				for ( const key in themeSettings ) {
-					if ( key in props.attributes ) {
-						props.attributes[ key ] = themeSettings[ key ];
+				for (const key in themeSettings) {
+					if (key in props.attributes) {
+						props.attributes[key] = themeSettings[key];
 					}
 				}
 			}
 
-			state?.stockPhotos?.onSelectTheme( props.attributes.theme, props, app, commonHandlers );
+			state?.stockPhotos?.onSelectTheme(props.attributes.theme, props, app, commonHandlers);
 			commonHandlers.updateCopyPasteContent();
 		},
 
@@ -746,42 +788,40 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {Array} Themes items JSX code.
 		 */
-		getThemesItemsJSX( props ) { // eslint-disable-line complexity
+		getThemesItemsJSX(props) {
+			// eslint-disable-line complexity
 			const allThemesData = app.getAllThemes();
 
-			if ( ! allThemesData ) {
+			if (!allThemesData) {
 				return [];
 			}
 
 			const itemsJsx = [];
-			const themes = Object.keys( allThemesData );
+			const themes = Object.keys(allThemesData);
 			let theme, firstThemeSlug;
 
 			// Display the current custom theme at the top of the list.
-			if ( ! app.isWPFormsTheme( props.attributes.theme ) ) {
+			if (!app.isWPFormsTheme(props.attributes.theme)) {
 				firstThemeSlug = props.attributes.theme;
 
 				itemsJsx.push(
-					app.getThemesItemJSX(
-						props.attributes.theme,
-						app.getTheme( props.attributes.theme )
-					)
+					app.getThemesItemJSX(props.attributes.theme, app.getTheme(props.attributes.theme))
 				);
 			}
 
-			for ( const key in themes ) {
-				const slug = themes[ key ];
+			for (const key in themes) {
+				const slug = themes[key];
 
 				// Skip the first theme.
-				if ( firstThemeSlug && firstThemeSlug === slug ) {
+				if (firstThemeSlug && firstThemeSlug === slug) {
 					continue;
 				}
 
 				// Ensure that all the theme settings are present.
-				theme = { ...allThemesData.default, ...( allThemesData[ slug ] || {} ) };
-				theme.settings = { ...allThemesData.default.settings, ...( theme.settings || {} ) };
+				theme = { ...allThemesData.default, ...(allThemesData[slug] || {}) };
+				theme.settings = { ...allThemesData.default.settings, ...(theme.settings || {}) };
 
-				itemsJsx.push( app.getThemesItemJSX( slug, theme ) );
+				itemsJsx.push(app.getThemesItemJSX(slug, theme));
 			}
 
 			return itemsJsx;
@@ -797,32 +837,49 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {Object|null} Themes panel single item JSX code.
 		 */
-		getThemesItemJSX( slug, theme ) {
-			if ( ! theme ) {
+		getThemesItemJSX(slug, theme) {
+			if (!theme) {
 				return null;
 			}
 
 			const title = theme.name?.length > 0 ? theme.name : strings.theme_noname;
 			let radioClasses = 'wpforms-gutenberg-form-selector-themes-radio';
 
-			radioClasses += app.isDisabledTheme( slug ) ? ' wpforms-gutenberg-form-selector-themes-radio-disabled' : ' wpforms-gutenberg-form-selector-themes-radio-enabled';
+			radioClasses += app.isDisabledTheme(slug)
+				? ' wpforms-gutenberg-form-selector-themes-radio-disabled'
+				: ' wpforms-gutenberg-form-selector-themes-radio-enabled';
 
 			return (
-				<Radio
-					value={ slug }
-					title={ title }
-				>
-					<div
-						className={ radioClasses }
-					>
-						<div className="wpforms-gutenberg-form-selector-themes-radio-title">{ title }</div>
+				<Radio value={slug} title={title}>
+					<div className={radioClasses}>
+						<div className="wpforms-gutenberg-form-selector-themes-radio-title">{title}</div>
 					</div>
 					<div className="wpforms-gutenberg-form-selector-themes-indicators">
-						<ColorIndicator colorValue={ theme.settings.buttonBackgroundColor } title={ strings.button_background } data-index="0" />
-						<ColorIndicator colorValue={ theme.settings.buttonTextColor } title={ strings.button_text } data-index="1" />
-						<ColorIndicator colorValue={ theme.settings.labelColor } title={ strings.field_label } data-index="2" />
-						<ColorIndicator colorValue={ theme.settings.labelSublabelColor } title={ strings.field_sublabel } data-index="3" />
-						<ColorIndicator colorValue={ theme.settings.fieldBorderColor } title={ strings.field_border } data-index="4" />
+						<ColorIndicator
+							colorValue={theme.settings.buttonBackgroundColor}
+							title={strings.button_background}
+							data-index="0"
+						/>
+						<ColorIndicator
+							colorValue={theme.settings.buttonTextColor}
+							title={strings.button_text}
+							data-index="1"
+						/>
+						<ColorIndicator
+							colorValue={theme.settings.labelColor}
+							title={strings.field_label}
+							data-index="2"
+						/>
+						<ColorIndicator
+							colorValue={theme.settings.labelSublabelColor}
+							title={strings.field_sublabel}
+							data-index="3"
+						/>
+						<ColorIndicator
+							colorValue={theme.settings.fieldBorderColor}
+							title={strings.field_border}
+							data-index="4"
+						/>
 					</div>
 				</Radio>
 			);
@@ -838,34 +895,34 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {boolean} True on success.
 		 */
-		setBlockTheme( props, themeSlug ) {
-			if ( app.maybeDisplayUpgradeModal( themeSlug ) ) {
+		setBlockTheme(props, themeSlug) {
+			if (app.maybeDisplayUpgradeModal(themeSlug)) {
 				return false;
 			}
 
-			const theme = app.getTheme( themeSlug );
+			const theme = app.getTheme(themeSlug);
 
-			if ( ! theme?.settings ) {
+			if (!theme?.settings) {
 				return false;
 			}
 
-			const attributes = Object.keys( theme.settings );
-			const block = formSelectorCommon.getBlockContainer( props );
-			const container = block.querySelector( `#wpforms-${ props.attributes.formId }` );
+			const attributes = Object.keys(theme.settings);
+			const block = formSelectorCommon.getBlockContainer(props);
+			const container = block.querySelector(`#wpforms-${props.attributes.formId}`);
 
 			// Overwrite block attributes with the new theme settings.
 			// It is necessary to rely on the theme settings only.
 			const newProps = { ...props, attributes: { ...props.attributes, ...theme.settings } };
 
 			// Update the preview with the new theme settings.
-			for ( const key in attributes ) {
-				const attr = attributes[ key ];
+			for (const key in attributes) {
+				const attr = attributes[key];
 
-				theme.settings[ attr ] = theme.settings[ attr ] === '0' ? '0px' : theme.settings[ attr ];
+				theme.settings[attr] = theme.settings[attr] === '0' ? '0px' : theme.settings[attr];
 
 				formSelectorCommon.updatePreviewCSSVarValue(
 					attr,
-					theme.settings[ attr ],
+					theme.settings[attr],
 					container,
 					newProps
 				);
@@ -878,13 +935,13 @@ export default ( function( document, window, $ ) {
 				...theme.settings,
 			};
 
-			if ( props.setAttributes ) {
+			if (props.setAttributes) {
 				// Update the block attributes with the new theme settings.
-				props.setAttributes( setAttributes );
+				props.setAttributes(setAttributes);
 			}
 
 			// Trigger event for developers.
-			el.$window.trigger( 'wpformsFormSelectorSetTheme', [ block, themeSlug, props ] );
+			el.$window.trigger('wpformsFormSelectorSetTheme', [block, themeSlug, props]);
 
 			return true;
 		},
@@ -898,19 +955,19 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @return {boolean} True if modal was displayed.
 		 */
-		maybeDisplayUpgradeModal( themeSlug ) {
-			if ( ! app.isDisabledTheme( themeSlug ) ) {
+		maybeDisplayUpgradeModal(themeSlug) {
+			if (!app.isDisabledTheme(themeSlug)) {
 				return false;
 			}
 
-			if ( ! isPro ) {
-				formSelectorCommon.education.showProModal( 'themes', strings.themes );
+			if (!isPro) {
+				formSelectorCommon.education.showProModal('themes', strings.themes);
 
 				return true;
 			}
 
-			if ( ! isLicenseActive ) {
-				formSelectorCommon.education.showLicenseModal( 'themes', strings.themes, 'select-theme' );
+			if (!isLicenseActive) {
+				formSelectorCommon.education.showLicenseModal('themes', strings.themes, 'select-theme');
 
 				return true;
 			}
@@ -927,8 +984,9 @@ export default ( function( document, window, $ ) {
 		 *
 		 * @type {Object}
 		 */
-		getEventHandlers( props ) { // eslint-disable-line max-lines-per-function
-			const commonHandlers = formSelectorCommon.getSettingsFieldsHandlers( props );
+		getEventHandlers(props) {
+			// eslint-disable-line max-lines-per-function
+			const commonHandlers = formSelectorCommon.getSettingsFieldsHandlers(props);
 
 			const handlers = {
 				/**
@@ -938,21 +996,21 @@ export default ( function( document, window, $ ) {
 				 *
 				 * @param {string} value New attribute value.
 				 */
-				selectTheme( value ) {
-					if ( ! app.setBlockTheme( props, value ) ) {
+				selectTheme(value) {
+					if (!app.setBlockTheme(props, value)) {
 						return;
 					}
 
 					// Maybe open a Stock Photo installation window.
-					state?.stockPhotos?.onSelectTheme( value, props, app, commonHandlers );
+					state?.stockPhotos?.onSelectTheme(value, props, app, commonHandlers);
 
-					const block = formSelectorCommon.getBlockContainer( props );
+					const block = formSelectorCommon.getBlockContainer(props);
 
-					formSelectorCommon.setTriggerServerRender( false );
+					formSelectorCommon.setTriggerServerRender(false);
 					commonHandlers.updateCopyPasteContent();
 
 					// Trigger event for developers.
-					el.$window.trigger( 'wpformsFormSelectorSelectTheme', [ block, props, value ] );
+					el.$window.trigger('wpformsFormSelectorSelectTheme', [block, props, value]);
 				},
 
 				/**
@@ -962,11 +1020,11 @@ export default ( function( document, window, $ ) {
 				 *
 				 * @param {string} value New attribute value.
 				 */
-				changeThemeName( value ) {
-					formSelectorCommon.setTriggerServerRender( false );
-					props.setAttributes( { themeName: value } );
+				changeThemeName(value) {
+					formSelectorCommon.setTriggerServerRender(false);
+					props.setAttributes({ themeName: value });
 
-					app.updateCustomThemeAttribute( 'themeName', value, props );
+					app.updateCustomThemeAttribute('themeName', value, props);
 				},
 
 				/**
@@ -978,10 +1036,10 @@ export default ( function( document, window, $ ) {
 					const deleteThemeSlug = props.attributes.theme;
 
 					// Remove theme from the theme storage.
-					delete themesData.custom[ deleteThemeSlug ];
+					delete themesData.custom[deleteThemeSlug];
 
 					// Open the confirmation modal window.
-					app.deleteThemeModal( props, deleteThemeSlug, handlers );
+					app.deleteThemeModal(props, deleteThemeSlug, handlers);
 				},
 			};
 
@@ -997,11 +1055,14 @@ export default ( function( document, window, $ ) {
 		 * @param {string} deleteThemeSlug Theme slug.
 		 * @param {Object} handlers        Block event handlers.
 		 */
-		deleteThemeModal( props, deleteThemeSlug, handlers ) {
-			const confirm = strings.theme_delete_confirm.replace( '%1$s', `<b>${ props.attributes.themeName }</b>` );
-			const content = `<p class="wpforms-theme-delete-text">${ confirm } ${ strings.theme_delete_cant_undone }</p>`;
+		deleteThemeModal(props, deleteThemeSlug, handlers) {
+			const confirm = strings.theme_delete_confirm.replace(
+				'%1$s',
+				`<b>${props.attributes.themeName}</b>`
+			);
+			const content = `<p class="wpforms-theme-delete-text">${confirm} ${strings.theme_delete_cant_undone}</p>`;
 
-			$.confirm( {
+			$.confirm({
 				title: strings.theme_delete_title,
 				content,
 				icon: 'wpforms-exclamation-circle',
@@ -1010,21 +1071,21 @@ export default ( function( document, window, $ ) {
 					confirm: {
 						text: strings.theme_delete_yes,
 						btnClass: 'btn-confirm',
-						keys: [ 'enter' ],
+						keys: ['enter'],
 						action() {
 							// Switch to the default theme.
-							handlers.selectTheme( 'default' );
+							handlers.selectTheme('default');
 
 							// Trigger event for developers.
-							el.$window.trigger( 'wpformsFormSelectorDeleteTheme', [ deleteThemeSlug, props ] );
+							el.$window.trigger('wpformsFormSelectorDeleteTheme', [deleteThemeSlug, props]);
 						},
 					},
 					cancel: {
 						text: strings.cancel,
-						keys: [ 'esc' ],
+						keys: ['esc'],
 					},
 				},
-			} );
+			});
 		},
 
 		/**
@@ -1033,7 +1094,7 @@ export default ( function( document, window, $ ) {
 		 * @return {boolean} True if the user is on a Mac.
 		 */
 		isMac() {
-			return navigator.userAgent.includes( 'Macintosh' );
+			return navigator.userAgent.includes('Macintosh');
 		},
 	};
 
@@ -1041,4 +1102,4 @@ export default ( function( document, window, $ ) {
 
 	// Provide access to public functions/properties.
 	return app;
-}( document, window, jQuery ) );
+})(document, window, jQuery);

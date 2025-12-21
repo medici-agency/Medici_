@@ -13,7 +13,8 @@
  *
  * @return {Function} The app cloning function.
  */
-export default function() { // eslint-disable-line no-unused-vars, max-lines-per-function
+export default function () {
+	// eslint-disable-line no-unused-vars, max-lines-per-function
 	/**
 	 * Public functions and properties.
 	 *
@@ -52,38 +53,35 @@ export default function() { // eslint-disable-line no-unused-vars, max-lines-per
 		 * @return {Promise} The fetch result data promise.
 		 */
 		// eslint-disable-next-line complexity
-		async ajax( data ) {
-			if ( ! data.nonce ) {
+		async ajax(data) {
+			if (!data.nonce) {
 				data.nonce = wpforms_ai_chat_element.nonce;
 			}
 
 			const options = {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-				body: new URLSearchParams( data ).toString(),
+				body: new URLSearchParams(data).toString(),
 			};
 
-			const response = await fetch( wpforms_ai_chat_element.ajaxurl, options )
-				.catch( ( error ) => {
-					if ( error.message === 'Failed to fetch' ) {
-						throw new Error( wpforms_ai_chat_element.errors.network );
-					} else {
-						throw new Error( error.message );
-					}
-				} );
+			const response = await fetch(wpforms_ai_chat_element.ajaxurl, options).catch((error) => {
+				if (error.message === 'Failed to fetch') {
+					throw new Error(wpforms_ai_chat_element.errors.network);
+				} else {
+					throw new Error(error.message);
+				}
+			});
 
-			if ( ! response.ok ) {
-				throw new Error( wpforms_ai_chat_element.errors.network );
+			if (!response.ok) {
+				throw new Error(wpforms_ai_chat_element.errors.network);
 			}
 
 			const result = await response.json();
 
-			if ( ! result.success || result.data?.error ) {
-				throw new Error(
-					result.data?.error ?? wpforms_ai_chat_element.errors.default,
-					{
-						cause: result.data?.code ?? 400,
-					} );
+			if (!result.success || result.data?.error) {
+				throw new Error(result.data?.error ?? wpforms_ai_chat_element.errors.default, {
+					cause: result.data?.code ?? 400,
+				});
 			}
 
 			return result.data;
@@ -97,17 +95,17 @@ export default function() { // eslint-disable-line no-unused-vars, max-lines-per
 		 *
 		 * @return {Promise} The response data in promise.
 		 */
-		async prompt( prompt, sessionId ) {
+		async prompt(prompt, sessionId) {
 			const data = {
-				action: app.actions[ this.mode ] ?? app.actions.choices,
+				action: app.actions[this.mode] ?? app.actions.choices,
 				prompt,
 			};
 
-			if ( sessionId ) {
+			if (sessionId) {
 				data.session_id = sessionId; // eslint-disable-line camelcase
 			}
 
-			return app.ajax( data );
+			return app.ajax(data);
 		},
 
 		/**
@@ -118,14 +116,14 @@ export default function() { // eslint-disable-line no-unused-vars, max-lines-per
 		 *
 		 * @return {Promise} The response data in promise.
 		 */
-		async rate( helpful, responseId ) {
+		async rate(helpful, responseId) {
 			const data = {
 				action: app.actions.rate,
 				helpful,
 				response_id: responseId, // eslint-disable-line camelcase
 			};
 
-			return app.ajax( data );
+			return app.ajax(data);
 		},
 
 		setUp() {
@@ -146,7 +144,7 @@ export default function() { // eslint-disable-line no-unused-vars, max-lines-per
 		 *
 		 * @return {Object} The app object.
 		 */
-		setMode( mode ) {
+		setMode(mode) {
 			this.mode = mode;
 
 			return this;
@@ -162,9 +160,9 @@ export default function() { // eslint-disable-line no-unused-vars, max-lines-per
 	 *
 	 * @return {Object} Cloned app object.
 	 */
-	return function( mode ) {
+	return function (mode) {
 		const obj = { ...app };
 
-		return obj.setUp().setMode( mode );
+		return obj.setUp().setMode(mode);
 	};
 }

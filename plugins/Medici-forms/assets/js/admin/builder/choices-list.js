@@ -12,16 +12,16 @@ const WPFormsChoicesList = {
 	 *
 	 * @param {jQuery} $container The container element with checkboxes.
 	 */
-	init( $container ) {
-		if ( $container.data( 'choices-list-initialized' ) ) {
+	init($container) {
+		if ($container.data('choices-list-initialized')) {
 			return;
 		}
 
-		$container.data( 'choices-list-initialized', true );
+		$container.data('choices-list-initialized', true);
 
 		// Private variables to store state.
-		const $selectAllCheckbox = $container.find( 'input[value="select-all"]' );
-		const $itemCheckboxes = $container.find( '.item-checkbox' );
+		const $selectAllCheckbox = $container.find('input[value="select-all"]');
+		const $itemCheckboxes = $container.find('.item-checkbox');
 
 		/**
 		 * Checks if the container has the necessary elements to initialize.
@@ -32,9 +32,9 @@ const WPFormsChoicesList = {
 		 *
 		 * @return {boolean} True if the root container contains specific elements required for initialization, otherwise false.
 		 */
-		const canInitialize = ( $rootContainer ) => {
-			const hasSelectAll = $rootContainer.find( 'input[value="select-all"]' ).length > 0;
-			const hasItemCheckboxes = $rootContainer.find( '.item-checkbox' ).length > 0;
+		const canInitialize = ($rootContainer) => {
+			const hasSelectAll = $rootContainer.find('input[value="select-all"]').length > 0;
+			const hasItemCheckboxes = $rootContainer.find('.item-checkbox').length > 0;
 			return hasSelectAll && hasItemCheckboxes;
 		};
 
@@ -46,7 +46,7 @@ const WPFormsChoicesList = {
 		 * @since 1.9.6.1
 		 */
 		const updateSelectAllState = () => {
-			this.updateSelectAllState( $container );
+			this.updateSelectAllState($container);
 		};
 
 		/**
@@ -58,14 +58,14 @@ const WPFormsChoicesList = {
 		 *
 		 * @param {Event} event The event object associated with the change event triggered on the "Select All" checkbox.
 		 */
-		const handleSelectAllChange = ( event ) => {
-			const isChecked = jQuery( event.target ).prop( 'checked' );
+		const handleSelectAllChange = (event) => {
+			const isChecked = jQuery(event.target).prop('checked');
 
 			// Update all item checkboxes.
-			$itemCheckboxes.prop( 'checked', isChecked );
+			$itemCheckboxes.prop('checked', isChecked);
 
 			// Clear indeterminate state.
-			$selectAllCheckbox.prop( 'indeterminate', false );
+			$selectAllCheckbox.prop('indeterminate', false);
 		};
 
 		/**
@@ -75,14 +75,14 @@ const WPFormsChoicesList = {
 		 */
 		const bindEvents = () => {
 			// Add event listener to "select all" checkbox.
-			$selectAllCheckbox.on( 'change', handleSelectAllChange );
+			$selectAllCheckbox.on('change', handleSelectAllChange);
 
 			// Add event listeners to item checkboxes.
-			$itemCheckboxes.on( 'change', updateSelectAllState );
+			$itemCheckboxes.on('change', updateSelectAllState);
 		};
 
 		// Return early if required elements aren't found.
-		if ( ! canInitialize( $container ) ) {
+		if (!canInitialize($container)) {
 			return;
 		}
 
@@ -101,31 +101,31 @@ const WPFormsChoicesList = {
 	 *
 	 * @param {jQuery} $container The container element with checkboxes.
 	 */
-	updateSelectAllState( $container ) {
-		const $selectAllCheckbox = $container.find( 'input[value="select-all"]' );
-		const $itemCheckboxes = $container.find( '.item-checkbox' );
+	updateSelectAllState($container) {
+		const $selectAllCheckbox = $container.find('input[value="select-all"]');
+		const $itemCheckboxes = $container.find('.item-checkbox');
 
 		const totalItems = $itemCheckboxes.length;
-		const checkedItems = $itemCheckboxes.filter( ':checked' ).length;
+		const checkedItems = $itemCheckboxes.filter(':checked').length;
 
-		if ( checkedItems === 0 ) {
+		if (checkedItems === 0) {
 			// None checked.
-			$selectAllCheckbox.prop( {
+			$selectAllCheckbox.prop({
 				checked: false,
 				indeterminate: false,
-			} );
-		} else if ( checkedItems === totalItems ) {
+			});
+		} else if (checkedItems === totalItems) {
 			// All checked.
-			$selectAllCheckbox.prop( {
+			$selectAllCheckbox.prop({
 				checked: true,
 				indeterminate: false,
-			} );
+			});
 		} else {
 			// Some checked.
-			$selectAllCheckbox.prop( {
+			$selectAllCheckbox.prop({
 				checked: false,
 				indeterminate: true,
-			} );
+			});
 		}
 	},
 };

@@ -16,106 +16,108 @@ import fieldStyles from '../../../../js/integrations/gutenberg/modules/field-sty
  */
 const WPForms = window.WPForms || {};
 
-WPForms.FormSelector = WPForms.FormSelector || ( function() {
-	/**
-	 * Public functions and properties.
-	 *
-	 * @since 1.8.8
-	 *
-	 * @type {Object}
-	 */
-	const app = {
+WPForms.FormSelector =
+	WPForms.FormSelector ||
+	(function () {
 		/**
-		 * Common module object.
+		 * Public functions and properties.
 		 *
 		 * @since 1.8.8
 		 *
 		 * @type {Object}
 		 */
-		common: {},
+		const app = {
+			/**
+			 * Common module object.
+			 *
+			 * @since 1.8.8
+			 *
+			 * @type {Object}
+			 */
+			common: {},
 
-		/**
-		 * Panel modules objects.
-		 *
-		 * @since 1.8.8
-		 *
-		 * @type {Object}
-		 */
-		panels: {},
+			/**
+			 * Panel modules objects.
+			 *
+			 * @since 1.8.8
+			 *
+			 * @type {Object}
+			 */
+			panels: {},
 
-		/**
-		 * Start the engine.
-		 *
-		 * @since 1.8.8
-		 */
-		init() {
-			app.education = education;
-			app.common = common;
-			app.panels.themes = themesPanel;
-			app.panels.container = containerStyles;
-			app.panels.background = backgroundStyles;
-			app.panels.button = buttonStyles;
-			app.panels.advanced = advancedSettings;
-			app.panels.field = fieldStyles;
+			/**
+			 * Start the engine.
+			 *
+			 * @since 1.8.8
+			 */
+			init() {
+				app.education = education;
+				app.common = common;
+				app.panels.themes = themesPanel;
+				app.panels.container = containerStyles;
+				app.panels.background = backgroundStyles;
+				app.panels.button = buttonStyles;
+				app.panels.advanced = advancedSettings;
+				app.panels.field = fieldStyles;
 
-			const blockOptions = {
-				panels: app.panels,
-				getThemesPanel: app.panels.themes.getThemesPanel,
-				getFieldStyles: app.panels.field.getFieldStyles,
-				getContainerStyles: app.panels.container.getContainerStyles,
-				getBackgroundStyles: app.panels.background.getBackgroundStyles,
-				getButtonStyles: app.panels.button.getButtonStyles,
-				getCommonAttributes: app.getCommonAttributes,
-				setStylesHandlers: app.getStyleHandlers(),
-				education: app.education,
-			};
+				const blockOptions = {
+					panels: app.panels,
+					getThemesPanel: app.panels.themes.getThemesPanel,
+					getFieldStyles: app.panels.field.getFieldStyles,
+					getContainerStyles: app.panels.container.getContainerStyles,
+					getBackgroundStyles: app.panels.background.getBackgroundStyles,
+					getButtonStyles: app.panels.button.getButtonStyles,
+					getCommonAttributes: app.getCommonAttributes,
+					setStylesHandlers: app.getStyleHandlers(),
+					education: app.education,
+				};
 
-			// Initialize Advanced Settings module.
-			app.panels.advanced.init( app.common );
+				// Initialize Advanced Settings module.
+				app.panels.advanced.init(app.common);
 
-			// Initialize block.
-			app.common.init( blockOptions );
-		},
+				// Initialize block.
+				app.common.init(blockOptions);
+			},
 
-		/**
-		 * Get style handlers.
-		 *
-		 * @since 1.8.8
-		 *
-		 * @return {Object} Style handlers.
-		 */
-		getCommonAttributes() {
-			return {
-				...app.panels.field.getBlockAttributes(),
-				...app.panels.container.getBlockAttributes(),
-				...app.panels.background.getBlockAttributes(),
-				...app.panels.button.getBlockAttributes(),
-			};
-		},
+			/**
+			 * Get style handlers.
+			 *
+			 * @since 1.8.8
+			 *
+			 * @return {Object} Style handlers.
+			 */
+			getCommonAttributes() {
+				return {
+					...app.panels.field.getBlockAttributes(),
+					...app.panels.container.getBlockAttributes(),
+					...app.panels.background.getBlockAttributes(),
+					...app.panels.button.getBlockAttributes(),
+				};
+			},
 
-		/**
-		 * Get style handlers.
-		 *
-		 * @since 1.8.8
-		 *
-		 * @return {Object} Style handlers.
-		 */
-		getStyleHandlers() {
-			return {
-				'background-image': app.panels.background.setContainerBackgroundImage,
-				'background-position': app.panels.background.setContainerBackgroundPosition,
-				'background-repeat': app.panels.background.setContainerBackgroundRepeat,
-				'background-width': app.panels.background.setContainerBackgroundWidth,
-				'background-height': app.panels.background.setContainerBackgroundHeight,
-				'background-color': app.panels.background.setBackgroundColor,
-				'background-url': app.panels.background.setBackgroundUrl,
-			};
-		},
-	};
+			/**
+			 * Get style handlers.
+			 *
+			 * @since 1.8.8
+			 *
+			 * @return {Object} Style handlers.
+			 */
+			getStyleHandlers() {
+				return {
+					'background-image': app.panels.background.setContainerBackgroundImage,
+					'background-position': app.panels.background.setContainerBackgroundPosition,
+					'background-repeat': app.panels.background.setContainerBackgroundRepeat,
+					'background-width': app.panels.background.setContainerBackgroundWidth,
+					'background-height': app.panels.background.setContainerBackgroundHeight,
+					'background-color': app.panels.background.setBackgroundColor,
+					'background-url': app.panels.background.setBackgroundUrl,
+				};
+			},
+		};
 
-	// Provide access to public functions/properties.
-	return app;
-}() );
+		// Provide access to public functions/properties.
+		return app;
+	})();
 
 // Initialize.
 WPForms.FormSelector.init();

@@ -7,251 +7,279 @@
  *
  * @since 1.7.6
  */
-var WPFormsInternalInformationField = window.WPFormsInternalInformationField || ( function( document, window, $ ) { // eslint-disable-line
-
-	/**
-	 * WPForms builder element.
-	 *
-	 * @since 1.7.6
-	 *
-	 * @type {jQuery}
-	 */
-	let $builder;
-
-	/**
-	 * Public functions and properties.
-	 *
-	 * @since 1.7.6
-	 *
-	 * @type {object}
-	 */
-	let app = {
+var WPFormsInternalInformationField =
+	window.WPFormsInternalInformationField ||
+	(function (document, window, $) {
+		// eslint-disable-line
 
 		/**
-		 * Start the engine.
-		 *
-		 * @since 1.7.6
-		 */
-		init: function() {
-
-			$( app.ready );
-		},
-
-		/**
-		 * Initialized once the DOM is fully loaded.
-		 *
-		 * @since 1.7.6
-		 */
-		ready: function() {
-
-			$builder = $( '#wpforms-builder' );
-
-			app.bindUIActionsFields();
-		},
-
-		/**
-		 * Element bindings.
-		 *
-		 * @since 1.7.6
-		 */
-		bindUIActionsFields: function() {
-
-			app.dragDisable();
-
-			$builder
-				.on( 'wpformsFieldAdd', app.dragDisable )
-				.on( 'input', '.wpforms-field-option-row-heading input[type="text"]', app.headingUpdates )
-				.on( 'input', '.wpforms-field-option-row-expanded-description textarea', app.expandedDescriptionUpdates )
-				.on( 'input', '.wpforms-field-option-row-cta-label input[type="text"]', app.ctaButtonLabelUpdates )
-				.on( 'input', '.wpforms-field-option-row-cta-link input[type="text"]', app.ctaButtonLinkUpdates )
-				.on( 'click', '.cta-button.cta-expand-description a', app.showExpandedDescription )
-				.on( 'focusout', '.wpforms-field-option-row-cta-link input[type="text"]', app.validateCTAlinkField )
-				.on( 'mousedown', '.wpforms-field-internal-information-checkbox', app.handleCheckboxClick )
-				.on( 'wpformsDescriptionFieldUpdated', app.descriptionFieldUpdated )
-				.on( 'wpformsBeforeFieldDeleteAlert', app.preventDeleteFieldAlert )
-				.on( 'mouseenter', '.internal-information-not-editable .wpforms-field-delete', app.showDismissTitle );
-		},
-
-		/**
-		 * Save checkbox state as a post meta.
+		 * WPForms builder element.
 		 *
 		 * @since 1.7.6
 		 *
-		 * @param {string} name    Checkbox name.
-		 * @param {int}    checked Checkbox state.
+		 * @type {jQuery}
 		 */
-		saveInternalInformationCheckbox: function( name, checked ) {
+		let $builder;
 
-			$.post(
-				wpforms_builder.ajax_url,
-				{
+		/**
+		 * Public functions and properties.
+		 *
+		 * @since 1.7.6
+		 *
+		 * @type {object}
+		 */
+		let app = {
+			/**
+			 * Start the engine.
+			 *
+			 * @since 1.7.6
+			 */
+			init: function () {
+				$(app.ready);
+			},
+
+			/**
+			 * Initialized once the DOM is fully loaded.
+			 *
+			 * @since 1.7.6
+			 */
+			ready: function () {
+				$builder = $('#wpforms-builder');
+
+				app.bindUIActionsFields();
+			},
+
+			/**
+			 * Element bindings.
+			 *
+			 * @since 1.7.6
+			 */
+			bindUIActionsFields: function () {
+				app.dragDisable();
+
+				$builder
+					.on('wpformsFieldAdd', app.dragDisable)
+					.on('input', '.wpforms-field-option-row-heading input[type="text"]', app.headingUpdates)
+					.on(
+						'input',
+						'.wpforms-field-option-row-expanded-description textarea',
+						app.expandedDescriptionUpdates
+					)
+					.on(
+						'input',
+						'.wpforms-field-option-row-cta-label input[type="text"]',
+						app.ctaButtonLabelUpdates
+					)
+					.on(
+						'input',
+						'.wpforms-field-option-row-cta-link input[type="text"]',
+						app.ctaButtonLinkUpdates
+					)
+					.on('click', '.cta-button.cta-expand-description a', app.showExpandedDescription)
+					.on(
+						'focusout',
+						'.wpforms-field-option-row-cta-link input[type="text"]',
+						app.validateCTAlinkField
+					)
+					.on('mousedown', '.wpforms-field-internal-information-checkbox', app.handleCheckboxClick)
+					.on('wpformsDescriptionFieldUpdated', app.descriptionFieldUpdated)
+					.on('wpformsBeforeFieldDeleteAlert', app.preventDeleteFieldAlert)
+					.on(
+						'mouseenter',
+						'.internal-information-not-editable .wpforms-field-delete',
+						app.showDismissTitle
+					);
+			},
+
+			/**
+			 * Save checkbox state as a post meta.
+			 *
+			 * @since 1.7.6
+			 *
+			 * @param {string} name    Checkbox name.
+			 * @param {int}    checked Checkbox state.
+			 */
+			saveInternalInformationCheckbox: function (name, checked) {
+				$.post(wpforms_builder.ajax_url, {
 					action: 'wpforms_builder_save_internal_information_checkbox',
-					formId: $( '#wpforms-builder-form' ).data( 'id' ),
+					formId: $('#wpforms-builder-form').data('id'),
 					name: name,
 					checked: checked,
 					nonce: wpforms_builder.nonce,
+				});
+			},
+
+			/**
+			 * Replace checkboxes.
+			 *
+			 * @since 1.7.6
+			 * @since 1.7.9 Added ID parameter.
+			 *
+			 * @param {string} description Expanded description.
+			 * @param {int}    id          Field ID.
+			 *
+			 * @returns {string} Expanded description with checkboxes HTML.
+			 */
+			replaceCheckboxes: function (description, id) {
+				const lines = description.split(/\r?\n/),
+					replaced = [],
+					needle = '[] ';
+
+				let lineNumber = -1;
+
+				for (let line of lines) {
+					lineNumber++;
+					line = line.trim();
+
+					if (!line.startsWith(needle)) {
+						replaced.push(line);
+
+						continue;
+					}
+
+					const hash = md5(line),
+						name = `iif-${id}-${hash}-${lineNumber}`;
+
+					line = line.replace(
+						'[] ',
+						`<div class="wpforms-field-internal-information-checkbox-wrap"><div class="wpforms-field-internal-information-checkbox-input"><input type="checkbox" name="${name}" value="1" class="wpforms-field-internal-information-checkbox" /></div><div class="wpforms-field-internal-information-checkbox-label">`
+					);
+					line += '</div></div>';
+
+					replaced.push(line);
 				}
-			);
-		},
 
-		/**
-		 * Replace checkboxes.
-		 *
-		 * @since 1.7.6
-		 * @since 1.7.9 Added ID parameter.
-		 *
-		 * @param {string} description Expanded description.
-		 * @param {int}    id          Field ID.
-		 *
-		 * @returns {string} Expanded description with checkboxes HTML.
-		 */
-		replaceCheckboxes: function( description, id ) {
+				return wpf.wpautop(replaced.join('\n')).replace(/<br \/>\n$/, '');
+			},
 
-			const lines  = description.split( /\r?\n/ ),
-				replaced = [],
-				needle   = '[] ';
+			/**
+			 * Do not allow field to be draggable.
+			 *
+			 * @since 1.7.9
+			 */
+			dragDisable: function () {
+				WPForms.Admin.Builder.DragFields.fieldDragDisable(
+					$('.internal-information-not-draggable'),
+					false
+				);
+			},
 
-			let lineNumber = -1;
+			/**
+			 * Real-time updates for "Heading" field option.
+			 *
+			 * @since 1.7.6
+			 */
+			headingUpdates: function () {
+				let $this = $(this),
+					value = wpf.sanitizeHTML($this.val()),
+					$head = $('#wpforms-field-' + $this.parent().data('field-id')).find(
+						'.wpforms-field-internal-information-row-heading .heading'
+					);
 
-			for ( let line of lines ) {
+				$head.toggle(value.length !== 0);
+				WPFormsBuilder.updateDescription($head.find('.text'), value);
+			},
 
-				lineNumber++;
-				line = line.trim();
+			/**
+			 * Real-time updates for "Expanded Description" field option.
+			 *
+			 * @since 1.7.6
+			 */
+			expandedDescriptionUpdates: function () {
+				const $this = $(this),
+					value = wpf.sanitizeHTML($this.val()),
+					id = $this.parent().data('field-id'),
+					$field = $('#wpforms-field-' + id),
+					$wrapper = $field.find('.internal-information-wrap'),
+					$buttonContainer = $field.find('.wpforms-field-internal-information-row-cta-button'),
+					$options = $('#wpforms-field-option-' + id),
+					link = $options.find('.wpforms-field-option-row-cta-link input[type="text"]').val(),
+					label =
+						$options.find('.wpforms-field-option-row-cta-label input[type="text"]').val().length !==
+						0
+							? $options.find('.wpforms-field-option-row-cta-label input[type="text"]').val()
+							: wpforms_builder.empty_label,
+					$expandable = $wrapper.find(
+						'.wpforms-field-internal-information-row-expanded-description'
+					);
 
-				if ( ! line.startsWith( needle ) ) {
-					replaced.push( line );
+				const newLines = app.replaceCheckboxes(value, id);
 
-					continue;
-				}
+				WPFormsBuilder.updateDescription($wrapper.find('.expanded-description'), newLines);
 
-				const hash = md5( line ),
-					name = `iif-${id}-${hash}-${lineNumber}`;
+				if (value.length !== 0) {
+					// Expanded description has content.
+					if ($expandable.hasClass('expanded')) {
+						return;
+					}
 
-				line = line.replace( '[] ', `<div class="wpforms-field-internal-information-checkbox-wrap"><div class="wpforms-field-internal-information-checkbox-input"><input type="checkbox" name="${name}" value="1" class="wpforms-field-internal-information-checkbox" /></div><div class="wpforms-field-internal-information-checkbox-label">` );				line += '</div></div>';
+					// Update CTA button.
+					$buttonContainer.html(app.notExpandedButton());
 
-				replaced.push( line );
-			}
-
-			return ( wpf.wpautop( replaced.join( '\n' ) ) ).replace( /<br \/>\n$/, '' );
-		},
-
-		/**
-		 * Do not allow field to be draggable.
-		 *
-		 * @since 1.7.9
-		 */
-		dragDisable: function() {
-
-			WPForms.Admin.Builder.DragFields.fieldDragDisable( $( '.internal-information-not-draggable' ), false );
-		},
-
-		/**
-		 * Real-time updates for "Heading" field option.
-		 *
-		 * @since 1.7.6
-		 */
-		headingUpdates: function() {
-
-			let $this = $( this ),
-				value = wpf.sanitizeHTML( $this.val() ),
-				$head = $( '#wpforms-field-' + $this.parent().data( 'field-id' ) ).find( '.wpforms-field-internal-information-row-heading .heading' );
-
-			$head.toggle( value.length !== 0 );
-			WPFormsBuilder.updateDescription( $head.find( '.text' ), value );
-		},
-
-		/**
-		 * Real-time updates for "Expanded Description" field option.
-		 *
-		 * @since 1.7.6
-		 */
-		expandedDescriptionUpdates: function() {
-
-			const $this          = $( this ),
-				value            = wpf.sanitizeHTML( $this.val() ),
-				id               = $this.parent().data( 'field-id' ),
-				$field           = $( '#wpforms-field-' + id ),
-				$wrapper         = $field.find( '.internal-information-wrap' ),
-				$buttonContainer = $field.find( '.wpforms-field-internal-information-row-cta-button' ),
-				$options         = $( '#wpforms-field-option-' + id ),
-				link             = $options.find( '.wpforms-field-option-row-cta-link input[type="text"]' ).val(),
-				label            = $options.find( '.wpforms-field-option-row-cta-label input[type="text"]' ).val().length !== 0 ? $options.find( '.wpforms-field-option-row-cta-label input[type="text"]' ).val() : wpforms_builder.empty_label,
-				$expandable      = $wrapper.find( '.wpforms-field-internal-information-row-expanded-description' );
-
-			const newLines = app.replaceCheckboxes( value, id );
-
-			WPFormsBuilder.updateDescription( $wrapper.find( '.expanded-description' ), newLines );
-
-			if ( value.length !== 0 ) { // Expanded description has content.
-				if ( $expandable.hasClass( 'expanded' ) ) {
 					return;
 				}
 
-				// Update CTA button.
-				$buttonContainer.html( app.notExpandedButton() );
+				$expandable.hide().removeClass('expanded');
 
-				return;
-			}
+				if (link.length === 0) {
+					// Expanded description does not have value and button has no link.
+					$buttonContainer.html('');
 
-			$expandable.hide().removeClass( 'expanded' );
+					return;
+				}
 
-			if ( link.length === 0 ) { // Expanded description does not have value and button has no link.
-				$buttonContainer.html( '' );
+				$buttonContainer.html(app.standardCtaButton(link, label));
+			},
 
-				return;
-			}
+			/**
+			 * Expand additional description on button click.
+			 *
+			 * @since 1.7.6
+			 *
+			 * @param {object} event Click event.
+			 */
+			showExpandedDescription: function (event) {
+				event.preventDefault();
 
-			$buttonContainer.html( app.standardCtaButton( link, label ) );
-		},
+				const $this = $(this),
+					id = $this.closest('.wpforms-field-internal-information').data('field-id'),
+					$expandable = $this
+						.closest('.internal-information-content')
+						.find('.wpforms-field-internal-information-row-expanded-description'),
+					$buttonContainer = $('#wpforms-field-' + id).find(
+						'.wpforms-field-internal-information-row-cta-button'
+					),
+					isExpanded = $expandable.hasClass('expanded');
 
-		/**
-		 * Expand additional description on button click.
-		 *
-		 * @since 1.7.6
-		 *
-		 * @param {object} event Click event.
-		 */
-		showExpandedDescription: function( event ) {
+				$expandable.toggleClass('expanded');
 
-			event.preventDefault();
+				if (!isExpanded) {
+					$expandable.slideDown(400);
+					$buttonContainer.html(app.expandedButton());
 
-			const $this          = $( this ),
-				id               = $this.closest( '.wpforms-field-internal-information' ).data( 'field-id' ),
-				$expandable      = $this.closest( '.internal-information-content' ).find( '.wpforms-field-internal-information-row-expanded-description' ),
-				$buttonContainer = $( '#wpforms-field-' + id ).find( '.wpforms-field-internal-information-row-cta-button' ),
-				isExpanded       = $expandable.hasClass( 'expanded' );
+					return;
+				}
 
-			$expandable.toggleClass( 'expanded' );
+				$expandable.slideUp(400);
+				$buttonContainer.html(app.notExpandedButton());
+			},
 
-			if ( ! isExpanded ) {
-				$expandable.slideDown( 400 );
-				$buttonContainer.html( app.expandedButton() );
+			/**
+			 * Validate if the CTA Link field has correct url.
+			 *
+			 * @since 1.7.6
+			 */
+			validateCTAlinkField: function () {
+				const $field = $(this),
+					url = $field.val().trim();
 
-				return;
-			}
+				$field.val(url);
 
-			$expandable.slideUp( 400 );
-			$buttonContainer.html( app.notExpandedButton() );
-		},
+				if (url === '' || wpf.isURL(url)) {
+					return;
+				}
 
-		/**
-		 * Validate if the CTA Link field has correct url.
-		 *
-		 * @since 1.7.6
-		 */
-		validateCTAlinkField: function() {
-
-			const $field = $( this ),
-				url      = $field.val().trim();
-
-			$field.val( url );
-
-			if ( url === '' || wpf.isURL( url ) ) {
-				return;
-			}
-
-			$.confirm(
-				{
+				$.confirm({
 					title: wpforms_builder.heads_up,
 					content: wpforms_builder.iif_redirect_url_field_error,
 					icon: 'fa fa-exclamation-circle',
@@ -260,190 +288,192 @@ var WPFormsInternalInformationField = window.WPFormsInternalInformationField || 
 						confirm: {
 							text: wpforms_builder.ok,
 							btnClass: 'btn-confirm',
-							keys: [ 'enter' ],
-							action: function() {
-								$field.trigger( 'focus' );
+							keys: ['enter'],
+							action: function () {
+								$field.trigger('focus');
 							},
 						},
 					},
-				}
-			);
-		},
+				});
+			},
 
-		/**
-		 * Handle checkbox checking.
-		 *
-		 * @since 1.7.6
-		 *
-		 * @param {object} event Click event.
-		 */
-		handleCheckboxClick: function( event ) {
-
-			event.preventDefault();
-
-			const $this = $( this ),
-				checked = ! $this.prop( 'checked' );
-
-			$this.prop( 'checked', checked );
-
-			app.saveInternalInformationCheckbox( $this.prop( 'name' ), Number( checked ) );
-		},
-
-		/**
-		 * Replace checkboxes on description field.
-		 *
-		 * @since 1.7.6
-		 *
-		 * @param {object} event Triggered event.
-		 * @param {object} data  Field element and field value.
-		 */
-		descriptionFieldUpdated: function( event, data ) {
-
-			const type = $( '#wpforms-field-' + data.id ).data( 'field-type' );
-
-			if ( type !== 'internal-information' || data.value.length === 0 ) {
-				return;
-			}
-
-			data.value = app.replaceCheckboxes( data.value, data.id );
-
-			WPFormsBuilder.updateDescription( data.descField, data.value );
-		},
-
-		/**
-		 * Prevent delete field alert to show.
-		 *
-		 * @since 1.7.6
-		 *
-		 * @param {object} event     Triggered event.
-		 * @param {object} fieldData Field data.
-		 * @param {string} type      Field type.
-		 */
-		preventDeleteFieldAlert: function( event, fieldData, type ) {
-
-			if ( type === 'internal-information' ) {
+			/**
+			 * Handle checkbox checking.
+			 *
+			 * @since 1.7.6
+			 *
+			 * @param {object} event Click event.
+			 */
+			handleCheckboxClick: function (event) {
 				event.preventDefault();
-				WPFormsBuilder.fieldDeleteById( fieldData.id, type, 50 );
-			}
-		},
 
-		/**
-		 * Replace Delete field button title with Dismiss.
-		 *
-		 * @since 1.7.6
-		 */
-		showDismissTitle: function() {
+				const $this = $(this),
+					checked = !$this.prop('checked');
 
-			$( this ).attr( 'title', wpforms_builder.iif_dismiss );
-		},
+				$this.prop('checked', checked);
 
-		/**
-		 * Real-time updates for "CTA button" link.
-		 *
-		 * @since 1.7.6
-		 */
-		ctaButtonLinkUpdates() {
+				app.saveInternalInformationCheckbox($this.prop('name'), Number(checked));
+			},
 
-			let $this            = $( this ),
-				id               = $this.parent().data( 'field-id' ),
-				$field           = $( '#wpforms-field-' + id ),
-				$buttonContainer = $field.find( '.wpforms-field-internal-information-row-cta-button' ),
-				$expandable      = $field.find( '.wpforms-field-internal-information-row-expanded-description' ),
-				desc             = $this.closest( '#wpforms-field-option-' + id ).find( '.wpforms-field-option-row-expanded-description textarea' ).val(),
-				label            = $this.closest( '#wpforms-field-option-' + id ).find( '.wpforms-field-option-row-cta-label input[type="text"]' ).val();
+			/**
+			 * Replace checkboxes on description field.
+			 *
+			 * @since 1.7.6
+			 *
+			 * @param {object} event Triggered event.
+			 * @param {object} data  Field element and field value.
+			 */
+			descriptionFieldUpdated: function (event, data) {
+				const type = $('#wpforms-field-' + data.id).data('field-type');
 
-			if ( desc.length !== 0 ) {
-
-				if ( $expandable.hasClass( 'expanded' ) ) {
-
-					$buttonContainer.html( app.expandedButton() );
-
-					return;
-				}
-				$buttonContainer.html( app.notExpandedButton() );
-
-				return;
-			}
-
-			if ( wpf.isURL( $this.val() ) && label.length !== 0 ) {
-				$buttonContainer.html( app.standardCtaButton( $this.val(), label ) );
-
-				return;
-			}
-
-			$buttonContainer.html( '' );
-		},
-
-		/**
-		 * Real-time updates for "CTA button" label.
-		 *
-		 * @since 1.7.6
-		 */
-		ctaButtonLabelUpdates: function() {
-
-			let $this            = $( this ),
-				value            = wpf.sanitizeHTML( $this.val() ),
-				id               = $this.parent().data( 'field-id' ),
-				$field           = $( '#wpforms-field-' + id ),
-				$buttonContainer = $field.find( '.wpforms-field-internal-information-row-cta-button' ),
-				$expandable      = $field.find( '.wpforms-field-internal-information-row-expanded-description' ),
-				desc             = $this.closest( '#wpforms-field-option-' + id ).find( '.wpforms-field-option-row-expanded-description textarea' ).val(),
-				link             = $this.closest( '#wpforms-field-option-' + id ).find( '.wpforms-field-option-row-cta-link input[type="text"]' ).val();
-
-			if ( desc.length !== 0 && value.length !== 0 ) {
-				if ( $expandable.hasClass( 'expanded' ) ) {
-
-					$buttonContainer.html( app.expandedButton() );
-
+				if (type !== 'internal-information' || data.value.length === 0) {
 					return;
 				}
 
-				$buttonContainer.html( app.notExpandedButton() );
+				data.value = app.replaceCheckboxes(data.value, data.id);
 
-				return;
-			}
+				WPFormsBuilder.updateDescription(data.descField, data.value);
+			},
 
-			if ( value.length !== 0 && wpf.isURL( link ) ) {
-				$buttonContainer.html( app.standardCtaButton( link, value ) );
+			/**
+			 * Prevent delete field alert to show.
+			 *
+			 * @since 1.7.6
+			 *
+			 * @param {object} event     Triggered event.
+			 * @param {object} fieldData Field data.
+			 * @param {string} type      Field type.
+			 */
+			preventDeleteFieldAlert: function (event, fieldData, type) {
+				if (type === 'internal-information') {
+					event.preventDefault();
+					WPFormsBuilder.fieldDeleteById(fieldData.id, type, 50);
+				}
+			},
 
-				return;
-			}
+			/**
+			 * Replace Delete field button title with Dismiss.
+			 *
+			 * @since 1.7.6
+			 */
+			showDismissTitle: function () {
+				$(this).attr('title', wpforms_builder.iif_dismiss);
+			},
 
-			if ( desc.length === 0 ) {
-				$buttonContainer.html( '' );
-			}
-		},
+			/**
+			 * Real-time updates for "CTA button" link.
+			 *
+			 * @since 1.7.6
+			 */
+			ctaButtonLinkUpdates() {
+				let $this = $(this),
+					id = $this.parent().data('field-id'),
+					$field = $('#wpforms-field-' + id),
+					$buttonContainer = $field.find('.wpforms-field-internal-information-row-cta-button'),
+					$expandable = $field.find('.wpforms-field-internal-information-row-expanded-description'),
+					desc = $this
+						.closest('#wpforms-field-option-' + id)
+						.find('.wpforms-field-option-row-expanded-description textarea')
+						.val(),
+					label = $this
+						.closest('#wpforms-field-option-' + id)
+						.find('.wpforms-field-option-row-cta-label input[type="text"]')
+						.val();
 
-		/**
-		 * Standard CTA button template.
-		 *
-		 * @since 1.7.6
-		 *
-		 * @param {string} url   Button URL.
-		 * @param {string} label Button label.
-		 *
-		 * @returns {string} Button HTML.
-		 */
-		standardCtaButton: function( url, label ) {
+				if (desc.length !== 0) {
+					if ($expandable.hasClass('expanded')) {
+						$buttonContainer.html(app.expandedButton());
 
-			let button = `<div class="cta-button cta-link-external ">
+						return;
+					}
+					$buttonContainer.html(app.notExpandedButton());
+
+					return;
+				}
+
+				if (wpf.isURL($this.val()) && label.length !== 0) {
+					$buttonContainer.html(app.standardCtaButton($this.val(), label));
+
+					return;
+				}
+
+				$buttonContainer.html('');
+			},
+
+			/**
+			 * Real-time updates for "CTA button" label.
+			 *
+			 * @since 1.7.6
+			 */
+			ctaButtonLabelUpdates: function () {
+				let $this = $(this),
+					value = wpf.sanitizeHTML($this.val()),
+					id = $this.parent().data('field-id'),
+					$field = $('#wpforms-field-' + id),
+					$buttonContainer = $field.find('.wpforms-field-internal-information-row-cta-button'),
+					$expandable = $field.find('.wpforms-field-internal-information-row-expanded-description'),
+					desc = $this
+						.closest('#wpforms-field-option-' + id)
+						.find('.wpforms-field-option-row-expanded-description textarea')
+						.val(),
+					link = $this
+						.closest('#wpforms-field-option-' + id)
+						.find('.wpforms-field-option-row-cta-link input[type="text"]')
+						.val();
+
+				if (desc.length !== 0 && value.length !== 0) {
+					if ($expandable.hasClass('expanded')) {
+						$buttonContainer.html(app.expandedButton());
+
+						return;
+					}
+
+					$buttonContainer.html(app.notExpandedButton());
+
+					return;
+				}
+
+				if (value.length !== 0 && wpf.isURL(link)) {
+					$buttonContainer.html(app.standardCtaButton(link, value));
+
+					return;
+				}
+
+				if (desc.length === 0) {
+					$buttonContainer.html('');
+				}
+			},
+
+			/**
+			 * Standard CTA button template.
+			 *
+			 * @since 1.7.6
+			 *
+			 * @param {string} url   Button URL.
+			 * @param {string} label Button label.
+			 *
+			 * @returns {string} Button HTML.
+			 */
+			standardCtaButton: function (url, label) {
+				let button = `<div class="cta-button cta-link-external ">
 				<a href="%url%" target="_blank" rel="noopener noreferrer">
 					<span class="button-label">%label%</span>
 				</a></div>`;
 
-			return button.replace( '%url%', wpf.sanitizeHTML( url ) ).replace( '%label%', wpf.sanitizeHTML( label ) );
-		},
+				return button
+					.replace('%url%', wpf.sanitizeHTML(url))
+					.replace('%label%', wpf.sanitizeHTML(label));
+			},
 
-		/**
-		 * Not expanded button.
-		 *
-		 * @since 1.7.6
-		 *
-		 * @returns {string} Not expanded button HTML.
-		 */
-		notExpandedButton: function() {
-
-			let button = `<div class="cta-button cta-expand-description not-expanded">
+			/**
+			 * Not expanded button.
+			 *
+			 * @since 1.7.6
+			 *
+			 * @returns {string} Not expanded button HTML.
+			 */
+			notExpandedButton: function () {
+				let button = `<div class="cta-button cta-expand-description not-expanded">
 				<a href="#" target="_blank" rel="noopener noreferrer">
 					<span class="button-label">%label%</span>
 					<span class="icon not-expanded">
@@ -454,19 +484,18 @@ var WPFormsInternalInformationField = window.WPFormsInternalInformationField || 
 					</span>
 				</a></div>`;
 
-			return button.replace( '%label%', wpforms_builder.iif_more );
-		},
+				return button.replace('%label%', wpforms_builder.iif_more);
+			},
 
-		/**
-		 * Expanded button.
-		 *
-		 * @since 1.7.6
-		 *
-		 * @returns {string} Expanded button HTML.
-		 */
-		expandedButton: function() {
-
-			let button = `<div class="cta-button cta-expand-description expanded">
+			/**
+			 * Expanded button.
+			 *
+			 * @since 1.7.6
+			 *
+			 * @returns {string} Expanded button HTML.
+			 */
+			expandedButton: function () {
+				let button = `<div class="cta-button cta-expand-description expanded">
 				<a href="#" target="_blank" rel="noopener noreferrer">
 					<span class="button-label">%label%</span>
 					<span class="icon expanded">
@@ -476,11 +505,11 @@ var WPFormsInternalInformationField = window.WPFormsInternalInformationField || 
 					</span>
 				</a></div>`;
 
-			return button.replace( '%label%', wpforms_builder.close );
-		},
-	};
+				return button.replace('%label%', wpforms_builder.close);
+			},
+		};
 
-	return app;
-}( document, window, jQuery ) );
+		return app;
+	})(document, window, jQuery);
 
 WPFormsInternalInformationField.init();

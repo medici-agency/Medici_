@@ -4,9 +4,8 @@
  * @param wpforms_settings.address_field.list_countries_without_states
  */
 
-( function( window, $ ) {
+(function (window, $) {
 	const app = {
-
 		/**
 		 * List of countries without states.
 		 *
@@ -22,9 +21,8 @@
 		 * @since 1.9.5
 		 */
 		init() {
-			$( window ).on( 'load', app.onLoad );
-			$( document )
-				.on( 'wpformsRepeaterFieldCloneCreated', app.setChangeHandlers );
+			$(window).on('load', app.onLoad);
+			$(document).on('wpformsRepeaterFieldCloneCreated', app.setChangeHandlers);
 		},
 
 		/**
@@ -35,7 +33,7 @@
 		onLoad() {
 			app.noStateCountries = wpforms_settings?.address_field?.list_countries_without_states || [];
 
-			if ( ! app.noStateCountries.length ) {
+			if (!app.noStateCountries.length) {
 				return;
 			}
 
@@ -48,21 +46,19 @@
 		 * @since 1.9.5
 		 */
 		setChangeHandlers() {
-			$( '.wpforms-field-address' ).each( function() {
-				const $countrySelect = $( this ).find( 'select.wpforms-field-address-country' );
+			$('.wpforms-field-address').each(function () {
+				const $countrySelect = $(this).find('select.wpforms-field-address-country');
 
-				if ( ! $countrySelect.length ) {
+				if (!$countrySelect.length) {
 					return;
 				}
 
-				app.handleCountryChange( $countrySelect );
+				app.handleCountryChange($countrySelect);
 
-				$countrySelect
-					.off( 'change' )
-					.on( 'change', function() {
-						app.handleCountryChange( this );
-					} );
-			} );
+				$countrySelect.off('change').on('change', function () {
+					app.handleCountryChange(this);
+				});
+			});
 		},
 
 		/**
@@ -72,18 +68,18 @@
 		 *
 		 * @param {HTMLElement} field Country select field.
 		 */
-		handleCountryChange( field ) {
-			const $this = $( field ),
-				$stateInput = $this.closest( '.wpforms-field' ).find( '.wpforms-field-address-state' ),
-				$rowWithState = $stateInput.closest( '.wpforms-field-row' );
+		handleCountryChange(field) {
+			const $this = $(field),
+				$stateInput = $this.closest('.wpforms-field').find('.wpforms-field-address-state'),
+				$rowWithState = $stateInput.closest('.wpforms-field-row');
 
-			if ( ! $rowWithState.length ) {
+			if (!$rowWithState.length) {
 				return;
 			}
 
 			const value = $this.val();
 
-			app.handleStateInput( $stateInput, $rowWithState, value );
+			app.handleStateInput($stateInput, $rowWithState, value);
 		},
 
 		/**
@@ -95,31 +91,31 @@
 		 * @param {jQuery} $rowWithState Row with state.
 		 * @param {string} countryValue  Country value.
 		 */
-		handleStateInput( $stateInput, $rowWithState, countryValue ) {
-			if ( app.noStateCountries.includes( countryValue ) ) {
+		handleStateInput($stateInput, $rowWithState, countryValue) {
+			if (app.noStateCountries.includes(countryValue)) {
 				$stateInput
-					.val( '' )
-					.prop( 'disabled', true )
-					.prop( 'required', false )
-					.on( 'change', function() {
-						$( this ).val( '' );
-					} );
+					.val('')
+					.prop('disabled', true)
+					.prop('required', false)
+					.on('change', function () {
+						$(this).val('');
+					});
 
-				$rowWithState.addClass( 'wpforms-without-state' );
+				$rowWithState.addClass('wpforms-without-state');
 
 				return;
 			}
 
 			$stateInput
-				.prop( 'disabled', false )
-				.prop( 'required', $rowWithState.find( '.wpforms-first input' ).prop( 'required' ) ) // Set required same as first input.
-				.off( 'change' );
+				.prop('disabled', false)
+				.prop('required', $rowWithState.find('.wpforms-first input').prop('required')) // Set required same as first input.
+				.off('change');
 
-			$rowWithState.removeClass( 'wpforms-without-state' );
+			$rowWithState.removeClass('wpforms-without-state');
 		},
 	};
 
 	app.init();
 
 	return app;
-}( window, jQuery ) );
+})(window, jQuery);

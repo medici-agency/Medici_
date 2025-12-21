@@ -16,8 +16,8 @@ const WPFormsChocolateChoices = {
 	 * @param {Array}  options.choices  Array of choice objects with label and value properties.
 	 * @param {Array}  options.selected Array of selected choice values.
 	 */
-	init( $grid, options ) {
-		const selected = options.selected?.map?.( String ) ?? [];
+	init($grid, options) {
+		const selected = options.selected?.map?.(String) ?? [];
 		const $ = jQuery;
 		/**
 		 * Generate a random ID string.
@@ -27,7 +27,7 @@ const WPFormsChocolateChoices = {
 		 *
 		 * @return {string} A hexadecimal string representation of the current timestamp.
 		 */
-		const getRandomId = () => new Date().getTime().toString( 16 );
+		const getRandomId = () => new Date().getTime().toString(16);
 
 		/**
 		 * Creates a single choice item.
@@ -39,43 +39,43 @@ const WPFormsChocolateChoices = {
 		 *
 		 * @return {jQuery} The created choice item element.
 		 */
-		const createChoiceItem = ( itemData, index ) => {
-			const id = `choice-${ index }-${ getRandomId() }`;
-			const itemValue = String( typeof itemData === 'object' ? itemData.value : itemData );
+		const createChoiceItem = (itemData, index) => {
+			const id = `choice-${index}-${getRandomId()}`;
+			const itemValue = String(typeof itemData === 'object' ? itemData.value : itemData);
 
 			// Create the container div.
-			const $itemDiv = $( '<div>', {
+			const $itemDiv = $('<div>', {
 				class: 'choice-item',
-			} );
+			});
 
 			// Create the checkbox input.
-			const $checkbox = $( '<input>', {
+			const $checkbox = $('<input>', {
 				type: 'checkbox',
 				id,
 				value: itemValue,
-				checked: selected.includes( itemValue ),
-				name: options.name.replace( '{index}', index ),
-			} );
+				checked: selected.includes(itemValue),
+				name: options.name.replace('{index}', index),
+			});
 
 			// Create the label.
-			const $label = $( '<label>', { for: id } );
-			$label.text( itemData.label ?? itemData );
+			const $label = $('<label>', { for: id });
+			$label.text(itemData.label ?? itemData);
 
 			// Append elements.
-			$itemDiv.append( $checkbox, $label );
+			$itemDiv.append($checkbox, $label);
 
 			return $itemDiv;
 		};
 
 		// Clear existing content.
-		$grid.html( '' );
+		$grid.html('');
 		const choices = [];
 
 		// Populate the grid with items.
-		$.each( options.choices, function( index, choiceData ) {
-			choices.push( createChoiceItem( choiceData, index ) );
-		} );
+		$.each(options.choices, function (index, choiceData) {
+			choices.push(createChoiceItem(choiceData, index));
+		});
 
-		$grid.append( choices );
+		$grid.append(choices);
 	},
 };

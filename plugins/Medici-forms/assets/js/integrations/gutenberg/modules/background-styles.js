@@ -33,14 +33,22 @@ import BackgroundPreview from './background-preview.js';
  *
  * @since 1.8.8
  */
-export default ( function() {
+export default (function () {
 	/**
 	 * WP core components.
 	 *
 	 * @since 1.8.8
 	 */
 	const { PanelColorSettings } = wp.blockEditor || wp.editor;
-	const { SelectControl, PanelBody, Flex, FlexBlock, __experimentalUnitControl, TextControl, Button } = wp.components;
+	const {
+		SelectControl,
+		PanelBody,
+		Flex,
+		FlexBlock,
+		__experimentalUnitControl,
+		TextControl,
+		Button,
+	} = wp.components;
 
 	/**
 	 * Localized data aliases.
@@ -57,7 +65,6 @@ export default ( function() {
 	 * @type {Object}
 	 */
 	const app = {
-
 		/**
 		 * Get block attributes.
 		 *
@@ -119,7 +126,8 @@ export default ( function() {
 		 *
 		 * @return {Object} Field styles JSX code.
 		 */
-		getBackgroundStyles( props, handlers, formSelectorCommon, stockPhotos, uiState ) { // eslint-disable-line max-lines-per-function, complexity
+		getBackgroundStyles(props, handlers, formSelectorCommon, stockPhotos, uiState) {
+			// eslint-disable-line max-lines-per-function, complexity
 			const isNotDisabled = uiState.isNotDisabled;
 			const isProEnabled = uiState.isProEnabled;
 			const showBackgroundPreview = uiState.showBackgroundPreview;
@@ -127,60 +135,89 @@ export default ( function() {
 			const lastBgImage = uiState.lastBgImage;
 			const setLastBgImage = uiState.setLastBgImage;
 			const tabIndex = isNotDisabled ? 0 : -1;
-			const cssClass = formSelectorCommon.getPanelClass( props ) + ( isNotDisabled ? '' : ' wpforms-gutenberg-panel-disabled' );
+			const cssClass =
+				formSelectorCommon.getPanelClass(props) +
+				(isNotDisabled ? '' : ' wpforms-gutenberg-panel-disabled');
 
 			return (
-				<PanelBody className={ cssClass } title={ strings.background_styles }>
+				<PanelBody className={cssClass} title={strings.background_styles}>
 					<div // eslint-disable-line jsx-a11y/no-static-element-interactions
 						className="wpforms-gutenberg-form-selector-panel-body"
-						onClick={ ( event ) => {
-							if ( isNotDisabled ) {
+						onClick={(event) => {
+							if (isNotDisabled) {
 								return;
 							}
 
 							event.stopPropagation();
 
-							if ( ! isProEnabled ) {
-								return formSelectorCommon.education.showProModal( 'background', strings.background_styles );
+							if (!isProEnabled) {
+								return formSelectorCommon.education.showProModal(
+									'background',
+									strings.background_styles
+								);
 							}
 
-							formSelectorCommon.education.showLicenseModal( 'background', strings.background_styles, 'background-styles' );
-						} }
-						onKeyDown={ ( event ) => {
-							if ( isNotDisabled ) {
+							formSelectorCommon.education.showLicenseModal(
+								'background',
+								strings.background_styles,
+								'background-styles'
+							);
+						}}
+						onKeyDown={(event) => {
+							if (isNotDisabled) {
 								return;
 							}
 
 							event.stopPropagation();
 
-							if ( ! isProEnabled ) {
-								return formSelectorCommon.education.showProModal( 'background', strings.background_styles );
+							if (!isProEnabled) {
+								return formSelectorCommon.education.showProModal(
+									'background',
+									strings.background_styles
+								);
 							}
 
-							formSelectorCommon.education.showLicenseModal( 'background', strings.background_styles, 'background-styles' );
-						} }
+							formSelectorCommon.education.showLicenseModal(
+								'background',
+								strings.background_styles,
+								'background-styles'
+							);
+						}}
 					>
-						<Flex gap={ 4 } align="flex-start" className={ 'wpforms-gutenberg-form-selector-flex' } justify="space-between">
+						<Flex
+							gap={4}
+							align="flex-start"
+							className={'wpforms-gutenberg-form-selector-flex'}
+							justify="space-between"
+						>
 							<FlexBlock>
 								<SelectControl
-									label={ strings.image }
-									tabIndex={ tabIndex }
-									value={ props.attributes.backgroundImage }
-									options={ [
+									label={strings.image}
+									tabIndex={tabIndex}
+									value={props.attributes.backgroundImage}
+									options={[
 										{ label: strings.none, value: 'none' },
 										{ label: strings.media_library, value: 'library' },
 										{ label: strings.stock_photo, value: 'stock' },
-									] }
-									onChange={ ( value ) => app.setContainerBackgroundImageWrapper( props, handlers, value, lastBgImage, setLastBgImage ) }
+									]}
+									onChange={(value) =>
+										app.setContainerBackgroundImageWrapper(
+											props,
+											handlers,
+											value,
+											lastBgImage,
+											setLastBgImage
+										)
+									}
 								/>
 							</FlexBlock>
 							<FlexBlock>
-								{ ( props.attributes.backgroundImage !== 'none' || ! isNotDisabled ) && (
+								{(props.attributes.backgroundImage !== 'none' || !isNotDisabled) && (
 									<SelectControl
-										label={ strings.position }
-										value={ props.attributes.backgroundPosition }
-										tabIndex={ tabIndex }
-										options={ [
+										label={strings.position}
+										value={props.attributes.backgroundPosition}
+										tabIndex={tabIndex}
+										options={[
 											{ label: strings.top_left, value: 'top left' },
 											{ label: strings.top_center, value: 'top center' },
 											{ label: strings.top_right, value: 'top right' },
@@ -190,149 +227,203 @@ export default ( function() {
 											{ label: strings.bottom_left, value: 'bottom left' },
 											{ label: strings.bottom_center, value: 'bottom center' },
 											{ label: strings.bottom_right, value: 'bottom right' },
-										] }
-										disabled={ ( props.attributes.backgroundImage === 'none' && isNotDisabled ) }
-										onChange={ ( value ) => handlers.styleAttrChange( 'backgroundPosition', value ) }
+										]}
+										disabled={props.attributes.backgroundImage === 'none' && isNotDisabled}
+										onChange={(value) => handlers.styleAttrChange('backgroundPosition', value)}
 									/>
-								) }
+								)}
 							</FlexBlock>
 						</Flex>
-						{ ( props.attributes.backgroundImage !== 'none' || ! isNotDisabled ) && (
-							<Flex gap={ 4 } align="flex-start" className={ 'wpforms-gutenberg-form-selector-flex' } justify="space-between">
+						{(props.attributes.backgroundImage !== 'none' || !isNotDisabled) && (
+							<Flex
+								gap={4}
+								align="flex-start"
+								className={'wpforms-gutenberg-form-selector-flex'}
+								justify="space-between"
+							>
 								<FlexBlock>
 									<SelectControl
-										label={ strings.repeat }
-										tabIndex={ tabIndex }
-										value={ props.attributes.backgroundRepeat }
-										options={ [
+										label={strings.repeat}
+										tabIndex={tabIndex}
+										value={props.attributes.backgroundRepeat}
+										options={[
 											{ label: strings.no_repeat, value: 'no-repeat' },
 											{ label: strings.tile, value: 'repeat' },
 											{ label: strings.repeat_x, value: 'repeat-x' },
 											{ label: strings.repeat_y, value: 'repeat-y' },
-										] }
-										disabled={ ( props.attributes.backgroundImage === 'none' && isNotDisabled ) }
-										onChange={ ( value ) => handlers.styleAttrChange( 'backgroundRepeat', value ) }
+										]}
+										disabled={props.attributes.backgroundImage === 'none' && isNotDisabled}
+										onChange={(value) => handlers.styleAttrChange('backgroundRepeat', value)}
 									/>
 								</FlexBlock>
 								<FlexBlock>
 									<SelectControl
-										label={ strings.size }
-										tabIndex={ tabIndex }
-										value={ props.attributes.backgroundSizeMode }
-										options={ [
+										label={strings.size}
+										tabIndex={tabIndex}
+										value={props.attributes.backgroundSizeMode}
+										options={[
 											{ label: strings.dimensions, value: 'dimensions' },
 											{ label: strings.cover, value: 'cover' },
-										] }
-										disabled={ ( props.attributes.backgroundImage === 'none' && isNotDisabled ) }
-										onChange={ ( value ) => app.handleSizeFromDimensions( props, handlers, value ) }
+										]}
+										disabled={props.attributes.backgroundImage === 'none' && isNotDisabled}
+										onChange={(value) => app.handleSizeFromDimensions(props, handlers, value)}
 									/>
 								</FlexBlock>
 							</Flex>
-						) }
-						{ ( ( props.attributes.backgroundSizeMode === 'dimensions' && props.attributes.backgroundImage !== 'none' ) || ! isNotDisabled ) && (
-							<Flex gap={ 4 } align="flex-start" className={ 'wpforms-gutenberg-form-selector-flex' } justify="space-between">
+						)}
+						{((props.attributes.backgroundSizeMode === 'dimensions' &&
+							props.attributes.backgroundImage !== 'none') ||
+							!isNotDisabled) && (
+							<Flex
+								gap={4}
+								align="flex-start"
+								className={'wpforms-gutenberg-form-selector-flex'}
+								justify="space-between"
+							>
 								<FlexBlock>
 									<__experimentalUnitControl
-										label={ strings.width }
-										tabIndex={ tabIndex }
-										value={ props.attributes.backgroundWidth }
-										isUnitSelectTabbable={ isNotDisabled }
-										onChange={ ( value ) => app.handleSizeFromWidth( props, handlers, value ) }
+										label={strings.width}
+										tabIndex={tabIndex}
+										value={props.attributes.backgroundWidth}
+										isUnitSelectTabbable={isNotDisabled}
+										onChange={(value) => app.handleSizeFromWidth(props, handlers, value)}
 									/>
 								</FlexBlock>
 								<FlexBlock>
 									<__experimentalUnitControl
-										label={ strings.height }
-										tabIndex={ tabIndex }
-										value={ props.attributes.backgroundHeight }
-										isUnitSelectTabbable={ isNotDisabled }
-										onChange={ ( value ) => app.handleSizeFromHeight( props, handlers, value ) }
+										label={strings.height}
+										tabIndex={tabIndex}
+										value={props.attributes.backgroundHeight}
+										isUnitSelectTabbable={isNotDisabled}
+										onChange={(value) => app.handleSizeFromHeight(props, handlers, value)}
 									/>
 								</FlexBlock>
 							</Flex>
-						) }
-						{ ( ! showBackgroundPreview || props.attributes.backgroundUrl === 'url()' ) && (
-							( props.attributes.backgroundImage === 'library' && (
-								<Flex gap={ 4 } align="flex-start" className={ 'wpforms-gutenberg-form-selector-flex' } justify="space-between">
+						)}
+						{(!showBackgroundPreview || props.attributes.backgroundUrl === 'url()') &&
+							((props.attributes.backgroundImage === 'library' && (
+								<Flex
+									gap={4}
+									align="flex-start"
+									className={'wpforms-gutenberg-form-selector-flex'}
+									justify="space-between"
+								>
 									<FlexBlock>
 										<Button
 											isSecondary
-											tabIndex={ tabIndex }
-											className={ 'wpforms-gutenberg-form-selector-media-library-button' }
-											onClick={ app.openMediaLibrary.bind( null, props, handlers, setShowBackgroundPreview ) }
+											tabIndex={tabIndex}
+											className={'wpforms-gutenberg-form-selector-media-library-button'}
+											onClick={app.openMediaLibrary.bind(
+												null,
+												props,
+												handlers,
+												setShowBackgroundPreview
+											)}
 										>
-											{ strings.choose_image }
+											{strings.choose_image}
 										</Button>
 									</FlexBlock>
 								</Flex>
-							) ) || ( props.attributes.backgroundImage === 'stock' && (
-								<Flex gap={ 4 } align="flex-start" className={ 'wpforms-gutenberg-form-selector-flex' } justify="space-between">
-									<FlexBlock>
-										<Button
-											isSecondary
-											tabIndex={ tabIndex }
-											className={ 'wpforms-gutenberg-form-selector-media-library-button' }
-											onClick={ stockPhotos?.openModal.bind( null, props, handlers, 'bg-styles', setShowBackgroundPreview ) }
-										>
-											{ strings.choose_image }
-										</Button>
-									</FlexBlock>
-								</Flex>
-							) )
-						) }
-						{ ( ( showBackgroundPreview && props.attributes.backgroundImage !== 'none' ) || props.attributes.backgroundUrl !== 'url()' ) && (
-							<Flex gap={ 4 } align="flex-start" className={ 'wpforms-gutenberg-form-selector-flex' } justify="space-between">
+							)) ||
+								(props.attributes.backgroundImage === 'stock' && (
+									<Flex
+										gap={4}
+										align="flex-start"
+										className={'wpforms-gutenberg-form-selector-flex'}
+										justify="space-between"
+									>
+										<FlexBlock>
+											<Button
+												isSecondary
+												tabIndex={tabIndex}
+												className={'wpforms-gutenberg-form-selector-media-library-button'}
+												onClick={stockPhotos?.openModal.bind(
+													null,
+													props,
+													handlers,
+													'bg-styles',
+													setShowBackgroundPreview
+												)}
+											>
+												{strings.choose_image}
+											</Button>
+										</FlexBlock>
+									</Flex>
+								)))}
+						{((showBackgroundPreview && props.attributes.backgroundImage !== 'none') ||
+							props.attributes.backgroundUrl !== 'url()') && (
+							<Flex
+								gap={4}
+								align="flex-start"
+								className={'wpforms-gutenberg-form-selector-flex'}
+								justify="space-between"
+							>
 								<FlexBlock>
 									<div>
 										<BackgroundPreview
-											attributes={ props.attributes }
-											onRemoveBackground={
-												() => {
-													app.onRemoveBackground( setShowBackgroundPreview, handlers, setLastBgImage );
-												}
-											}
-											onPreviewClicked={ () => {
-												if ( props.attributes.backgroundImage === 'library' ) {
-													return app.openMediaLibrary( props, handlers, setShowBackgroundPreview );
+											attributes={props.attributes}
+											onRemoveBackground={() => {
+												app.onRemoveBackground(setShowBackgroundPreview, handlers, setLastBgImage);
+											}}
+											onPreviewClicked={() => {
+												if (props.attributes.backgroundImage === 'library') {
+													return app.openMediaLibrary(props, handlers, setShowBackgroundPreview);
 												}
 
-												return stockPhotos?.openModal( props, handlers, 'bg-styles', setShowBackgroundPreview );
-											} }
+												return stockPhotos?.openModal(
+													props,
+													handlers,
+													'bg-styles',
+													setShowBackgroundPreview
+												);
+											}}
 										/>
 									</div>
 									<TextControl
-										label={ strings.image_url }
-										tabIndex={ tabIndex }
-										value={ props.attributes.backgroundImage !== 'none' && props.attributes.backgroundUrl }
-										className={ 'wpforms-gutenberg-form-selector-image-url' }
-										onChange={ ( value ) => handlers.styleAttrChange( 'backgroundUrl', value ) }
-										onLoad={ ( value ) => props.attributes.backgroundImage !== 'none' && handlers.styleAttrChange( 'backgroundUrl', value ) }
+										label={strings.image_url}
+										tabIndex={tabIndex}
+										value={
+											props.attributes.backgroundImage !== 'none' && props.attributes.backgroundUrl
+										}
+										className={'wpforms-gutenberg-form-selector-image-url'}
+										onChange={(value) => handlers.styleAttrChange('backgroundUrl', value)}
+										onLoad={(value) =>
+											props.attributes.backgroundImage !== 'none' &&
+											handlers.styleAttrChange('backgroundUrl', value)
+										}
 									/>
 								</FlexBlock>
 							</Flex>
-						) }
-						<Flex gap={ 4 } align="flex-start" className={ 'wpforms-gutenberg-form-selector-flex' } justify="space-between">
+						)}
+						<Flex
+							gap={4}
+							align="flex-start"
+							className={'wpforms-gutenberg-form-selector-flex'}
+							justify="space-between"
+						>
 							<FlexBlock>
-								<div className="wpforms-gutenberg-form-selector-control-label">{ strings.colors }</div>
+								<div className="wpforms-gutenberg-form-selector-control-label">
+									{strings.colors}
+								</div>
 								<PanelColorSettings
 									__experimentalIsRenderedInSidebar
 									enableAlpha
-									showTitle={ false }
-									tabIndex={ tabIndex }
+									showTitle={false}
+									tabIndex={tabIndex}
 									className="wpforms-gutenberg-form-selector-color-panel"
-									colorSettings={ [
+									colorSettings={[
 										{
 											value: props.attributes.backgroundColor,
-											onChange: ( value ) => {
-												if ( ! isNotDisabled ) {
+											onChange: (value) => {
+												if (!isNotDisabled) {
 													return;
 												}
 
-												handlers.styleAttrChange( 'backgroundColor', value );
+												handlers.styleAttrChange('backgroundColor', value);
 											},
 											label: strings.background,
 										},
-									] }
+									]}
 								/>
 							</FlexBlock>
 						</Flex>
@@ -350,8 +441,8 @@ export default ( function() {
 		 * @param {Object}   handlers                 Block handlers.
 		 * @param {Function} setShowBackgroundPreview Set show background preview.
 		 */
-		openMediaLibrary( props, handlers, setShowBackgroundPreview ) {
-			const frame = wp.media( {
+		openMediaLibrary(props, handlers, setShowBackgroundPreview) {
+			const frame = wp.media({
 				title: strings.select_background_image,
 				multiple: false,
 				library: {
@@ -360,25 +451,25 @@ export default ( function() {
 				button: {
 					text: strings.select_image,
 				},
-			} );
+			});
 
-			frame.on( 'select', () => {
-				const attachment = frame.state().get( 'selection' ).first().toJSON();
+			frame.on('select', () => {
+				const attachment = frame.state().get('selection').first().toJSON();
 				const setAttr = {};
 				const attribute = 'backgroundUrl';
 
-				if ( attachment.url ) {
-					const value = `url(${ attachment.url })`;
+				if (attachment.url) {
+					const value = `url(${attachment.url})`;
 
-					setAttr[ attribute ] = value;
+					setAttr[attribute] = value;
 
-					props.setAttributes( setAttr );
+					props.setAttributes(setAttr);
 
-					handlers.styleAttrChange( 'backgroundUrl', value );
+					handlers.styleAttrChange('backgroundUrl', value);
 
-					setShowBackgroundPreview( true );
+					setShowBackgroundPreview(true);
 				}
-			} );
+			});
 
 			frame.open();
 		},
@@ -393,9 +484,9 @@ export default ( function() {
 		 *
 		 * @return {boolean} True if the value was set, false otherwise.
 		 */
-		setContainerBackgroundImage( container, value ) {
-			if ( value === 'none' ) {
-				container.style.setProperty( `--wpforms-background-url`, 'url()' );
+		setContainerBackgroundImage(container, value) {
+			if (value === 'none') {
+				container.style.setProperty(`--wpforms-background-url`, 'url()');
 			}
 
 			return true;
@@ -412,18 +503,18 @@ export default ( function() {
 		 * @param {string}   lastBgImage    Last background image.
 		 * @param {Function} setLastBgImage Set last background image.
 		 */
-		setContainerBackgroundImageWrapper( props, handlers, value, lastBgImage, setLastBgImage ) {
-			if ( value === 'none' ) {
-				setLastBgImage( props.attributes.backgroundUrl );
+		setContainerBackgroundImageWrapper(props, handlers, value, lastBgImage, setLastBgImage) {
+			if (value === 'none') {
+				setLastBgImage(props.attributes.backgroundUrl);
 				props.attributes.backgroundUrl = 'url()';
 
-				handlers.styleAttrChange( 'backgroundUrl', 'url()' );
-			} else if ( lastBgImage ) {
+				handlers.styleAttrChange('backgroundUrl', 'url()');
+			} else if (lastBgImage) {
 				props.attributes.backgroundUrl = lastBgImage;
-				handlers.styleAttrChange( 'backgroundUrl', lastBgImage );
+				handlers.styleAttrChange('backgroundUrl', lastBgImage);
 			}
 
-			handlers.styleAttrChange( 'backgroundImage', value );
+			handlers.styleAttrChange('backgroundImage', value);
 		},
 
 		/**
@@ -436,8 +527,8 @@ export default ( function() {
 		 *
 		 * @return {boolean} True if the value was set, false otherwise.
 		 */
-		setContainerBackgroundPosition( container, value ) {
-			container.style.setProperty( `--wpforms-background-position`, value );
+		setContainerBackgroundPosition(container, value) {
+			container.style.setProperty(`--wpforms-background-position`, value);
 
 			return true;
 		},
@@ -452,8 +543,8 @@ export default ( function() {
 		 *
 		 * @return {boolean} True if the value was set, false otherwise.
 		 */
-		setContainerBackgroundRepeat( container, value ) {
-			container.style.setProperty( `--wpforms-background-repeat`, value );
+		setContainerBackgroundRepeat(container, value) {
+			container.style.setProperty(`--wpforms-background-repeat`, value);
 
 			return true;
 		},
@@ -467,19 +558,22 @@ export default ( function() {
 		 * @param {Object} handlers Block handlers.
 		 * @param {string} value    Value.
 		 */
-		handleSizeFromDimensions( props, handlers, value ) {
-			if ( value === 'cover' ) {
+		handleSizeFromDimensions(props, handlers, value) {
+			if (value === 'cover') {
 				props.attributes.backgroundSize = 'cover';
 
-				handlers.styleAttrChange( 'backgroundWidth', props.attributes.backgroundWidth );
-				handlers.styleAttrChange( 'backgroundHeight', props.attributes.backgroundHeight );
-				handlers.styleAttrChange( 'backgroundSizeMode', 'cover' );
-				handlers.styleAttrChange( 'backgroundSize', 'cover' );
+				handlers.styleAttrChange('backgroundWidth', props.attributes.backgroundWidth);
+				handlers.styleAttrChange('backgroundHeight', props.attributes.backgroundHeight);
+				handlers.styleAttrChange('backgroundSizeMode', 'cover');
+				handlers.styleAttrChange('backgroundSize', 'cover');
 			} else {
 				props.attributes.backgroundSize = 'dimensions';
 
-				handlers.styleAttrChange( 'backgroundSizeMode', 'dimensions' );
-				handlers.styleAttrChange( 'backgroundSize', props.attributes.backgroundWidth + ' ' + props.attributes.backgroundHeight );
+				handlers.styleAttrChange('backgroundSizeMode', 'dimensions');
+				handlers.styleAttrChange(
+					'backgroundSize',
+					props.attributes.backgroundWidth + ' ' + props.attributes.backgroundHeight
+				);
 			}
 		},
 
@@ -492,12 +586,12 @@ export default ( function() {
 		 * @param {Object} handlers Block handlers.
 		 * @param {string} value    Value.
 		 */
-		handleSizeFromWidth( props, handlers, value ) {
+		handleSizeFromWidth(props, handlers, value) {
 			props.attributes.backgroundSize = value + ' ' + props.attributes.backgroundHeight;
 			props.attributes.backgroundWidth = value;
 
-			handlers.styleAttrChange( 'backgroundSize', value + ' ' + props.attributes.backgroundHeight );
-			handlers.styleAttrChange( 'backgroundWidth', value );
+			handlers.styleAttrChange('backgroundSize', value + ' ' + props.attributes.backgroundHeight);
+			handlers.styleAttrChange('backgroundWidth', value);
 		},
 
 		/**
@@ -509,12 +603,12 @@ export default ( function() {
 		 * @param {Object} handlers Block handlers.
 		 * @param {string} value    Value.
 		 */
-		handleSizeFromHeight( props, handlers, value ) {
+		handleSizeFromHeight(props, handlers, value) {
 			props.attributes.backgroundSize = props.attributes.backgroundWidth + ' ' + value;
 			props.attributes.backgroundHeight = value;
 
-			handlers.styleAttrChange( 'backgroundSize', props.attributes.backgroundWidth + ' ' + value );
-			handlers.styleAttrChange( 'backgroundHeight', value );
+			handlers.styleAttrChange('backgroundSize', props.attributes.backgroundWidth + ' ' + value);
+			handlers.styleAttrChange('backgroundHeight', value);
 		},
 
 		/**
@@ -527,8 +621,8 @@ export default ( function() {
 		 *
 		 * @return {boolean} True if the value was set, false otherwise.
 		 */
-		setContainerBackgroundWidth( container, value ) {
-			container.style.setProperty( `--wpforms-background-width`, value );
+		setContainerBackgroundWidth(container, value) {
+			container.style.setProperty(`--wpforms-background-width`, value);
 
 			return true;
 		},
@@ -543,8 +637,8 @@ export default ( function() {
 		 *
 		 * @return {boolean} True if the value was set, false otherwise.
 		 */
-		setContainerBackgroundHeight( container, value ) {
-			container.style.setProperty( `--wpforms-background-height`, value );
+		setContainerBackgroundHeight(container, value) {
+			container.style.setProperty(`--wpforms-background-height`, value);
 
 			return true;
 		},
@@ -559,8 +653,8 @@ export default ( function() {
 		 *
 		 * @return {boolean} True if the value was set, false otherwise.
 		 */
-		setBackgroundUrl( container, value ) {
-			container.style.setProperty( `--wpforms-background-url`, value );
+		setBackgroundUrl(container, value) {
+			container.style.setProperty(`--wpforms-background-url`, value);
 
 			return true;
 		},
@@ -575,16 +669,18 @@ export default ( function() {
 		 *
 		 * @return {boolean} True if the value was set, false otherwise.
 		 */
-		setBackgroundColor( container, value ) {
-			container.style.setProperty( `--wpforms-background-color`, value );
+		setBackgroundColor(container, value) {
+			container.style.setProperty(`--wpforms-background-color`, value);
 
 			return true;
 		},
 
-		_showBackgroundPreview( props ) {
-			return props.attributes.backgroundImage !== 'none' &&
+		_showBackgroundPreview(props) {
+			return (
+				props.attributes.backgroundImage !== 'none' &&
 				props.attributes.backgroundUrl &&
-				props.attributes.backgroundUrl !== 'url()';
+				props.attributes.backgroundUrl !== 'url()'
+			);
 		},
 
 		/**
@@ -596,12 +692,12 @@ export default ( function() {
 		 * @param {Object}   handlers                 Block handlers.
 		 * @param {Function} setLastBgImage           Set last background image.
 		 */
-		onRemoveBackground( setShowBackgroundPreview, handlers, setLastBgImage ) {
-			setShowBackgroundPreview( false );
-			handlers.styleAttrChange( 'backgroundUrl', 'url()' );
-			setLastBgImage( '' );
+		onRemoveBackground(setShowBackgroundPreview, handlers, setLastBgImage) {
+			setShowBackgroundPreview(false);
+			handlers.styleAttrChange('backgroundUrl', 'url()');
+			setLastBgImage('');
 		},
 	};
 
 	return app;
-}() );
+})();

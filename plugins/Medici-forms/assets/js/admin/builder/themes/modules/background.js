@@ -9,7 +9,8 @@
  *
  * @return {Object} Public functions and properties.
  */
-export default function( document, window, $ ) {// eslint-disable-line max-lines-per-function
+export default function (document, window, $) {
+	// eslint-disable-line max-lines-per-function
 	const WPForms = window.WPForms || {};
 	const WPFormsBuilderThemes = WPForms.Admin.Builder.Themes || {};
 
@@ -28,7 +29,6 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 	 * @since 1.9.7
 	 */
 	const app = {
-
 		/**
 		 * Start the engine.
 		 *
@@ -38,19 +38,19 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 			app.setup();
 			app.events();
 
-			WPFormsBuilderThemes.store.subscribe( 'backgroundUrl', ( value ) => {
-				app.setImagePreview( value );
+			WPFormsBuilderThemes.store.subscribe('backgroundUrl', (value) => {
+				app.setImagePreview(value);
 				app.maybeShowChooseButton();
-			} );
+			});
 
-			WPFormsBuilderThemes.store.subscribe( 'backgroundImage', ( value ) => {
-				app.maybeShowImageSelector( value );
+			WPFormsBuilderThemes.store.subscribe('backgroundImage', (value) => {
+				app.maybeShowImageSelector(value);
 				app.maybeShowChooseButton();
-			} );
+			});
 
-			WPFormsBuilderThemes.store.subscribe( 'backgroundSizeMode', ( value ) => {
-				app.handleSizeFromDimensions( value );
-			} );
+			WPFormsBuilderThemes.store.subscribe('backgroundSizeMode', (value) => {
+				app.handleSizeFromDimensions(value);
+			});
 		},
 
 		/**
@@ -59,12 +59,12 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @since 1.9.7
 		 */
 		setup() {
-			el.$builder = $( '#wpforms-builder' );
-			el.$preview = $( '#wpforms-builder-themes-preview' );
-			el.$imageSelector = $( '.wpforms-builder-themes-background-selector' );
-			el.$imagePreview = el.$imageSelector.find( '.wpforms-builder-themes-bg-image-preview' );
-			el.$chooseButton = el.$imageSelector.find( '.wpforms-builder-themes-bg-image-choose' );
-			el.$removeButton = el.$imageSelector.find( '.wpforms-builder-themes-bg-image-remove' );
+			el.$builder = $('#wpforms-builder');
+			el.$preview = $('#wpforms-builder-themes-preview');
+			el.$imageSelector = $('.wpforms-builder-themes-background-selector');
+			el.$imagePreview = el.$imageSelector.find('.wpforms-builder-themes-bg-image-preview');
+			el.$chooseButton = el.$imageSelector.find('.wpforms-builder-themes-bg-image-choose');
+			el.$removeButton = el.$imageSelector.find('.wpforms-builder-themes-bg-image-remove');
 
 			app.initImageSelector();
 		},
@@ -76,8 +76,12 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 */
 		events() {
 			el.$builder
-				.on( 'click', '.wpforms-builder-themes-bg-image-remove', app.removeImage )
-				.on( 'click', '.wpforms-builder-themes-bg-image-choose, .wpforms-builder-themes-bg-image-preview', app.chooseImage );
+				.on('click', '.wpforms-builder-themes-bg-image-remove', app.removeImage)
+				.on(
+					'click',
+					'.wpforms-builder-themes-bg-image-choose, .wpforms-builder-themes-bg-image-preview',
+					app.chooseImage
+				);
 		},
 
 		/**
@@ -88,9 +92,9 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		initImageSelector() {
 			const settings = WPFormsBuilderThemes.getSettings();
 
-			el.$imageSelector.removeClass( 'wpforms-hidden' );
+			el.$imageSelector.removeClass('wpforms-hidden');
 
-			app.setImagePreview( settings.backgroundUrl );
+			app.setImagePreview(settings.backgroundUrl);
 			app.maybeShowChooseButton();
 		},
 
@@ -100,18 +104,18 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @since 1.9.7
 		 * @param {string} value `backgroundImage` setting value.
 		 */
-		maybeShowImageSelector( value ) {
-			if ( value === 'none' ) {
-				el.$imageSelector.addClass( 'wpforms-hidden' );
+		maybeShowImageSelector(value) {
+			if (value === 'none') {
+				el.$imageSelector.addClass('wpforms-hidden');
 			} else {
-				el.$imageSelector.removeClass( 'wpforms-hidden' );
+				el.$imageSelector.removeClass('wpforms-hidden');
 
-				const backgroundUrl = WPFormsBuilderThemes.store.get( 'backgroundUrl' );
+				const backgroundUrl = WPFormsBuilderThemes.store.get('backgroundUrl');
 
 				// Here we need to clean the url value and set a new one.
 				// Otherwise, the picture preview won't be updated.
-				WPFormsBuilderThemes.store.set( 'backgroundUrl', 'url()' );
-				WPFormsBuilderThemes.store.set( 'backgroundUrl', backgroundUrl );
+				WPFormsBuilderThemes.store.set('backgroundUrl', 'url()');
+				WPFormsBuilderThemes.store.set('backgroundUrl', backgroundUrl);
 			}
 		},
 
@@ -122,10 +126,10 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 *
 		 * @since 1.9.7
 		 */
-		removeImage( e ) {
+		removeImage(e) {
 			e.preventDefault();
-			WPFormsBuilderThemes.store.set( 'backgroundUrl', 'url()' );
-			el.$chooseButton.removeClass( 'wpforms-hidden' );
+			WPFormsBuilderThemes.store.set('backgroundUrl', 'url()');
+			el.$chooseButton.removeClass('wpforms-hidden');
 		},
 
 		/**
@@ -135,14 +139,14 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 *
 		 * @since 1.9.7
 		 */
-		chooseImage( e ) {
+		chooseImage(e) {
 			e.preventDefault();
 			const settings = WPFormsBuilderThemes.getSettings();
 
-			if ( settings.backgroundImage === 'library' ) {
+			if (settings.backgroundImage === 'library') {
 				app.openMediaLibrary();
 			} else {
-				WPFormsBuilderThemes.stockPhotos.openModal( 'bg-styles' );
+				WPFormsBuilderThemes.stockPhotos.openModal('bg-styles');
 			}
 
 			app.maybeShowChooseButton();
@@ -155,13 +159,13 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 *
 		 * @since 1.9.7
 		 */
-		setImagePreview( value = null ) {
-			const isHidden = ! value || value === 'url()';
-			const imageValue = isHidden ? 'url()' : `url(${ value })`;
+		setImagePreview(value = null) {
+			const isHidden = !value || value === 'url()';
+			const imageValue = isHidden ? 'url()' : `url(${value})`;
 
-			el.$imagePreview.css( 'background-image', imageValue );
-			el.$imagePreview.toggleClass( 'wpforms-hidden', isHidden );
-			el.$removeButton.toggleClass( 'wpforms-hidden', isHidden );
+			el.$imagePreview.css('background-image', imageValue);
+			el.$imagePreview.toggleClass('wpforms-hidden', isHidden);
+			el.$removeButton.toggleClass('wpforms-hidden', isHidden);
 		},
 
 		/**
@@ -172,10 +176,10 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		maybeShowChooseButton() {
 			const settings = WPFormsBuilderThemes.getSettings();
 
-			if ( settings.backgroundImage !== 'none' && settings.backgroundUrl === 'url()' ) {
-				el.$chooseButton.removeClass( 'wpforms-hidden' );
+			if (settings.backgroundImage !== 'none' && settings.backgroundUrl === 'url()') {
+				el.$chooseButton.removeClass('wpforms-hidden');
 			} else {
-				el.$chooseButton.addClass( 'wpforms-hidden' );
+				el.$chooseButton.addClass('wpforms-hidden');
 			}
 		},
 
@@ -185,20 +189,20 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @since 1.9.7
 		 */
 		openMediaLibrary() {
-			const frame = wp.media( {
+			const frame = wp.media({
 				multiple: false,
 				library: {
 					type: 'image',
 				},
-			} );
+			});
 
-			frame.on( 'select', () => {
-				const attachment = frame.state().get( 'selection' ).first().toJSON();
+			frame.on('select', () => {
+				const attachment = frame.state().get('selection').first().toJSON();
 
-				if ( attachment.url ) {
-					WPFormsBuilderThemes.store.set( 'backgroundUrl', attachment.url );
+				if (attachment.url) {
+					WPFormsBuilderThemes.store.set('backgroundUrl', attachment.url);
 				}
-			} );
+			});
 
 			frame.open();
 		},
@@ -210,25 +214,34 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 *
 		 * @param {string} value Value.
 		 */
-		handleSizeFromDimensions( value ) {
+		handleSizeFromDimensions(value) {
 			const settings = WPFormsBuilderThemes.getSettings();
-			const $container = el.$preview.find( '.wpforms-container' )[ 0 ];
-			const backgroundWidth = WPFormsBuilderThemes.common.prepareComplexAttrValues( settings.backgroundWidth, 'backgroundWidth' );
-			const backgroundHeight = WPFormsBuilderThemes.common.prepareComplexAttrValues( settings.backgroundHeight, 'backgroundHeight' );
-			const $backgroundSizeControl = WPFormsBuilderThemes.getControls( 'backgroundSize' );
+			const $container = el.$preview.find('.wpforms-container')[0];
+			const backgroundWidth = WPFormsBuilderThemes.common.prepareComplexAttrValues(
+				settings.backgroundWidth,
+				'backgroundWidth'
+			);
+			const backgroundHeight = WPFormsBuilderThemes.common.prepareComplexAttrValues(
+				settings.backgroundHeight,
+				'backgroundHeight'
+			);
+			const $backgroundSizeControl = WPFormsBuilderThemes.getControls('backgroundSize');
 
-			if ( value === 'cover' ) {
-				app.setContainerBackgroundWidth( $container, backgroundWidth );
-				app.setContainerBackgroundHeight( $container, backgroundHeight );
+			if (value === 'cover') {
+				app.setContainerBackgroundWidth($container, backgroundWidth);
+				app.setContainerBackgroundHeight($container, backgroundHeight);
 
-				$container.style.setProperty( `--wpforms-background-size`, 'cover' );
-				$backgroundSizeControl.val( 'cover' );
+				$container.style.setProperty(`--wpforms-background-size`, 'cover');
+				$backgroundSizeControl.val('cover');
 			} else {
-				$container.style.setProperty( `--wpforms-background-size`, backgroundWidth + ' ' + backgroundHeight );
-				$backgroundSizeControl.val( backgroundWidth + ' ' + backgroundHeight );
+				$container.style.setProperty(
+					`--wpforms-background-size`,
+					backgroundWidth + ' ' + backgroundHeight
+				);
+				$backgroundSizeControl.val(backgroundWidth + ' ' + backgroundHeight);
 			}
 
-			$backgroundSizeControl.trigger( 'input' );
+			$backgroundSizeControl.trigger('input');
 		},
 
 		/**
@@ -240,16 +253,19 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {string}      value     Value.
 		 * @param {Object}      atts      Form style settings.
 		 */
-		handleSizeFromHeight( container, value, atts ) {
-			const backgroundWidth = WPFormsBuilderThemes.common.prepareComplexAttrValues( atts.backgroundWidth, 'backgroundWidth' );
-			const $backgroundSizeControl = WPFormsBuilderThemes.getControls( 'backgroundSize' );
+		handleSizeFromHeight(container, value, atts) {
+			const backgroundWidth = WPFormsBuilderThemes.common.prepareComplexAttrValues(
+				atts.backgroundWidth,
+				'backgroundWidth'
+			);
+			const $backgroundSizeControl = WPFormsBuilderThemes.getControls('backgroundSize');
 
-			app.setContainerBackgroundHeight( container, value );
+			app.setContainerBackgroundHeight(container, value);
 
-			if ( atts.backgroundSizeMode !== 'cover' ) {
-				$backgroundSizeControl.val( backgroundWidth + ' ' + value );
-				container.style.setProperty( `--wpforms-background-size`, backgroundWidth + ' ' + value );
-				$backgroundSizeControl.trigger( 'input' );
+			if (atts.backgroundSizeMode !== 'cover') {
+				$backgroundSizeControl.val(backgroundWidth + ' ' + value);
+				container.style.setProperty(`--wpforms-background-size`, backgroundWidth + ' ' + value);
+				$backgroundSizeControl.trigger('input');
 			}
 		},
 
@@ -262,17 +278,23 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {string}      value     Value.
 		 * @param {Object}      atts      Form style settings.
 		 */
-		handleSizeFromWidth( container, value, atts ) {
-			const backgroundWidth = WPFormsBuilderThemes.common.prepareComplexAttrValues( atts.backgroundWidth, 'backgroundWidth' );
-			const backgroundHeight = WPFormsBuilderThemes.common.prepareComplexAttrValues( atts.backgroundHeight, 'backgroundHeight' );
-			const $backgroundSizeControl = WPFormsBuilderThemes.getControls( 'backgroundSize' );
+		handleSizeFromWidth(container, value, atts) {
+			const backgroundWidth = WPFormsBuilderThemes.common.prepareComplexAttrValues(
+				atts.backgroundWidth,
+				'backgroundWidth'
+			);
+			const backgroundHeight = WPFormsBuilderThemes.common.prepareComplexAttrValues(
+				atts.backgroundHeight,
+				'backgroundHeight'
+			);
+			const $backgroundSizeControl = WPFormsBuilderThemes.getControls('backgroundSize');
 
-			app.setContainerBackgroundWidth( container, backgroundWidth );
+			app.setContainerBackgroundWidth(container, backgroundWidth);
 
-			if ( atts.backgroundSizeMode !== 'cover' ) {
-				$backgroundSizeControl.val( value + ' ' + backgroundHeight );
-				container.style.setProperty( `--wpforms-background-size`, value + ' ' + backgroundHeight );
-				$backgroundSizeControl.trigger( 'input' );
+			if (atts.backgroundSizeMode !== 'cover') {
+				$backgroundSizeControl.val(value + ' ' + backgroundHeight);
+				container.style.setProperty(`--wpforms-background-size`, value + ' ' + backgroundHeight);
+				$backgroundSizeControl.trigger('input');
 			}
 		},
 
@@ -284,8 +306,8 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {HTMLElement} container Container element.
 		 * @param {string}      value     Value.
 		 */
-		setBackgroundColor( container, value ) {
-			container.style.setProperty( `--wpforms-background-color`, value );
+		setBackgroundColor(container, value) {
+			container.style.setProperty(`--wpforms-background-color`, value);
 		},
 
 		/**
@@ -296,8 +318,8 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {HTMLElement} container Container element.
 		 * @param {string}      value     Value.
 		 */
-		setBackgroundUrl( container, value ) {
-			container.style.setProperty( `--wpforms-background-url`, value );
+		setBackgroundUrl(container, value) {
+			container.style.setProperty(`--wpforms-background-url`, value);
 		},
 
 		/**
@@ -308,8 +330,8 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {HTMLElement} container Container element.
 		 * @param {string}      value     Value.
 		 */
-		setContainerBackgroundHeight( container, value ) {
-			container.style.setProperty( `--wpforms-background-height`, value );
+		setContainerBackgroundHeight(container, value) {
+			container.style.setProperty(`--wpforms-background-height`, value);
 		},
 
 		/**
@@ -320,9 +342,9 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {HTMLElement} container Container element.
 		 * @param {string}      value     Value.
 		 */
-		setContainerBackgroundImage( container, value ) {
-			if ( value === 'none' ) {
-				container.style.setProperty( `--wpforms-background-url`, 'url()' );
+		setContainerBackgroundImage(container, value) {
+			if (value === 'none') {
+				container.style.setProperty(`--wpforms-background-url`, 'url()');
 			}
 		},
 
@@ -334,8 +356,8 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {HTMLElement} container Container element.
 		 * @param {string}      value     Value.
 		 */
-		setContainerBackgroundPosition( container, value ) {
-			container.style.setProperty( `--wpforms-background-position`, value );
+		setContainerBackgroundPosition(container, value) {
+			container.style.setProperty(`--wpforms-background-position`, value);
 		},
 
 		/**
@@ -346,8 +368,8 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {HTMLElement} container Container element.
 		 * @param {string}      value     Value.
 		 */
-		setContainerBackgroundRepeat( container, value ) {
-			container.style.setProperty( `--wpforms-background-repeat`, value );
+		setContainerBackgroundRepeat(container, value) {
+			container.style.setProperty(`--wpforms-background-repeat`, value);
 		},
 
 		/**
@@ -358,8 +380,8 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {HTMLElement} container Container element.
 		 * @param {string}      value     Value.
 		 */
-		setContainerBackgroundWidth( container, value ) {
-			container.style.setProperty( `--wpforms-background-width`, value );
+		setContainerBackgroundWidth(container, value) {
+			container.style.setProperty(`--wpforms-background-width`, value);
 		},
 	};
 

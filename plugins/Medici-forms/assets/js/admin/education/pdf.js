@@ -6,7 +6,7 @@
  * @param {Window} window The global window object.
  * @param {jQuery} $      The jQuery object.
  */
-( function( window, $ ) {
+(function (window, $) {
 	const app = {
 		/**
 		 * The whole popup element.
@@ -70,7 +70,7 @@
 		 * @since 1.9.7.3
 		 */
 		init() {
-			$( app.ready );
+			$(app.ready);
 		},
 
 		/**
@@ -79,12 +79,14 @@
 		 * @since 1.9.7.3
 		 */
 		ready() {
-			app.$popup = $( '#wpforms-pdf-popup' );
-			app.$close = app.$popup.find( '.close-popup' );
-			app.$switchButton = app.$popup.find( 'button.education-modal[data-target="wpforms-pdf"]' );
-			app.$notifications = $( '.wpforms-panel-content-section.wpforms-panel-content-section-notifications' );
-			app.$builder = $( '#wpforms-builder' );
-			app.$pdfPanel = $( '.wpforms-panel-sidebar-section.wpforms-panel-sidebar-section-pdf' );
+			app.$popup = $('#wpforms-pdf-popup');
+			app.$close = app.$popup.find('.close-popup');
+			app.$switchButton = app.$popup.find('button.education-modal[data-target="wpforms-pdf"]');
+			app.$notifications = $(
+				'.wpforms-panel-content-section.wpforms-panel-content-section-notifications'
+			);
+			app.$builder = $('#wpforms-builder');
+			app.$pdfPanel = $('.wpforms-panel-sidebar-section.wpforms-panel-sidebar-section-pdf');
 
 			app.run();
 		},
@@ -97,31 +99,31 @@
 			/*
 			 * User clicked on one of the subsections in Builder > Settings.
 			 */
-			app.$builder.on( 'wpformsPanelSectionSwitch', function( e, section ) {
-				if ( section === 'default' || ! section ) {
+			app.$builder.on('wpformsPanelSectionSwitch', function (e, section) {
+				if (section === 'default' || !section) {
 					return;
 				}
 
-				app.$popup.toggle( section === 'notifications' );
-			} );
+				app.$popup.toggle(section === 'notifications');
+			});
 
 			/*
 			 * User clicked on the left dark sidebar in Builder.
 			 */
-			app.$builder.on( 'wpformsPanelSwitched', () => {
-				app.$popup.toggle( app.$notifications.is( ':visible' ) );
-			} );
+			app.$builder.on('wpformsPanelSwitched', () => {
+				app.$popup.toggle(app.$notifications.is(':visible'));
+			});
 
 			/*
 			 * User clicked on the 'Try it Out' button.
 			 */
-			app.$switchButton.on( 'click', function( e ) {
+			app.$switchButton.on('click', function (e) {
 				e.preventDefault();
 
 				app.$pdfPanel.click();
-			} );
+			});
 		},
 	};
 
 	app.init();
-}( window, jQuery ) );
+})(window, jQuery);

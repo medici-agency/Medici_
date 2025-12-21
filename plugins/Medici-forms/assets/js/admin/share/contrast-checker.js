@@ -28,18 +28,18 @@
  */
 /* eslint-enable */
 
-( function( root, factory ) {
+(function (root, factory) {
 	const pluginName = 'WPFormsColorContrastChecker';
 
-	if ( typeof define === 'function' && define.amd ) {
-		define( [], factory( pluginName ) );
-	} else if ( typeof exports === 'object' ) {
-		module.exports = factory( pluginName );
+	if (typeof define === 'function' && define.amd) {
+		define([], factory(pluginName));
+	} else if (typeof exports === 'object') {
+		module.exports = factory(pluginName);
 	} else {
-		root[ pluginName ] = factory( pluginName );
+		root[pluginName] = factory(pluginName);
 	}
-// eslint-disable-next-line max-lines-per-function
-}( this, function( pluginName ) {
+	// eslint-disable-next-line max-lines-per-function
+})(this, function (pluginName) {
 	// eslint-disable-next-line strict
 	'use strict';
 
@@ -60,8 +60,8 @@
 		 *
 		 * @param {string} message The error message.
 		 */
-		constructor( message ) {
-			super( message );
+		constructor(message) {
+			super(message);
 
 			this.name = pluginName;
 		}
@@ -75,11 +75,11 @@
 	 *
 	 * @param {string} error The error message.
 	 */
-	function logError( error ) {
+	function logError(error) {
 		// Custom error logging logic.
 		// Display the error message in a specific format or send it to a logging service
 		// eslint-disable-next-line no-console
-		console.error( error );
+		console.error(error);
 	}
 
 	/**
@@ -97,7 +97,8 @@
 			contrastThreshold: 4.5, // W3C recommended minimum contrast ratio for normal text
 			message: {
 				contrastPass: 'The contrast ratio between the text and background color is sufficient.',
-				contrastFail: 'The contrast ratio between the text and background color is insufficient. Please choose a darker text color or a lighter background color.',
+				contrastFail:
+					'The contrast ratio between the text and background color is insufficient. Please choose a darker text color or a lighter background color.',
 			},
 		};
 
@@ -108,9 +109,9 @@
 		 *
 		 * @param {Object} args The argument object.
 		 */
-		constructor( args ) {
+		constructor(args) {
 			// Merge the default settings with the provided settings.
-			this.args = Object.assign( {}, Plugin.defaults, args );
+			this.args = Object.assign({}, Plugin.defaults, args);
 		}
 
 		/**
@@ -122,23 +123,23 @@
 		 *
 		 * @return {number[]|null} The RGB array or null if the conversion failed.
 		 */
-		hexToRgb( hexColor ) {
+		hexToRgb(hexColor) {
 			const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-			const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec( hexColor );
+			const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hexColor);
 
-			if ( shorthandRegex.test( hexColor ) ) {
-				return result ? [
-					parseInt( result[ 1 ], 16 ) * 17,
-					parseInt( result[ 2 ], 16 ) * 17,
-					parseInt( result[ 3 ], 16 ) * 17,
-				] : null;
+			if (shorthandRegex.test(hexColor)) {
+				return result
+					? [
+							parseInt(result[1], 16) * 17,
+							parseInt(result[2], 16) * 17,
+							parseInt(result[3], 16) * 17,
+						]
+					: null;
 			}
 
-			return result ? [
-				parseInt( result[ 1 ], 16 ),
-				parseInt( result[ 2 ], 16 ),
-				parseInt( result[ 3 ], 16 ),
-			] : null;
+			return result
+				? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)]
+				: null;
 		}
 
 		/**
@@ -153,10 +154,10 @@
 		 *
 		 * @return {number} The relative luminance.
 		 */
-		calculateRelativeLuminance( rgb ) {
-			for ( let i = 0; i < rgb.length; i++ ) {
-				rgb[ i ] /= 255;
-				rgb[ i ] = rgb[ i ] <= 0.03928 ? rgb[ i ] / 12.92 : Math.pow( ( rgb[ i ] + 0.055 ) / 1.055, 2.4 );
+		calculateRelativeLuminance(rgb) {
+			for (let i = 0; i < rgb.length; i++) {
+				rgb[i] /= 255;
+				rgb[i] = rgb[i] <= 0.03928 ? rgb[i] / 12.92 : Math.pow((rgb[i] + 0.055) / 1.055, 2.4);
 			}
 
 			// As Stated in WCAG the relative luminance of a color is defined as:
@@ -164,7 +165,7 @@
 			// where R, G and B are the color values normalized to the range [0, 1].
 			// @see https://www.w3.org/WAI/GL/wiki/Relative_luminance
 			// eslint-disable-next-line no-mixed-operators
-			return 0.2126 * rgb[ 0 ] + 0.7152 * rgb[ 1 ] + 0.0722 * rgb[ 2 ];
+			return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
 		}
 
 		/**
@@ -176,23 +177,26 @@
 		 */
 		getContrastRatio() {
 			try {
-				const rgbText = this.hexToRgb( this.args.textColor );
-				const rgbBg = this.hexToRgb( this.args.bgColor );
+				const rgbText = this.hexToRgb(this.args.textColor);
+				const rgbBg = this.hexToRgb(this.args.bgColor);
 
 				// Check for invalid color format
-				if ( ! rgbText || ! rgbBg ) {
-					throw new PluginError( 'Invalid color format. Provide valid hex color codes.' );
+				if (!rgbText || !rgbBg) {
+					throw new PluginError('Invalid color format. Provide valid hex color codes.');
 				}
 
-				const [ l1, l2 ] = [ this.calculateRelativeLuminance( rgbText ), this.calculateRelativeLuminance( rgbBg ) ];
+				const [l1, l2] = [
+					this.calculateRelativeLuminance(rgbText),
+					this.calculateRelativeLuminance(rgbBg),
+				];
 
 				// The purpose of adding 0.05 to both the maximum and minimum relative luminance
 				// is to ensure that even if one of the luminance values is zero (which would cause division by zero),
 				// the result won't be infinite. This kind of adjustment is common in contrast ratio calculations
 				// to handle extreme cases and avoid mathematical errors.
-				return ( Math.max( l1, l2 ) + 0.05 ) / ( Math.min( l1, l2 ) + 0.05 );
-			} catch ( error ) {
-				logError( error.message );
+				return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+			} catch (error) {
+				logError(error.message);
 				return null;
 			}
 		}
@@ -209,22 +213,24 @@
 				const contrastRatio = this.getContrastRatio();
 
 				// Return early if invalid color format
-				if ( contrastRatio === null ) {
-					throw new PluginError( 'Invalid contrast ratio. Provide valid contrast ratio between two colors.' );
+				if (contrastRatio === null) {
+					throw new PluginError(
+						'Invalid contrast ratio. Provide valid contrast ratio between two colors.'
+					);
 				}
 
 				// Warn if the contrast is below the threshold.
-				if ( contrastRatio < this.args.contrastThreshold ) {
+				if (contrastRatio < this.args.contrastThreshold) {
 					return this.args.message.contrastFail;
 				}
 
 				return this.args.message.contrastPass;
-			} catch ( error ) {
-				logError( error.message );
+			} catch (error) {
+				logError(error.message);
 				return null;
 			}
 		}
 	}
 
 	return Plugin;
-} ) );
+});

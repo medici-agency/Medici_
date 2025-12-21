@@ -19,39 +19,32 @@ import PropTypes from 'prop-types';
  *
  * @return {Object} React component.
  */
-const BackgroundPreview = ( { attributes, onRemoveBackground, onPreviewClicked } ) => {
+const BackgroundPreview = ({ attributes, onRemoveBackground, onPreviewClicked }) => {
 	const { Button } = wp.components;
 	const { strings } = wpforms_gutenberg_form_selector;
 
 	return (
 		<div className="wpforms-gutenberg-form-selector-background-preview">
 			<style>
-				{ `
+				{`
 					.wpforms-gutenberg-form-selector-background-preview-image {
-						--wpforms-background-url: ${ attributes.backgroundUrl };
+						--wpforms-background-url: ${attributes.backgroundUrl};
 					}
-				` }
+				`}
 			</style>
 			<input
 				className="wpforms-gutenberg-form-selector-background-preview-image"
-				onClick={ onPreviewClicked }
-				tabIndex={ 0 }
+				onClick={onPreviewClicked}
+				tabIndex={0}
 				type="button"
-				onKeyDown={
-					( event ) => {
-						if ( event.key === 'Enter' || event.key === ' ' ) {
-							onPreviewClicked();
-						}
+				onKeyDown={(event) => {
+					if (event.key === 'Enter' || event.key === ' ') {
+						onPreviewClicked();
 					}
-				}
-			>
-			</input>
-			<Button
-				isSecondary
-				className="is-destructive"
-				onClick={ onRemoveBackground }
-			>
-				{ strings.remove_image }
+				}}
+			></input>
+			<Button isSecondary className="is-destructive" onClick={onRemoveBackground}>
+				{strings.remove_image}
 			</Button>
 		</div>
 	);

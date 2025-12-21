@@ -16,7 +16,7 @@
  *
  * @since 1.8.8
  */
-export default ( ( $ ) => {
+export default (($) => {
 	/**
 	 * WP core components.
 	 *
@@ -46,7 +46,7 @@ export default ( ( $ ) => {
 		 * @since 1.8.8
 		 */
 		init() {
-			$( app.ready );
+			$(app.ready);
 		},
 
 		/**
@@ -63,8 +63,7 @@ export default ( ( $ ) => {
 		 *
 		 * @since 1.8.8
 		 */
-		events() {
-		},
+		events() {},
 
 		/**
 		 * Get block attributes.
@@ -115,133 +114,178 @@ export default ( ( $ ) => {
 		 *
 		 * @return {Object} Field styles JSX code.
 		 */
-		getContainerStyles( props, handlers, formSelectorCommon, uiState ) { // eslint-disable-line max-lines-per-function, complexity
-			let cssClass = formSelectorCommon.getPanelClass( props );
+		getContainerStyles(props, handlers, formSelectorCommon, uiState) {
+			// eslint-disable-line max-lines-per-function, complexity
+			let cssClass = formSelectorCommon.getPanelClass(props);
 			const isNotDisabled = uiState.isNotDisabled;
 			const isProEnabled = uiState.isProEnabled;
 
-			if ( ! isNotDisabled ) {
+			if (!isNotDisabled) {
 				cssClass += ' wpforms-gutenberg-panel-disabled';
 			}
 
 			return (
-				<PanelBody className={ cssClass } title={ strings.container_styles }>
+				<PanelBody className={cssClass} title={strings.container_styles}>
 					<div // eslint-disable-line jsx-a11y/no-static-element-interactions
 						className="wpforms-gutenberg-form-selector-panel-body"
-						onClick={ ( event ) => {
-							if ( isNotDisabled ) {
+						onClick={(event) => {
+							if (isNotDisabled) {
 								return;
 							}
 
 							event.stopPropagation();
 
-							if ( ! isProEnabled ) {
-								return formSelectorCommon.education.showProModal( 'container', strings.container_styles );
+							if (!isProEnabled) {
+								return formSelectorCommon.education.showProModal(
+									'container',
+									strings.container_styles
+								);
 							}
 
-							formSelectorCommon.education.showLicenseModal( 'container', strings.container_styles, 'container-styles' );
-						} }
-						onKeyDown={ ( event ) => {
-							if ( isNotDisabled ) {
+							formSelectorCommon.education.showLicenseModal(
+								'container',
+								strings.container_styles,
+								'container-styles'
+							);
+						}}
+						onKeyDown={(event) => {
+							if (isNotDisabled) {
 								return;
 							}
 
 							event.stopPropagation();
 
-							if ( ! isProEnabled ) {
-								return formSelectorCommon.education.showProModal( 'container', strings.container_styles );
+							if (!isProEnabled) {
+								return formSelectorCommon.education.showProModal(
+									'container',
+									strings.container_styles
+								);
 							}
 
-							formSelectorCommon.education.showLicenseModal( 'container', strings.container_styles, 'container-styles' );
-						} }
+							formSelectorCommon.education.showLicenseModal(
+								'container',
+								strings.container_styles,
+								'container-styles'
+							);
+						}}
 					>
-						<Flex gap={ 4 } align="flex-start" className="wpforms-gutenberg-form-selector-flex" justify="space-between">
+						<Flex
+							gap={4}
+							align="flex-start"
+							className="wpforms-gutenberg-form-selector-flex"
+							justify="space-between"
+						>
 							<FlexBlock>
 								<__experimentalUnitControl
-									label={ strings.padding }
-									tabIndex={ isNotDisabled ? 0 : -1 }
-									value={ props.attributes.containerPadding }
-									min={ 0 }
-									isUnitSelectTabbable={ isNotDisabled }
-									onChange={ ( value ) => handlers.styleAttrChange( 'containerPadding', value ) }
+									label={strings.padding}
+									tabIndex={isNotDisabled ? 0 : -1}
+									value={props.attributes.containerPadding}
+									min={0}
+									isUnitSelectTabbable={isNotDisabled}
+									onChange={(value) => handlers.styleAttrChange('containerPadding', value)}
 								/>
 							</FlexBlock>
 							<FlexBlock>
 								<SelectControl
-									label={ strings.border_style }
-									tabIndex={ isNotDisabled ? 0 : -1 }
-									value={ props.attributes.containerBorderStyle }
-									options={ [
+									label={strings.border_style}
+									tabIndex={isNotDisabled ? 0 : -1}
+									value={props.attributes.containerBorderStyle}
+									options={[
 										{ label: strings.none, value: 'none' },
 										{ label: strings.solid, value: 'solid' },
 										{ label: strings.dotted, value: 'dotted' },
 										{ label: strings.dashed, value: 'dashed' },
 										{ label: strings.double, value: 'double' },
-									] }
-									onChange={ ( value ) => handlers.styleAttrChange( 'containerBorderStyle', value ) }
+									]}
+									onChange={(value) => handlers.styleAttrChange('containerBorderStyle', value)}
 								/>
 							</FlexBlock>
 						</Flex>
-						<Flex gap={ 4 } align="flex-start" className="wpforms-gutenberg-form-selector-flex" justify="space-between">
+						<Flex
+							gap={4}
+							align="flex-start"
+							className="wpforms-gutenberg-form-selector-flex"
+							justify="space-between"
+						>
 							<FlexBlock>
 								<__experimentalUnitControl
-									label={ strings.border_width }
-									tabIndex={ isNotDisabled ? 0 : -1 }
-									value={ props.attributes.containerBorderStyle === 'none' ? '' : props.attributes.containerBorderWidth }
-									min={ 0 }
-									disabled={ props.attributes.containerBorderStyle === 'none' }
-									isUnitSelectTabbable={ isNotDisabled }
-									onChange={ ( value ) => handlers.styleAttrChange( 'containerBorderWidth', value ) }
+									label={strings.border_width}
+									tabIndex={isNotDisabled ? 0 : -1}
+									value={
+										props.attributes.containerBorderStyle === 'none'
+											? ''
+											: props.attributes.containerBorderWidth
+									}
+									min={0}
+									disabled={props.attributes.containerBorderStyle === 'none'}
+									isUnitSelectTabbable={isNotDisabled}
+									onChange={(value) => handlers.styleAttrChange('containerBorderWidth', value)}
 								/>
 							</FlexBlock>
 							<FlexBlock>
 								<__experimentalUnitControl
-									label={ strings.border_radius }
-									tabIndex={ isNotDisabled ? 0 : -1 }
-									value={ props.attributes.containerBorderRadius }
-									min={ 0 }
-									isUnitSelectTabbable={ isNotDisabled }
-									onChange={ ( value ) => handlers.styleAttrChange( 'containerBorderRadius', value ) }
+									label={strings.border_radius}
+									tabIndex={isNotDisabled ? 0 : -1}
+									value={props.attributes.containerBorderRadius}
+									min={0}
+									isUnitSelectTabbable={isNotDisabled}
+									onChange={(value) => handlers.styleAttrChange('containerBorderRadius', value)}
 								/>
 							</FlexBlock>
 						</Flex>
-						<Flex gap={ 4 } align="flex-start" className="wpforms-gutenberg-form-selector-flex" justify="space-between">
+						<Flex
+							gap={4}
+							align="flex-start"
+							className="wpforms-gutenberg-form-selector-flex"
+							justify="space-between"
+						>
 							<FlexBlock>
 								<SelectControl
-									label={ strings.shadow_size }
-									tabIndex={ isNotDisabled ? 0 : -1 }
-									value={ props.attributes.containerShadowSize }
-									options={ [
+									label={strings.shadow_size}
+									tabIndex={isNotDisabled ? 0 : -1}
+									value={props.attributes.containerShadowSize}
+									options={[
 										{ label: strings.none, value: 'none' },
 										{ label: strings.small, value: 'small' },
 										{ label: strings.medium, value: 'medium' },
 										{ label: strings.large, value: 'large' },
-									] }
-									onChange={ ( value ) => handlers.styleAttrChange( 'containerShadowSize', value ) }
+									]}
+									onChange={(value) => handlers.styleAttrChange('containerShadowSize', value)}
 								/>
 							</FlexBlock>
 						</Flex>
-						<Flex gap={ 4 } align="flex-start" className="wpforms-gutenberg-form-selector-flex" justify="space-between">
+						<Flex
+							gap={4}
+							align="flex-start"
+							className="wpforms-gutenberg-form-selector-flex"
+							justify="space-between"
+						>
 							<FlexBlock>
-								<div className="wpforms-gutenberg-form-selector-control-label">{ strings.colors }</div>
+								<div className="wpforms-gutenberg-form-selector-control-label">
+									{strings.colors}
+								</div>
 								<PanelColorSettings
 									__experimentalIsRenderedInSidebar
 									enableAlpha
-									showTitle={ false }
-									tabIndex={ isNotDisabled ? 0 : -1 }
-									className={ props.attributes.containerBorderStyle === 'none' ? 'wpforms-gutenberg-form-selector-color-panel wpforms-gutenberg-form-selector-color-panel-disabled' : 'wpforms-gutenberg-form-selector-color-panel' }
-									colorSettings={ [
+									showTitle={false}
+									tabIndex={isNotDisabled ? 0 : -1}
+									className={
+										props.attributes.containerBorderStyle === 'none'
+											? 'wpforms-gutenberg-form-selector-color-panel wpforms-gutenberg-form-selector-color-panel-disabled'
+											: 'wpforms-gutenberg-form-selector-color-panel'
+									}
+									colorSettings={[
 										{
 											value: props.attributes.containerBorderColor,
-											onChange: ( value ) => {
-												if ( ! isNotDisabled ) {
+											onChange: (value) => {
+												if (!isNotDisabled) {
 													return;
 												}
-												handlers.styleAttrChange( 'containerBorderColor', value );
+												handlers.styleAttrChange('containerBorderColor', value);
 											},
 											label: strings.border_color,
 										},
-									] }
+									]}
 								/>
 							</FlexBlock>
 						</Flex>
@@ -252,4 +296,4 @@ export default ( ( $ ) => {
 	};
 
 	return app;
-} )( jQuery );
+})(jQuery);

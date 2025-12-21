@@ -5,7 +5,7 @@
  *
  * @since 1.8.8
  */
-export default ( ( $ ) => {
+export default (($) => {
 	/**
 	 * Public functions and properties.
 	 *
@@ -22,40 +22,45 @@ export default ( ( $ ) => {
 		 * @param {string} panel   Panel slug.
 		 * @param {string} feature Feature name.
 		 */
-		showProModal( panel, feature ) {
+		showProModal(panel, feature) {
 			const type = 'pro';
-			const message = wpforms_education.upgrade[ type ].message_plural.replace( /%name%/g, feature );
+			const message = wpforms_education.upgrade[type].message_plural.replace(/%name%/g, feature);
 			const utmContent = {
 				container: 'Upgrade to Pro - Container Styles',
 				background: 'Upgrade to Pro - Background Styles',
 				themes: 'Upgrade to Pro - Themes',
 			};
 
-			$.alert( {
+			$.alert({
 				backgroundDismiss: true,
-				title: feature + ' ' + wpforms_education.upgrade[ type ].title_plural,
+				title: feature + ' ' + wpforms_education.upgrade[type].title_plural,
 				icon: 'fa fa-lock',
 				content: message,
 				boxWidth: '550px',
 				theme: 'modern,wpforms-education',
 				closeIcon: true,
-				onOpenBefore: function() { // eslint-disable-line object-shorthand
-					this.$btnc.after( '<div class="discount-note">' + wpforms_education.upgrade_bonus + '</div>' );
-					this.$btnc.after( wpforms_education.upgrade[ type ].doc.replace( /%25name%25/g, 'AP - ' + feature ) );
-					this.$body.find( '.jconfirm-content' ).addClass( 'lite-upgrade' );
+				onOpenBefore: function () {
+					// eslint-disable-line object-shorthand
+					this.$btnc.after(
+						'<div class="discount-note">' + wpforms_education.upgrade_bonus + '</div>'
+					);
+					this.$btnc.after(
+						wpforms_education.upgrade[type].doc.replace(/%25name%25/g, 'AP - ' + feature)
+					);
+					this.$body.find('.jconfirm-content').addClass('lite-upgrade');
 				},
 				buttons: {
 					confirm: {
-						text: wpforms_education.upgrade[ type ].button,
+						text: wpforms_education.upgrade[type].button,
 						btnClass: 'btn-confirm',
-						keys: [ 'enter' ],
+						keys: ['enter'],
 						action: () => {
-							window.open( WPFormsEducation.core.getUpgradeURL( utmContent[ panel ], type ), '_blank' );
-							WPFormsEducation.core.upgradeModalThankYou( type );
+							window.open(WPFormsEducation.core.getUpgradeURL(utmContent[panel], type), '_blank');
+							WPFormsEducation.core.upgradeModalThankYou(type);
 						},
 					},
 				},
-			} );
+			});
 		},
 
 		/**
@@ -67,10 +72,10 @@ export default ( ( $ ) => {
 		 * @param {string} fieldName  Field name.
 		 * @param {string} utmContent UTM content.
 		 */
-		showLicenseModal( feature, fieldName, utmContent ) {
-			WPFormsEducation.proCore.licenseModal( feature, fieldName, utmContent );
+		showLicenseModal(feature, fieldName, utmContent) {
+			WPFormsEducation.proCore.licenseModal(feature, fieldName, utmContent);
 		},
 	};
 
 	return app;
-} )( jQuery );
+})(jQuery);

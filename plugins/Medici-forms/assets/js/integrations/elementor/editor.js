@@ -8,616 +8,612 @@
  * @since 1.6.0
  * @since 1.6.2 Moved frontend integration to `wpforms-elementor-frontend.js`
  */
-var WPFormsElementor = window.WPFormsElementor || ( function( document, window, $ ) {
-
-	/**
-	 * Runtime variables.
-	 *
-	 * @since 1.6.2
-	 *
-	 * @type {object}
-	 */
-	var vars = {};
-
-	/**
-	 * Public functions and properties.
-	 *
-	 * @since 1.6.0
-	 *
-	 * @type {object}
-	 */
-	var app = {
+var WPFormsElementor =
+	window.WPFormsElementor ||
+	(function (document, window, $) {
+		/**
+		 * Runtime variables.
+		 *
+		 * @since 1.6.2
+		 *
+		 * @type {object}
+		 */
+		var vars = {};
 
 		/**
-		 * Start the engine.
+		 * Public functions and properties.
 		 *
 		 * @since 1.6.0
+		 *
+		 * @type {object}
 		 */
-		init: function() {
-
-			app.events();
-		},
-
-		/**
-		 * Register JS events.
-		 *
-		 * @since 1.6.0
-		 */
-		events: function() {
-
-			// Widget events.
-			$( window ).on( 'elementor/frontend/init', function( event, id, instance ) {
-
-				// Widget buttons click.
-				elementor.channels.editor.on( 'elementorWPFormsAddFormBtnClick', app.addFormBtnClick );
-
-				// Widget frontend events.
-				elementorFrontend.hooks.addAction( 'frontend/element_ready/wpforms.default', app.widgetPreviewEvents );
-
-				// Initialize widget controls.
-				elementor.hooks.addAction( 'panel/open_editor/widget/wpforms', app.widgetPanelOpen );
-
-				// Initialize choiceJS.
-				elementorFrontend.hooks.addAction( 'frontend/element_ready/wpforms.default', app.loadChoicesJS );
-			} );
-		},
-
-		/**
-		 * Init Modern style Dropdown fields (<select>) with choiceJS.
-		 *
-		 * @since 1.9.0
-		 *
-		 * @param {Object} $scope Elementor scope object.
-		 */
-		loadChoicesJS( $scope ) {
-			// Loads if function exists.
-			if ( typeof parent.Choices !== 'function' ) {
-				return;
-			}
-
-			const $elements = $scope.find( '.wpforms-field .choicesjs-select' );
-			const config = window.wpforms_choicesjs_config || {};
-
-			// Initialize ChoicesJS.
-			$elements.each( function( index, el ) {
-				if ( ! ( el instanceof parent.HTMLSelectElement ) ) {
-					return;
-				}
-
-				const $el = $( el );
-
-				if ( $el.data( 'choicesjs' ) ) {
-					return;
-				}
-
-				const $field = $el.closest( '.wpforms-field' );
-
-				config.callbackOnInit = function() {
-					const self = this,
-						$element = $( self.passedElement.element ),
-						$input = $( self.input.element ),
-						sizeClass = $element.data( 'size-class' );
-
-					// Add CSS-class for size.
-					if ( sizeClass ) {
-						$( self.containerOuter.element ).addClass( sizeClass );
-					}
-
-					/**
-					 * If a multiple select has selected choices - hide a placeholder text.
-					 * In case if select is empty - we return placeholder text.
-					 */
-					if ( $element.prop( 'multiple' ) ) {
-						// On init event.
-						$input.data( 'placeholder', $input.attr( 'placeholder' ) );
-
-						if ( self.getValue( true ).length ) {
-							$input.hide();
-						}
-					}
-
-					this.disable();
-					$field.find( '.is-disabled' ).removeClass( 'is-disabled' );
-				};
-				$el.data( 'choicesjs', new parent.Choices( el, config ) );
-			} );
-		},
-
-		/**
-		 * Widget events.
-		 *
-		 * @since 1.6.2
-		 *
-		 * @param {jQuery} $scope The current element wrapped with jQuery.
-		 */
-		widgetPreviewEvents: function( $scope ) {
-
-			$scope
-				.on( 'click', '.wpforms-btn', app.addFormBtnClick )
-				.on( 'click', '.wpforms-admin-no-forms-container a', app.clickLinkInPreview )
-				.on( 'change', '.wpforms-elementor-form-selector select', app.selectFormInPreview )
-				.on( 'click mousedown focus keydown submit', '.wpforms-container *', app.disableEvents )
-				.on( 'click', '.wpforms-comprehensive-link', app.openComprehensiveLink );
-
-			app.updateSameForms( $scope );
-		},
-
-		/**
-		 * Update all the same forms on the preview.
-		 *
-		 * @since 1.6.3
-		 *
-		 * @param {jQuery} $scope The current element wrapped with jQuery.
-		 */
-		updateSameForms: function( $scope ) {
-
-			var elementId = $scope.data( 'id' ),
-				$formContainer = $scope.find( '.wpforms-container' ),
-				formContainerHtml = $formContainer.html(),
-				formContainerId = $formContainer.attr( 'id' );
-
-			$scope
-				.closest( '.elementor-editor-active' )
-				.find( '.elementor-widget-wpforms:not(.elementor-element-' + elementId + ')' )
-				.each( function() {
-
-					var $anotherFormContainer = $( this ).find( '.wpforms-container' );
-
-					if ( $anotherFormContainer.attr( 'id' ) === formContainerId ) {
-						$anotherFormContainer.html( formContainerHtml );
-					}
-				} );
-		},
-
-		/**
-		 * Initialize widget controls when widget is activated.
-		 *
-		 * @since 1.6.2
-		 *
-		 * @param {object} panel Panel object.
-		 * @param {object} model Model object.
-		 */
-		widgetPanelOpen: function( panel, model ) {
-
-			vars.widgetId = model.attributes.id;
-			vars.formId = model.attributes.settings.attributes.form_id;
-
-			app.widgetPanelInit( panel );
-
-			app.widgetPanelObserver.init( panel );
-		},
-
-		/**
-		 * Initialize widget controls when widget is activated.
-		 *
-		 * @since 1.6.2
-		 *
-		 * @param {object} panel Panel object.
-		 */
-		widgetPanelInit: function( panel ) {
-
-			var	$formSelectControl = panel.$el.find( '.elementor-control.elementor-control-form_id' ),
-				$formSelect = $formSelectControl.find( 'select' ),
-				$addFormNoticeControl = panel.$el.find( '.elementor-control.elementor-control-add_form_notice' ),
-				$testFormNoticeControl = panel.$el.find( '.elementor-control.elementor-control-test_form_notice' );
-
-			// Update form select options if it is available after adding the form.
-			if ( vars.formSelectOptions ) {
-				$formSelect.html( vars.formSelectOptions );
-			}
-
-			// Update form select value.
-			if ( vars.formId && vars.formId !== '' ) {
-				$formSelect.val( vars.formId );
-			}
-
-			// Hide not needed controls.
-			if ( $formSelect.find( 'option' ).length > 0 ) {
-				$addFormNoticeControl.hide();
-			} else {
-				$formSelectControl.hide();
-				$testFormNoticeControl.hide();
-			}
-
-			// Show needed controls.
-			if ( parseInt( $formSelect.val(), 10 ) > 0 ) {
-				$testFormNoticeControl.show();
-			}
-
-			// Select form.
-			panel.$el.find( '.elementor-control.elementor-control-form_id' ).on( 'change', 'select', function() {
-
-				// Update `vars.formId` to be able to restore selected value after options update.
-				vars.formId = $( this ).val();
-			} );
-
-			// Click on the `Edit the selected form` link.
-			panel.$el.find( '.elementor-control.elementor-control-edit_form' ).on( 'click', 'a', app.editFormLinkClick );
-		},
-
-		/**
-		 * The observer needed to re-init controls when the widget panel section and tabs switches.
-		 *
-		 * @since 1.6.3
-		 *
-		 * @member {object}
-		 */
-		widgetPanelObserver: {
+		var app = {
+			/**
+			 * Start the engine.
+			 *
+			 * @since 1.6.0
+			 */
+			init: function () {
+				app.events();
+			},
 
 			/**
-			 * Initialize observer.
+			 * Register JS events.
+			 *
+			 * @since 1.6.0
+			 */
+			events: function () {
+				// Widget events.
+				$(window).on('elementor/frontend/init', function (event, id, instance) {
+					// Widget buttons click.
+					elementor.channels.editor.on('elementorWPFormsAddFormBtnClick', app.addFormBtnClick);
+
+					// Widget frontend events.
+					elementorFrontend.hooks.addAction(
+						'frontend/element_ready/wpforms.default',
+						app.widgetPreviewEvents
+					);
+
+					// Initialize widget controls.
+					elementor.hooks.addAction('panel/open_editor/widget/wpforms', app.widgetPanelOpen);
+
+					// Initialize choiceJS.
+					elementorFrontend.hooks.addAction(
+						'frontend/element_ready/wpforms.default',
+						app.loadChoicesJS
+					);
+				});
+			},
+
+			/**
+			 * Init Modern style Dropdown fields (<select>) with choiceJS.
+			 *
+			 * @since 1.9.0
+			 *
+			 * @param {Object} $scope Elementor scope object.
+			 */
+			loadChoicesJS($scope) {
+				// Loads if function exists.
+				if (typeof parent.Choices !== 'function') {
+					return;
+				}
+
+				const $elements = $scope.find('.wpforms-field .choicesjs-select');
+				const config = window.wpforms_choicesjs_config || {};
+
+				// Initialize ChoicesJS.
+				$elements.each(function (index, el) {
+					if (!(el instanceof parent.HTMLSelectElement)) {
+						return;
+					}
+
+					const $el = $(el);
+
+					if ($el.data('choicesjs')) {
+						return;
+					}
+
+					const $field = $el.closest('.wpforms-field');
+
+					config.callbackOnInit = function () {
+						const self = this,
+							$element = $(self.passedElement.element),
+							$input = $(self.input.element),
+							sizeClass = $element.data('size-class');
+
+						// Add CSS-class for size.
+						if (sizeClass) {
+							$(self.containerOuter.element).addClass(sizeClass);
+						}
+
+						/**
+						 * If a multiple select has selected choices - hide a placeholder text.
+						 * In case if select is empty - we return placeholder text.
+						 */
+						if ($element.prop('multiple')) {
+							// On init event.
+							$input.data('placeholder', $input.attr('placeholder'));
+
+							if (self.getValue(true).length) {
+								$input.hide();
+							}
+						}
+
+						this.disable();
+						$field.find('.is-disabled').removeClass('is-disabled');
+					};
+					$el.data('choicesjs', new parent.Choices(el, config));
+				});
+			},
+
+			/**
+			 * Widget events.
+			 *
+			 * @since 1.6.2
+			 *
+			 * @param {jQuery} $scope The current element wrapped with jQuery.
+			 */
+			widgetPreviewEvents: function ($scope) {
+				$scope
+					.on('click', '.wpforms-btn', app.addFormBtnClick)
+					.on('click', '.wpforms-admin-no-forms-container a', app.clickLinkInPreview)
+					.on('change', '.wpforms-elementor-form-selector select', app.selectFormInPreview)
+					.on('click mousedown focus keydown submit', '.wpforms-container *', app.disableEvents)
+					.on('click', '.wpforms-comprehensive-link', app.openComprehensiveLink);
+
+				app.updateSameForms($scope);
+			},
+
+			/**
+			 * Update all the same forms on the preview.
 			 *
 			 * @since 1.6.3
+			 *
+			 * @param {jQuery} $scope The current element wrapped with jQuery.
+			 */
+			updateSameForms: function ($scope) {
+				var elementId = $scope.data('id'),
+					$formContainer = $scope.find('.wpforms-container'),
+					formContainerHtml = $formContainer.html(),
+					formContainerId = $formContainer.attr('id');
+
+				$scope
+					.closest('.elementor-editor-active')
+					.find('.elementor-widget-wpforms:not(.elementor-element-' + elementId + ')')
+					.each(function () {
+						var $anotherFormContainer = $(this).find('.wpforms-container');
+
+						if ($anotherFormContainer.attr('id') === formContainerId) {
+							$anotherFormContainer.html(formContainerHtml);
+						}
+					});
+			},
+
+			/**
+			 * Initialize widget controls when widget is activated.
+			 *
+			 * @since 1.6.2
+			 *
+			 * @param {object} panel Panel object.
+			 * @param {object} model Model object.
+			 */
+			widgetPanelOpen: function (panel, model) {
+				vars.widgetId = model.attributes.id;
+				vars.formId = model.attributes.settings.attributes.form_id;
+
+				app.widgetPanelInit(panel);
+
+				app.widgetPanelObserver.init(panel);
+			},
+
+			/**
+			 * Initialize widget controls when widget is activated.
+			 *
+			 * @since 1.6.2
 			 *
 			 * @param {object} panel Panel object.
 			 */
-			init: function( panel ) {
+			widgetPanelInit: function (panel) {
+				var $formSelectControl = panel.$el.find('.elementor-control.elementor-control-form_id'),
+					$formSelect = $formSelectControl.find('select'),
+					$addFormNoticeControl = panel.$el.find(
+						'.elementor-control.elementor-control-add_form_notice'
+					),
+					$testFormNoticeControl = panel.$el.find(
+						'.elementor-control.elementor-control-test_form_notice'
+					);
 
-				// Skip if observer for current widget already initialized.
-				if ( vars.observerWidgetId === vars.widgetId ) {
-					return;
+				// Update form select options if it is available after adding the form.
+				if (vars.formSelectOptions) {
+					$formSelect.html(vars.formSelectOptions);
 				}
 
-				// Disconnect previous widget observer.
-				if ( typeof vars.observer !== 'undefined' && typeof vars.observer.disconnect === 'function' ) {
-					vars.observer.disconnect();
+				// Update form select value.
+				if (vars.formId && vars.formId !== '') {
+					$formSelect.val(vars.formId);
 				}
 
-				var obs = {
-					targetNode  : panel.$el.find( '#elementor-panel-content-wrapper' )[0],
-					config      : {
-						childList: true,
-						subtree: true,
-						attributes: true,
-					},
-				};
+				// Hide not needed controls.
+				if ($formSelect.find('option').length > 0) {
+					$addFormNoticeControl.hide();
+				} else {
+					$formSelectControl.hide();
+					$testFormNoticeControl.hide();
+				}
 
-				app.widgetPanelObserver.panel = panel;
+				// Show needed controls.
+				if (parseInt($formSelect.val(), 10) > 0) {
+					$testFormNoticeControl.show();
+				}
 
-				obs.observer = new MutationObserver( app.widgetPanelObserver.callback );
-				obs.observer.observe( obs.targetNode, obs.config );
+				// Select form.
+				panel.$el
+					.find('.elementor-control.elementor-control-form_id')
+					.on('change', 'select', function () {
+						// Update `vars.formId` to be able to restore selected value after options update.
+						vars.formId = $(this).val();
+					});
 
-				vars.observerWidgetId = vars.widgetId;
-				vars.observer = obs.observer;
+				// Click on the `Edit the selected form` link.
+				panel.$el
+					.find('.elementor-control.elementor-control-edit_form')
+					.on('click', 'a', app.editFormLinkClick);
 			},
 
 			/**
-			 * Observer callback.
+			 * The observer needed to re-init controls when the widget panel section and tabs switches.
 			 *
 			 * @since 1.6.3
 			 *
-			 * @param {Array} mutationsList Mutation list.
+			 * @member {object}
 			 */
-			callback: function( mutationsList ) {
-
-				var mutation,
-					quit = false;
-
-				for ( var i in mutationsList ) {
-					mutation = mutationsList[ i ];
-
-					if ( mutation.type === 'childList' && mutation.addedNodes.length > 0 ) {
-						quit = app.widgetPanelObserver.callbackMutationChildList( mutation );
-					}
-
-					if ( mutation.type === 'attributes' ) {
-						quit = app.widgetPanelObserver.callbackMutationAttributes( mutation );
-					}
-
-					if ( quit ) {
+			widgetPanelObserver: {
+				/**
+				 * Initialize observer.
+				 *
+				 * @since 1.6.3
+				 *
+				 * @param {object} panel Panel object.
+				 */
+				init: function (panel) {
+					// Skip if observer for current widget already initialized.
+					if (vars.observerWidgetId === vars.widgetId) {
 						return;
 					}
-				}
-			},
 
-			/**
-			 * Process 'childList' mutation.
-			 *
-			 * @since 1.6.3
-			 *
-			 * @param {MutationRecord} mutation Mutation record.
-			 *
-			 * @returns {boolean} True if detect needed node.
-			 */
-			callbackMutationChildList: function( mutation ) {
+					// Disconnect previous widget observer.
+					if (
+						typeof vars.observer !== 'undefined' &&
+						typeof vars.observer.disconnect === 'function'
+					) {
+						vars.observer.disconnect();
+					}
 
-				var addedNodes = mutation.addedNodes || [],
-					node;
+					var obs = {
+						targetNode: panel.$el.find('#elementor-panel-content-wrapper')[0],
+						config: {
+							childList: true,
+							subtree: true,
+							attributes: true,
+						},
+					};
 
-				for ( var n in addedNodes ) {
-					node = addedNodes[ n ];
+					app.widgetPanelObserver.panel = panel;
 
-					if ( node && node.classList && node.classList.contains( 'elementor-control-section_form' ) ) {
-						app.widgetPanelInit( app.widgetPanelObserver.panel );
+					obs.observer = new MutationObserver(app.widgetPanelObserver.callback);
+					obs.observer.observe(obs.targetNode, obs.config);
+
+					vars.observerWidgetId = vars.widgetId;
+					vars.observer = obs.observer;
+				},
+
+				/**
+				 * Observer callback.
+				 *
+				 * @since 1.6.3
+				 *
+				 * @param {Array} mutationsList Mutation list.
+				 */
+				callback: function (mutationsList) {
+					var mutation,
+						quit = false;
+
+					for (var i in mutationsList) {
+						mutation = mutationsList[i];
+
+						if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+							quit = app.widgetPanelObserver.callbackMutationChildList(mutation);
+						}
+
+						if (mutation.type === 'attributes') {
+							quit = app.widgetPanelObserver.callbackMutationAttributes(mutation);
+						}
+
+						if (quit) {
+							return;
+						}
+					}
+				},
+
+				/**
+				 * Process 'childList' mutation.
+				 *
+				 * @since 1.6.3
+				 *
+				 * @param {MutationRecord} mutation Mutation record.
+				 *
+				 * @returns {boolean} True if detect needed node.
+				 */
+				callbackMutationChildList: function (mutation) {
+					var addedNodes = mutation.addedNodes || [],
+						node;
+
+					for (var n in addedNodes) {
+						node = addedNodes[n];
+
+						if (
+							node &&
+							node.classList &&
+							node.classList.contains('elementor-control-section_form')
+						) {
+							app.widgetPanelInit(app.widgetPanelObserver.panel);
+							return true;
+						}
+					}
+
+					return false;
+				},
+
+				/**
+				 * Process 'attributes' mutation.
+				 *
+				 * @since 1.6.3
+				 *
+				 * @param {MutationRecord} mutation Mutation record.
+				 *
+				 * @returns {boolean} True if detect needed target.
+				 */
+				callbackMutationAttributes: function (mutation) {
+					if (
+						mutation.target &&
+						mutation.target.classList &&
+						mutation.target.classList.contains('elementor-tab-control-content')
+					) {
+						app.widgetPanelInit(app.widgetPanelObserver.panel);
+
 						return true;
 					}
+
+					return false;
+				},
+			},
+
+			/**
+			 * Edit selected form button click event handler.
+			 *
+			 * @since 1.6.2
+			 *
+			 * @param {object} event Event object.
+			 */
+			editFormLinkClick: function (event) {
+				app.findFormSelector(event);
+				app.openBuilderPopup(vars.$select.val());
+			},
+
+			/**
+			 * Add a new form button click event handler.
+			 *
+			 * @since 1.6.2
+			 *
+			 * @param {object} event Event object.
+			 */
+			addFormBtnClick: function (event) {
+				app.findFormSelector(event);
+				app.openBuilderPopup(0);
+			},
+
+			/**
+			 * Find and store the form selector control wrapped in jQuery object.
+			 *
+			 * @since 1.6.2
+			 *
+			 * @param {object} event Event object.
+			 */
+			findFormSelector: function (event) {
+				let view = elementor.getPanelView().getCurrentPageView();
+
+				// We need to be sure that we are on the widget Content section.
+				if (view.activeSection && view.activeSection !== 'section_form') {
+					$(view.ui.tabs[0]).trigger('click');
 				}
+
+				vars.$select =
+					event && event.$el
+						? event.$el.closest('#elementor-controls').find('select[data-setting="form_id"]')
+						: window.parent.jQuery('#elementor-controls select[data-setting="form_id"]');
+			},
+
+			/**
+			 * Preview: Form selector event handler.
+			 *
+			 * @since 1.6.2
+			 */
+			selectFormInPreview: function () {
+				vars.formId = $(this).val();
+
+				app.findFormSelector();
+
+				// To be sure, that both form selector selects are in sync.
+				app.refreshFormsList(null, vars.formId);
+			},
+
+			/**
+			 * Preview: Click on the link event handler.
+			 *
+			 * @since 1.6.2
+			 *
+			 * @param {object} event Event object.
+			 */
+			clickLinkInPreview: function (event) {
+				if (event.target && event.target.href) {
+					window.open(event.target.href, '_blank', 'noopener,noreferrer');
+				}
+			},
+
+			/**
+			 * Disable events.
+			 *
+			 * @since 1.6.2
+			 *
+			 * @param {object} event Event object.
+			 *
+			 * @returns {boolean} Always false.
+			 */
+			disableEvents: function (event) {
+				event.preventDefault();
+				event.stopImmediatePropagation();
 
 				return false;
 			},
 
 			/**
-			 * Process 'attributes' mutation.
+			 * Open the compreshenvie guide link,
+			 * as elementor disables all links in the preview.
 			 *
-			 * @since 1.6.3
+			 * @since 1.8.3
 			 *
-			 * @param {MutationRecord} mutation Mutation record.
-			 *
-			 * @returns {boolean} True if detect needed target.
+			 * @param {object} event Event object.
 			 */
-			callbackMutationAttributes: function( mutation ) {
+			openComprehensiveLink: function (event) {
+				const url = $(this).attr('href');
 
-				if (
-					mutation.target &&
-					mutation.target.classList &&
-					mutation.target.classList.contains( 'elementor-tab-control-content' )
-				) {
-					app.widgetPanelInit( app.widgetPanelObserver.panel );
+				// Open the url in a new tab with JS bc elementor doesn't allow links in the preview.
+				window.open(url, '_blank').focus();
+			},
 
-					return true;
+			/**
+			 * Open builder popup.
+			 *
+			 * @since 1.6.2
+			 *
+			 * @param {number} formId Form id. 0 for create new form.
+			 */
+			openBuilderPopup: function (formId) {
+				formId = parseInt(formId || '0', 10);
+
+				if (!vars.$popup) {
+					// We need to add popup markup to the editor top document.
+					var $elementor = window.parent.jQuery('#elementor-editor-wrapper'),
+						popupTpl = wp.template('wpforms-builder-elementor-popup');
+
+					$elementor.after(popupTpl());
+					vars.$popup = $elementor.siblings('#wpforms-builder-elementor-popup');
 				}
 
-				return false;
+				var url =
+						formId > 0
+							? wpformsElementorVars.edit_form_url + formId
+							: wpformsElementorVars.add_form_url,
+					$iframe = vars.$popup.find('iframe');
+
+				app.builderCloseButtonEvent();
+				$iframe.attr('src', url);
+				vars.$popup.fadeIn();
 			},
-		},
 
-		/**
-		 * Edit selected form button click event handler.
-		 *
-		 * @since 1.6.2
-		 *
-		 * @param {object} event Event object.
-		 */
-		editFormLinkClick: function( event ) {
+			/**
+			 * Close button (inside the form builder) click event.
+			 *
+			 * @since 1.6.2
+			 */
+			builderCloseButtonEvent: function () {
+				vars.$popup
+					.off('wpformsBuilderInPopupClose')
+					.on('wpformsBuilderInPopupClose', function (e, action, formId) {
+						if (action !== 'saved' || !formId) {
+							return;
+						}
 
-			app.findFormSelector( event );
-			app.openBuilderPopup( vars.$select.val() );
-		},
+						app.refreshFormsList(null, formId);
+					});
+			},
 
-		/**
-		 * Add a new form button click event handler.
-		 *
-		 * @since 1.6.2
-		 *
-		 * @param {object} event Event object.
-		 */
-		addFormBtnClick: function( event ) {
+			/**
+			 * Refresh forms list event handler.
+			 *
+			 * @since 1.6.2
+			 *
+			 * @param {object} event     Event object.
+			 * @param {number} setFormId Set selected form to.
+			 */
+			refreshFormsList: function (event, setFormId) {
+				if (event) {
+					event.preventDefault();
+				}
 
-			app.findFormSelector( event );
-			app.openBuilderPopup( 0 );
-		},
+				app.findFormSelector();
 
-		/**
-		 * Find and store the form selector control wrapped in jQuery object.
-		 *
-		 * @since 1.6.2
-		 *
-		 * @param {object} event Event object.
-		 */
-		findFormSelector: function( event ) {
+				var data = {
+					action: 'wpforms_admin_get_form_selector_options',
+					nonce: wpformsElementorVars.nonce,
+				};
 
-			let view = elementor.getPanelView().getCurrentPageView();
+				vars.$select.prop('disabled', true);
 
-			// We need to be sure that we are on the widget Content section.
-			if ( view.activeSection && view.activeSection !== 'section_form' ) {
-				$( view.ui.tabs[0] ).trigger( 'click' );
-			}
+				$.post(wpformsElementorVars.ajax_url, data)
+					.done(function (response) {
+						if (!response.success) {
+							app.debug(response);
+							return;
+						}
 
-			vars.$select = event && event.$el ?
-				event.$el.closest( '#elementor-controls' ).find( 'select[data-setting="form_id"]' ) :
-				window.parent.jQuery( '#elementor-controls select[data-setting="form_id"]' );
-		},
+						vars.formSelectOptions = response.data;
+						vars.$select.html(response.data);
 
-		/**
-		 * Preview: Form selector event handler.
-		 *
-		 * @since 1.6.2
-		 */
-		selectFormInPreview: function() {
+						if (setFormId) {
+							vars.formId = setFormId;
+						}
 
-			vars.formId = $( this ).val();
+						if (vars.formId && vars.formId !== '') {
+							vars.$select.val(vars.formId).trigger('change');
+						}
+					})
+					.fail(function (xhr, textStatus) {
+						app.debug({
+							xhr: xhr,
+							textStatus: textStatus,
+						});
+					})
+					.always(function () {
+						if (!vars.$select || vars.$select.length < 1) {
+							return;
+						}
 
-			app.findFormSelector();
+						vars.$select.prop('disabled', false);
 
-			// To be sure, that both form selector selects are in sync.
-			app.refreshFormsList( null, vars.formId );
-		},
+						var $formSelectOptions = vars.$select.find('option'),
+							$formSelectControl = vars.$select.closest('.elementor-control');
 
-		/**
-		 * Preview: Click on the link event handler.
-		 *
-		 * @since 1.6.2
-		 *
-		 * @param {object} event Event object.
-		 */
-		clickLinkInPreview: function( event ) {
+						if ($formSelectOptions.length > 0) {
+							$formSelectControl.show();
+							$formSelectControl.siblings('.elementor-control-add_form_notice').hide();
+						}
+						if (parseInt(vars.$select.val(), 10) > 0) {
+							$formSelectControl.siblings('.elementor-control-test_form_notice').show();
+						}
+					});
+			},
 
-			if ( event.target && event.target.href ) {
-				window.open( event.target.href, '_blank', 'noopener,noreferrer' );
-			}
-		},
+			/**
+			 * Debug output helper.
+			 *
+			 * @since 1.6.2
+			 *
+			 * @param {mixed} msg Debug message.
+			 */
+			debug: function (msg) {
+				if (app.isDebug()) {
+					console.log('WPForms Debug:', msg);
+				}
+			},
 
-		/**
-		 * Disable events.
-		 *
-		 * @since 1.6.2
-		 *
-		 * @param {object} event Event object.
-		 *
-		 * @returns {boolean} Always false.
-		 */
-		disableEvents: function( event ) {
+			/**
+			 * Is debug mode.
+			 *
+			 * @since 1.6.2
+			 *
+			 * @returns {boolean} True if the debug enabled.
+			 */
+			isDebug: function () {
+				return (
+					(window.top.location.hash && '#wpformsdebug' === window.top.location.hash) ||
+					wpformsElementorVars.debug
+				);
+			},
+		};
 
-			event.preventDefault();
-			event.stopImmediatePropagation();
-
-			return false;
-		},
-
-		/**
-		 * Open the compreshenvie guide link,
-		 * as elementor disables all links in the preview.
-		 *
-		 * @since 1.8.3
-		 *
-		 * @param {object} event Event object.
-		 */
-		openComprehensiveLink: function( event ) {
-
-			const url = $( this ).attr( 'href' );
-
-			// Open the url in a new tab with JS bc elementor doesn't allow links in the preview.
-			window.open( url, '_blank' ).focus();
-		},
-
-		/**
-		 * Open builder popup.
-		 *
-		 * @since 1.6.2
-		 *
-		 * @param {number} formId Form id. 0 for create new form.
-		 */
-		openBuilderPopup: function( formId ) {
-
-			formId = parseInt( formId || '0', 10 );
-
-			if ( ! vars.$popup ) {
-
-				// We need to add popup markup to the editor top document.
-				var $elementor = window.parent.jQuery( '#elementor-editor-wrapper' ),
-					popupTpl = wp.template( 'wpforms-builder-elementor-popup' );
-
-				$elementor.after( popupTpl() );
-				vars.$popup = $elementor.siblings( '#wpforms-builder-elementor-popup' );
-			}
-
-			var url = formId > 0 ? wpformsElementorVars.edit_form_url + formId : wpformsElementorVars.add_form_url,
-				$iframe = vars.$popup.find( 'iframe' );
-
-			app.builderCloseButtonEvent();
-			$iframe.attr( 'src', url );
-			vars.$popup.fadeIn();
-		},
-
-		/**
-		 * Close button (inside the form builder) click event.
-		 *
-		 * @since 1.6.2
-		 */
-		builderCloseButtonEvent: function() {
-
-			vars.$popup
-				.off( 'wpformsBuilderInPopupClose' )
-				.on( 'wpformsBuilderInPopupClose', function( e, action, formId ) {
-
-					if ( action !== 'saved' || ! formId ) {
-						return;
-					}
-
-					app.refreshFormsList( null, formId );
-				} );
-		},
-
-		/**
-		 * Refresh forms list event handler.
-		 *
-		 * @since 1.6.2
-		 *
-		 * @param {object} event     Event object.
-		 * @param {number} setFormId Set selected form to.
-		 */
-		refreshFormsList: function( event, setFormId ) {
-
-			if ( event ) {
-				event.preventDefault();
-			}
-
-			app.findFormSelector();
-
-			var data = {
-				action: 'wpforms_admin_get_form_selector_options',
-				nonce : wpformsElementorVars.nonce,
-			};
-
-			vars.$select.prop( 'disabled', true );
-
-			$.post( wpformsElementorVars.ajax_url, data )
-				.done( function( response ) {
-
-					if ( ! response.success ) {
-						app.debug( response );
-						return;
-					}
-
-					vars.formSelectOptions = response.data;
-					vars.$select.html( response.data );
-
-					if ( setFormId ) {
-						vars.formId = setFormId;
-					}
-
-					if ( vars.formId && vars.formId !== '' ) {
-						vars.$select.val( vars.formId ).trigger( 'change' );
-					}
-				} )
-				.fail( function( xhr, textStatus ) {
-
-					app.debug( {
-						xhr: xhr,
-						textStatus: textStatus,
-					} );
-				} )
-				.always( function() {
-
-					if ( ! vars.$select || vars.$select.length < 1 ) {
-						return;
-					}
-
-					vars.$select.prop( 'disabled', false );
-
-					var $formSelectOptions = vars.$select.find( 'option' ),
-						$formSelectControl = vars.$select.closest( '.elementor-control' );
-
-					if ( $formSelectOptions.length > 0 ) {
-						$formSelectControl.show();
-						$formSelectControl.siblings( '.elementor-control-add_form_notice' ).hide();
-					}
-					if ( parseInt( vars.$select.val(), 10 ) > 0 ) {
-						$formSelectControl.siblings( '.elementor-control-test_form_notice' ).show();
-					}
-				} );
-		},
-
-		/**
-		 * Debug output helper.
-		 *
-		 * @since 1.6.2
-		 *
-		 * @param {mixed} msg Debug message.
-		 */
-		debug: function( msg ) {
-
-			if ( app.isDebug() ) {
-				console.log( 'WPForms Debug:', msg );
-			}
-		},
-
-		/**
-		 * Is debug mode.
-		 *
-		 * @since 1.6.2
-		 *
-		 * @returns {boolean} True if the debug enabled.
-		 */
-		isDebug: function() {
-
-			return ( ( window.top.location.hash && '#wpformsdebug' === window.top.location.hash ) || wpformsElementorVars.debug );
-		},
-	};
-
-	return app;
-
-}( document, window, jQuery ) );
+		return app;
+	})(document, window, jQuery);
 
 // Initialize.
 WPFormsElementor.init();

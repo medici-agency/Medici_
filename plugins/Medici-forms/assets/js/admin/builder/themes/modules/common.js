@@ -11,7 +11,8 @@
  *
  * @return {Object} Public functions and properties.
  */
-export default function( document, window, $ ) {// eslint-disable-line max-lines-per-function
+export default function (document, window, $) {
+	// eslint-disable-line max-lines-per-function
 	const WPForms = window.WPForms || {};
 	const WPFormsBuilderThemes = WPForms.Admin.Builder.Themes || {};
 
@@ -20,7 +21,8 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 	 *
 	 * @since 1.9.7
 	 */
-	const { isPro, isLicenseActive, isModern, isFullStyles, isLowFormPagesVersion, strings } = wpforms_builder_themes;
+	const { isPro, isLicenseActive, isModern, isFullStyles, isLowFormPagesVersion, strings } =
+		wpforms_builder_themes;
 
 	/**
 	 * Elements holder.
@@ -41,27 +43,33 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 	const fieldDependencies = {
 		fieldBorderStyle: {
 			none: {
-				disable: [ 'fieldBorderSize', 'fieldBorderColor' ],
+				disable: ['fieldBorderSize', 'fieldBorderColor'],
 			},
 		},
 		buttonBorderStyle: {
 			none: {
-				disable: [ 'buttonBorderSize', 'buttonBorderColor' ],
+				disable: ['buttonBorderSize', 'buttonBorderColor'],
 			},
 		},
 		containerBorderStyle: {
 			none: {
-				disable: [ 'containerBorderWidth', 'containerBorderColor' ],
+				disable: ['containerBorderWidth', 'containerBorderColor'],
 			},
 		},
 		backgroundImage: {
 			none: {
-				hide: [ 'backgroundPosition', 'backgroundRepeat', 'backgroundSizeMode', 'backgroundWidth', 'backgroundHeight' ],
+				hide: [
+					'backgroundPosition',
+					'backgroundRepeat',
+					'backgroundSizeMode',
+					'backgroundWidth',
+					'backgroundHeight',
+				],
 			},
 		},
 		backgroundSizeMode: {
 			cover: {
-				hide: [ 'backgroundWidth', 'backgroundHeight' ],
+				hide: ['backgroundWidth', 'backgroundHeight'],
 			},
 		},
 	};
@@ -72,7 +80,6 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 	 * @since 1.9.7
 	 */
 	const app = {
-
 		/**
 		 * Start the engine.
 		 *
@@ -92,10 +99,10 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 			WPFormsBuilderThemes.store.initFromDOM();
 
 			// Subscribe to all settings change.
-			WPFormsBuilderThemes.store.subscribeAll( ( value, key ) => {
-				app.changeStyleSettings( value, key );
-				app.handleFieldDependencies( key, value );
-			} );
+			WPFormsBuilderThemes.store.subscribeAll((value, key) => {
+				app.changeStyleSettings(value, key);
+				app.handleFieldDependencies(key, value);
+			});
 
 			// Render already saved settings.
 			app.renderSavedSettings();
@@ -116,15 +123,15 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @since 1.9.7
 		 */
 		setup() {
-			el.$builder = $( '#wpforms-builder' );
-			el.$settings = $( '.wpforms-panel-content-section-themes' );
-			el.$sidebar = $( '#wpforms-builder-themes-sidebar' );
-			el.$preview = $( '#wpforms-builder-themes-preview' );
-			el.$tabs = $( '#wpforms-builder-themes-sidebar-tabs > a' );
+			el.$builder = $('#wpforms-builder');
+			el.$settings = $('.wpforms-panel-content-section-themes');
+			el.$sidebar = $('#wpforms-builder-themes-sidebar');
+			el.$preview = $('#wpforms-builder-themes-preview');
+			el.$tabs = $('#wpforms-builder-themes-sidebar-tabs > a');
 
 			// Set the custom class to sidebar content for macOS.
-			if ( app.isMac() ) {
-				el.$sidebar.find( '.wpforms-builder-themes-sidebar-content' ).addClass( 'wpforms-is-mac' );
+			if (app.isMac()) {
+				el.$sidebar.find('.wpforms-builder-themes-sidebar-content').addClass('wpforms-is-mac');
 			}
 		},
 
@@ -135,13 +142,17 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 */
 		events() {
 			el.$builder
-				.on( 'click', '#wpforms-builder-themes-back', app.handleClosePreviewSidebar )
-				.on( 'click', '.wpforms-panel-sidebar-section-themes', app.handleOpenPreviewSidebar )
-				.on( 'wpformsPanelSwitched', '.wpforms-panel-sidebar-section-themes', app.handlePanelSwitch )
-				.on( 'wpformsPanelSectionSwitch', app.handlePanelSectionSwitch )
-				.on( 'click', '.wpforms-panel-settings-button.active[data-panel="settings"]', app.handleSettingsTabClick );
+				.on('click', '#wpforms-builder-themes-back', app.handleClosePreviewSidebar)
+				.on('click', '.wpforms-panel-sidebar-section-themes', app.handleOpenPreviewSidebar)
+				.on('wpformsPanelSwitched', '.wpforms-panel-sidebar-section-themes', app.handlePanelSwitch)
+				.on('wpformsPanelSectionSwitch', app.handlePanelSectionSwitch)
+				.on(
+					'click',
+					'.wpforms-panel-settings-button.active[data-panel="settings"]',
+					app.handleSettingsTabClick
+				);
 
-			el.$tabs.on( 'click', app.handleTabClick );
+			el.$tabs.on('click', app.handleTabClick);
 		},
 
 		/**
@@ -150,11 +161,11 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @since 1.9.7
 		 */
 		handleSettingsTabClick() {
-			if ( el.$sidebar.hasClass( 'wpforms-hidden' ) ) {
+			if (el.$sidebar.hasClass('wpforms-hidden')) {
 				return;
 			}
 
-			app.handleClosePreviewSidebar( null );
+			app.handleClosePreviewSidebar(null);
 		},
 
 		/**
@@ -165,10 +176,10 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {string} fieldKey   The field key that changed.
 		 * @param {string} fieldValue The new field value.
 		 */
-		handleFieldDependencies( fieldKey, fieldValue ) {
+		handleFieldDependencies(fieldKey, fieldValue) {
 			// After handling the specific field dependency, re-apply all dependencies
 			// to ensure all conditions are properly evaluated with current values.
-			app.applyFieldDependency( fieldKey, fieldValue );
+			app.applyFieldDependency(fieldKey, fieldValue);
 			app.applyAllDependencies();
 		},
 
@@ -180,63 +191,63 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {string} fieldKey   The field key that changed.
 		 * @param {string} fieldValue The new field value.
 		 */
-		applyFieldDependency( fieldKey, fieldValue ) {
-			if ( ! fieldDependencies[ fieldKey ] ) {
+		applyFieldDependency(fieldKey, fieldValue) {
+			if (!fieldDependencies[fieldKey]) {
 				return;
 			}
 
-			const dependencies = fieldDependencies[ fieldKey ];
+			const dependencies = fieldDependencies[fieldKey];
 
 			// Check each condition for the field.
 			// eslint-disable-next-line complexity
-			Object.keys( dependencies ).forEach( ( conditionValue ) => {
-				const condition = dependencies[ conditionValue ];
+			Object.keys(dependencies).forEach((conditionValue) => {
+				const condition = dependencies[conditionValue];
 				const shouldApply = fieldValue === conditionValue;
 
 				// Handle disable conditions.
-				if ( condition.disable && shouldApply ) {
-					condition.disable.forEach( ( dependentField ) => {
-						app.disableField( dependentField );
-					} );
-				} else if ( condition.disable ) {
-					condition.disable.forEach( ( dependentField ) => {
-						app.enableField( dependentField );
-					} );
+				if (condition.disable && shouldApply) {
+					condition.disable.forEach((dependentField) => {
+						app.disableField(dependentField);
+					});
+				} else if (condition.disable) {
+					condition.disable.forEach((dependentField) => {
+						app.enableField(dependentField);
+					});
 				}
 
 				// Handle enable conditions.
-				if ( condition.enable && shouldApply ) {
-					condition.enable.forEach( ( dependentField ) => {
-						app.enableField( dependentField );
-					} );
-				} else if ( condition.enable ) {
-					condition.enable.forEach( ( dependentField ) => {
-						app.disableField( dependentField );
-					} );
+				if (condition.enable && shouldApply) {
+					condition.enable.forEach((dependentField) => {
+						app.enableField(dependentField);
+					});
+				} else if (condition.enable) {
+					condition.enable.forEach((dependentField) => {
+						app.disableField(dependentField);
+					});
 				}
 
 				// Handle hide conditions.
-				if ( condition.hide && shouldApply ) {
-					condition.hide.forEach( ( dependentField ) => {
-						app.hideField( dependentField );
-					} );
-				} else if ( condition.hide ) {
-					condition.hide.forEach( ( dependentField ) => {
-						app.showField( dependentField );
-					} );
+				if (condition.hide && shouldApply) {
+					condition.hide.forEach((dependentField) => {
+						app.hideField(dependentField);
+					});
+				} else if (condition.hide) {
+					condition.hide.forEach((dependentField) => {
+						app.showField(dependentField);
+					});
 				}
 
 				// Handle show conditions.
-				if ( condition.show && shouldApply ) {
-					condition.show.forEach( ( dependentField ) => {
-						app.showField( dependentField );
-					} );
-				} else if ( condition.show ) {
-					condition.show.forEach( ( dependentField ) => {
-						app.hideField( dependentField );
-					} );
+				if (condition.show && shouldApply) {
+					condition.show.forEach((dependentField) => {
+						app.showField(dependentField);
+					});
+				} else if (condition.show) {
+					condition.show.forEach((dependentField) => {
+						app.hideField(dependentField);
+					});
 				}
-			} );
+			});
 		},
 
 		/**
@@ -247,12 +258,12 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		applyAllDependencies() {
 			const settings = WPFormsBuilderThemes.getSettings();
 
-			Object.keys( fieldDependencies ).forEach( ( fieldKey ) => {
-				const fieldValue = settings[ fieldKey ];
-				if ( fieldValue !== undefined ) {
-					app.applyFieldDependency( fieldKey, fieldValue );
+			Object.keys(fieldDependencies).forEach((fieldKey) => {
+				const fieldValue = settings[fieldKey];
+				if (fieldValue !== undefined) {
+					app.applyFieldDependency(fieldKey, fieldValue);
 				}
-			} );
+			});
 		},
 
 		/**
@@ -262,11 +273,11 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 *
 		 * @param {string} fieldKey The field key to disable.
 		 */
-		disableField( fieldKey ) {
-			const $field = el.$sidebar.find( `[name*="${ fieldKey }"]` );
+		disableField(fieldKey) {
+			const $field = el.$sidebar.find(`[name*="${fieldKey}"]`);
 
-			if ( $field.length ) {
-				$field.addClass( 'wpforms-builder-themes-disabled' );
+			if ($field.length) {
+				$field.addClass('wpforms-builder-themes-disabled');
 			}
 		},
 
@@ -277,11 +288,11 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 *
 		 * @param {string} fieldKey The field key to enable.
 		 */
-		enableField( fieldKey ) {
-			const $field = el.$sidebar.find( `[name*="${ fieldKey }"]` );
+		enableField(fieldKey) {
+			const $field = el.$sidebar.find(`[name*="${fieldKey}"]`);
 
-			if ( $field.length ) {
-				$field.removeClass( 'wpforms-builder-themes-disabled' );
+			if ($field.length) {
+				$field.removeClass('wpforms-builder-themes-disabled');
 			}
 		},
 
@@ -292,15 +303,15 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 *
 		 * @param {string} fieldKey The field key to hide.
 		 */
-		hideField( fieldKey ) {
-			const $field = el.$sidebar.find( `[name*="${ fieldKey }"]` );
-			const $wrapper = $field.parent().parent().hasClass( 'wpforms-builder-themes-conditional-hide' )
+		hideField(fieldKey) {
+			const $field = el.$sidebar.find(`[name*="${fieldKey}"]`);
+			const $wrapper = $field.parent().parent().hasClass('wpforms-builder-themes-conditional-hide')
 				? $field.parent().parent()
-				: $field.parent( '.wpforms-panel-field' );
+				: $field.parent('.wpforms-panel-field');
 
-			if ( $field.length ) {
-				$field.prop( 'disabled', true );
-				$wrapper.addClass( 'wpforms-builder-themes-hidden' );
+			if ($field.length) {
+				$field.prop('disabled', true);
+				$wrapper.addClass('wpforms-builder-themes-hidden');
 			}
 		},
 
@@ -311,15 +322,15 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 *
 		 * @param {string} fieldKey The field key to show.
 		 */
-		showField( fieldKey ) {
-			const $field = el.$sidebar.find( `[name*="${ fieldKey }"]` );
-			const $wrapper = $field.parent().parent().hasClass( 'wpforms-builder-themes-conditional-hide' )
+		showField(fieldKey) {
+			const $field = el.$sidebar.find(`[name*="${fieldKey}"]`);
+			const $wrapper = $field.parent().parent().hasClass('wpforms-builder-themes-conditional-hide')
 				? $field.parent().parent()
-				: $field.parent( '.wpforms-panel-field' );
+				: $field.parent('.wpforms-panel-field');
 
-			if ( $field.length ) {
-				$field.prop( 'disabled', false );
-				$wrapper.removeClass( 'wpforms-builder-themes-hidden' );
+			if ($field.length) {
+				$field.prop('disabled', false);
+				$wrapper.removeClass('wpforms-builder-themes-hidden');
 			}
 		},
 
@@ -330,8 +341,8 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 *
 		 * @param {Object} event The event object.
 		 */
-		handleOpenPreviewSidebar( event ) {
-			el.$sidebar?.removeClass( 'wpforms-hidden' );
+		handleOpenPreviewSidebar(event) {
+			el.$sidebar?.removeClass('wpforms-hidden');
 			event?.preventDefault();
 		},
 
@@ -342,8 +353,8 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 *
 		 * @param {Object} event The event object.
 		 */
-		handleClosePreviewSidebar( event ) {
-			el.$sidebar?.addClass( 'wpforms-hidden' );
+		handleClosePreviewSidebar(event) {
+			el.$sidebar?.addClass('wpforms-hidden');
 			event?.preventDefault();
 		},
 
@@ -353,8 +364,8 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @since 1.9.7
 		 */
 		handlePanelSwitch() {
-			if ( wpf.getQueryString( 'section' ) === 'themes' ) {
-				app.handleOpenPreviewSidebar( null );
+			if (wpf.getQueryString('section') === 'themes') {
+				app.handleOpenPreviewSidebar(null);
 			}
 		},
 
@@ -366,8 +377,8 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {Object} _event  The event object.
 		 * @param {string} section The section that was switched to.
 		 */
-		handlePanelSectionSwitch( _event, section ) {
-			if ( section === 'themes' ) {
+		handlePanelSectionSwitch(_event, section) {
+			if (section === 'themes') {
 				app.checkForFormFeatures();
 			}
 		},
@@ -379,10 +390,10 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 *
 		 * @param {Object} e Event object.
 		 */
-		handleTabClick( e ) {
+		handleTabClick(e) {
 			e.preventDefault();
-			el.$tabs.toggleClass( 'active' );
-			$( '.wpforms-builder-themes-sidebar-tab-content' ).toggleClass( 'wpforms-hidden' );
+			el.$tabs.toggleClass('active');
+			$('.wpforms-builder-themes-sidebar-tab-content').toggleClass('wpforms-hidden');
 		},
 
 		/**
@@ -459,15 +470,16 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {string} settingValue Setting value.
 		 * @param {string} settingKey   Setting key.
 		 */
-		changeStyleSettings( settingValue, settingKey ) {// eslint-disable-line complexity
-			const wpformsContainer = el.$preview.find( '.wpforms-container' )[ 0 ];
+		changeStyleSettings(settingValue, settingKey) {
+			// eslint-disable-line complexity
+			const wpformsContainer = el.$preview.find('.wpforms-container')[0];
 
-			if ( ! wpformsContainer ) {
+			if (!wpformsContainer) {
 				return;
 			}
 
 			// Process only styles related settings
-			if ( ! app.getStyleAttributesKeys().includes( settingKey ) ) {
+			if (!app.getStyleAttributesKeys().includes(settingKey)) {
 				return;
 			}
 
@@ -476,52 +488,75 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 			/**
 			 * @type {Object}
 			 */
-			const property = settingKey.replace( /[A-Z]/g, ( letter ) => `-${ letter.toLowerCase() }` );
-			settingValue = app.prepareComplexAttrValues( settingValue, settingKey );
+			const property = settingKey.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+			settingValue = app.prepareComplexAttrValues(settingValue, settingKey);
 
 			// Check for custom handlers.
-			if ( typeof app.getStyleHandlers()[ property ] === 'function' ) {
-				app.getStyleHandlers()[ property ]( wpformsContainer, settingValue, settings );
+			if (typeof app.getStyleHandlers()[property] === 'function') {
+				app.getStyleHandlers()[property](wpformsContainer, settingValue, settings);
 				return;
 			}
 
-			switch ( property ) {
+			switch (property) {
 				case 'field-size':
 				case 'label-size':
 				case 'button-size':
 				case 'container-shadow-size':
-					for ( const key in wpforms_builder_themes.sizes[ property ][ settingValue ] ) {
+					for (const key in wpforms_builder_themes.sizes[property][settingValue]) {
 						wpformsContainer.style.setProperty(
-							`--wpforms-${ property }-${ key }`,
-							wpforms_builder_themes.sizes[ property ][ settingValue ][ key ],
+							`--wpforms-${property}-${key}`,
+							wpforms_builder_themes.sizes[property][settingValue][key]
 						);
 					}
 
 					break;
 
 				case 'button-background-color':
-					app.maybeUpdateAccentColor( settings.buttonBorderColor, settingValue, wpformsContainer );
-					settingValue = app.maybeSetButtonAltBackgroundColor( settingValue, settings.buttonBorderColor, wpformsContainer );
-					app.maybeSetButtonAltTextColor( settings.buttonTextColor, settingValue, settings.buttonBorderColor, wpformsContainer );
-					wpformsContainer.style.setProperty( `--wpforms-${ property }`, settingValue );
+					app.maybeUpdateAccentColor(settings.buttonBorderColor, settingValue, wpformsContainer);
+					settingValue = app.maybeSetButtonAltBackgroundColor(
+						settingValue,
+						settings.buttonBorderColor,
+						wpformsContainer
+					);
+					app.maybeSetButtonAltTextColor(
+						settings.buttonTextColor,
+						settingValue,
+						settings.buttonBorderColor,
+						wpformsContainer
+					);
+					wpformsContainer.style.setProperty(`--wpforms-${property}`, settingValue);
 
 					break;
 
 				case 'button-border-color':
-					app.maybeUpdateAccentColor( settingValue, settings.buttonBackgroundColor, wpformsContainer );
-					app.maybeSetButtonAltTextColor( settings.buttonTextColor, settings.buttonBackgroundColor, settingValue, wpformsContainer );
-					wpformsContainer.style.setProperty( `--wpforms-${ property }`, settingValue );
+					app.maybeUpdateAccentColor(
+						settingValue,
+						settings.buttonBackgroundColor,
+						wpformsContainer
+					);
+					app.maybeSetButtonAltTextColor(
+						settings.buttonTextColor,
+						settings.buttonBackgroundColor,
+						settingValue,
+						wpformsContainer
+					);
+					wpformsContainer.style.setProperty(`--wpforms-${property}`, settingValue);
 
 					break;
 
 				case 'button-text-color':
-					app.maybeSetButtonAltTextColor( settingValue, settings.buttonBackgroundColor, settings.buttonBorderColor, wpformsContainer );
-					wpformsContainer.style.setProperty( `--wpforms-${ property }`, settingValue );
+					app.maybeSetButtonAltTextColor(
+						settingValue,
+						settings.buttonBackgroundColor,
+						settings.buttonBorderColor,
+						wpformsContainer
+					);
+					wpformsContainer.style.setProperty(`--wpforms-${property}`, settingValue);
 
 					break;
 				default:
-					wpformsContainer.style.setProperty( `--wpforms-${ property }`, settingValue );
-					wpformsContainer.style.setProperty( `--wpforms-${ property }-spare`, settingValue );
+					wpformsContainer.style.setProperty(`--wpforms-${property}`, settingValue);
+					wpformsContainer.style.setProperty(`--wpforms-${property}-spare`, settingValue);
 			}
 		},
 
@@ -534,20 +569,23 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {string} buttonBackgroundColor Button background color.
 		 * @param {Object} container             Form container.
 		 */
-		maybeUpdateAccentColor( color, buttonBackgroundColor, container ) {
+		maybeUpdateAccentColor(color, buttonBackgroundColor, container) {
 			// Setting the CSS property value to the child element overrides the parent property value.
-			const formWrapper = container.querySelector( '#builder-themes-form-preview-wrapper' );
+			const formWrapper = container.querySelector('#builder-themes-form-preview-wrapper');
 
 			// Fallback to the default color if the border color is transparent.
-			color = WPFormsUtils.cssColorsUtils.isTransparentColor( color ) ? '#066aab' : color;
+			color = WPFormsUtils.cssColorsUtils.isTransparentColor(color) ? '#066aab' : color;
 
-			if ( WPFormsUtils.cssColorsUtils.isTransparentColor( buttonBackgroundColor ) ) {
-				formWrapper.style.setProperty( '--wpforms-button-background-color-alt', 'rgba( 0, 0, 0, 0 )' );
-				formWrapper.style.setProperty( '--wpforms-button-background-color', color );
+			if (WPFormsUtils.cssColorsUtils.isTransparentColor(buttonBackgroundColor)) {
+				formWrapper.style.setProperty(
+					'--wpforms-button-background-color-alt',
+					'rgba( 0, 0, 0, 0 )'
+				);
+				formWrapper.style.setProperty('--wpforms-button-background-color', color);
 			} else {
-				container.style.setProperty( '--wpforms-button-background-color-alt', buttonBackgroundColor );
-				formWrapper.style.setProperty( '--wpforms-button-background-color-alt', null );
-				formWrapper.style.setProperty( '--wpforms-button-background-color', null );
+				container.style.setProperty('--wpforms-button-background-color-alt', buttonBackgroundColor);
+				formWrapper.style.setProperty('--wpforms-button-background-color-alt', null);
+				formWrapper.style.setProperty('--wpforms-button-background-color', null);
 			}
 		},
 
@@ -562,14 +600,16 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 *
 		 * @return {string|*} New background color.
 		 */
-		maybeSetButtonAltBackgroundColor( value, buttonBorderColor, container ) {
+		maybeSetButtonAltBackgroundColor(value, buttonBorderColor, container) {
 			// Setting the CSS property value to the child element overrides the parent property value.
-			const formWrapper = container.querySelector( '#builder-themes-form-preview-wrapper' );
+			const formWrapper = container.querySelector('#builder-themes-form-preview-wrapper');
 
-			formWrapper.style.setProperty( '--wpforms-button-background-color-alt', value );
+			formWrapper.style.setProperty('--wpforms-button-background-color-alt', value);
 
-			if ( WPFormsUtils.cssColorsUtils.isTransparentColor( value ) ) {
-				return WPFormsUtils.cssColorsUtils.isTransparentColor( buttonBorderColor ) ? '#066aab' : buttonBorderColor;
+			if (WPFormsUtils.cssColorsUtils.isTransparentColor(value)) {
+				return WPFormsUtils.cssColorsUtils.isTransparentColor(buttonBorderColor)
+					? '#066aab'
+					: buttonBorderColor;
 			}
 
 			return value;
@@ -585,26 +625,24 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {string} buttonBorderColor     Button border color.
 		 * @param {Object} container             Form container.
 		 */
-		maybeSetButtonAltTextColor( value, buttonBackgroundColor, buttonBorderColor, container ) {
-			const formWrapper = container.querySelector( '#builder-themes-form-preview-wrapper' );
+		maybeSetButtonAltTextColor(value, buttonBackgroundColor, buttonBorderColor, container) {
+			const formWrapper = container.querySelector('#builder-themes-form-preview-wrapper');
 
 			let altColor = null;
 
 			value = value.toLowerCase();
 
 			if (
-				WPFormsUtils.cssColorsUtils.isTransparentColor( value ) ||
+				WPFormsUtils.cssColorsUtils.isTransparentColor(value) ||
 				value === buttonBackgroundColor ||
-				(
-					WPFormsUtils.cssColorsUtils.isTransparentColor( buttonBackgroundColor ) &&
-					value === buttonBorderColor
-				)
+				(WPFormsUtils.cssColorsUtils.isTransparentColor(buttonBackgroundColor) &&
+					value === buttonBorderColor)
 			) {
-				altColor = WPFormsUtils.cssColorsUtils.getContrastColor( buttonBackgroundColor );
+				altColor = WPFormsUtils.cssColorsUtils.getContrastColor(buttonBackgroundColor);
 			}
 
-			container.style.setProperty( `--wpforms-button-text-color-alt`, value );
-			formWrapper.style.setProperty( `--wpforms-button-text-color-alt`, altColor );
+			container.style.setProperty(`--wpforms-button-text-color-alt`, value);
+			formWrapper.style.setProperty(`--wpforms-button-text-color-alt`, altColor);
 		},
 
 		/**
@@ -617,7 +655,7 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 *
 		 * @return {string|Object} Prepared setting value.
 		 */
-		prepareComplexAttrValues( value, key ) {
+		prepareComplexAttrValues(value, key) {
 			const pxItems = [
 				'fieldBorderRadius',
 				'fieldBorderSize',
@@ -630,20 +668,23 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 				'backgroundHeight',
 			];
 
-			if ( pxItems.includes( key ) ) {
-				if ( typeof value === 'number' || ( typeof value === 'string' && ! value.trim().endsWith( 'px' ) ) ) {
-					value = `${ value }px`;
+			if (pxItems.includes(key)) {
+				if (
+					typeof value === 'number' ||
+					(typeof value === 'string' && !value.trim().endsWith('px'))
+				) {
+					value = `${value}px`;
 				}
 			}
 
-			if ( key === 'backgroundUrl' ) {
-				if ( typeof value === 'string' && ! value.trim().startsWith( 'url(' ) ) {
-					value = value ? `url( ${ value } )` : 'url()';
+			if (key === 'backgroundUrl') {
+				if (typeof value === 'string' && !value.trim().startsWith('url(')) {
+					value = value ? `url( ${value} )` : 'url()';
 				}
 			}
 
 			// Remove spaces after/before braces in rgb/rgba colors.
-			value = app.removeRgbaSpaces( value );
+			value = app.removeRgbaSpaces(value);
 
 			return value;
 		},
@@ -657,14 +698,12 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 *
 		 * @return {string} Prepared setting value.
 		 */
-		removeRgbaSpaces( value ) {
-			if ( typeof value !== 'string' || ! value.includes( 'rgb' ) ) {
+		removeRgbaSpaces(value) {
+			if (typeof value !== 'string' || !value.includes('rgb')) {
 				return value;
 			}
 
-			return value
-				.replace( /\(\s*/g, '(' )
-				.replace( /\s*\)/g, ')' );
+			return value.replace(/\(\s*/g, '(').replace(/\s*\)/g, ')');
 		},
 
 		/**
@@ -673,17 +712,17 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @since 1.9.7
 		 */
 		renderSavedSettings() {
-			const wpformsContainer = el.$preview.find( '.wpforms-container' )[ 0 ];
+			const wpformsContainer = el.$preview.find('.wpforms-container')[0];
 
-			if ( ! wpformsContainer ) {
+			if (!wpformsContainer) {
 				return;
 			}
 
 			const settings = WPFormsBuilderThemes.getSettings();
 
-			_.each( settings, ( value, key ) => {
-				app.changeStyleSettings( value, key );
-			} );
+			_.each(settings, (value, key) => {
+				app.changeStyleSettings(value, key);
+			});
 		},
 
 		/**
@@ -692,9 +731,9 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @since 1.9.7
 		 */
 		loadColorPickers() {
-			WPFormsBuilder.loadColorPickers( el.$sidebar, {
+			WPFormsBuilder.loadColorPickers(el.$sidebar, {
 				position: 'top left',
-			} );
+			});
 		},
 
 		/**
@@ -703,19 +742,21 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @since 1.9.7
 		 */
 		blockProSections() {
-			if ( isPro && isLicenseActive ) {
+			if (isPro && isLicenseActive) {
 				return;
 			}
 
-			const $proSectionsHeadings = $( '.wpforms-add-fields-heading[data-group="background_styles"], .wpforms-add-fields-heading[data-group="container_styles"]' );
-			const proSections = $( '.wpforms-builder-themes-pro-section' );
+			const $proSectionsHeadings = $(
+				'.wpforms-add-fields-heading[data-group="background_styles"], .wpforms-add-fields-heading[data-group="container_styles"]'
+			);
+			const proSections = $('.wpforms-builder-themes-pro-section');
 
 			// Disable sections and show the PRO badge.
-			proSections.addClass( 'wpforms-builder-themes-disabled-pro' );
-			$proSectionsHeadings.addClass( 'wpforms-builder-themes-pro-blocked' );
+			proSections.addClass('wpforms-builder-themes-disabled-pro');
+			$proSectionsHeadings.addClass('wpforms-builder-themes-pro-blocked');
 
 			// Disable clicks on blocked sections.
-			proSections.off( 'click' ).on( 'click', app.handleProSectionClick );
+			proSections.off('click').on('click', app.handleProSectionClick);
 		},
 
 		/**
@@ -724,14 +765,16 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @since 1.9.7
 		 * @param {boolean} unblock Need to unblock status.
 		 */
-		blockAllSections( unblock = false ) {
-			const sections = el.$sidebar.find( '.wpforms-add-fields-buttons, .wpforms-builder-themes-sidebar-advanced' );
+		blockAllSections(unblock = false) {
+			const sections = el.$sidebar.find(
+				'.wpforms-add-fields-buttons, .wpforms-builder-themes-sidebar-advanced'
+			);
 
 			// Disable/Enable all sections.
-			if ( ! unblock ) {
-				sections.addClass( 'wpforms-builder-themes-disabled' );
+			if (!unblock) {
+				sections.addClass('wpforms-builder-themes-disabled');
 			} else {
-				sections.removeClass( 'wpforms-builder-themes-disabled' );
+				sections.removeClass('wpforms-builder-themes-disabled');
 			}
 		},
 
@@ -741,15 +784,19 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @since 1.9.7
 		 */
 		handleProSectionClick() {
-			const section = $( this ).prev( 'a' ).data( 'group' )?.replace( '_styles', '' );
+			const section = $(this).prev('a').data('group')?.replace('_styles', '');
 
-			if ( ! isPro ) {
-				app.showProModal( section, strings.pro_sections[ section ] );
+			if (!isPro) {
+				app.showProModal(section, strings.pro_sections[section]);
 				return;
 			}
 
-			if ( ! isLicenseActive ) {
-				app.showLicenseModal( strings.pro_sections[ section ], strings.pro_sections[ section ], 'pro-section' );
+			if (!isLicenseActive) {
+				app.showLicenseModal(
+					strings.pro_sections[section],
+					strings.pro_sections[section],
+					'pro-section'
+				);
 			}
 		},
 
@@ -761,40 +808,45 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {string} panel   Panel slug.
 		 * @param {string} feature Feature name.
 		 */
-		showProModal( panel, feature ) {
+		showProModal(panel, feature) {
 			const type = 'pro';
-			const message = wpforms_education.upgrade[ type ].message_plural.replace( /%name%/g, feature );
+			const message = wpforms_education.upgrade[type].message_plural.replace(/%name%/g, feature);
 			const utmContent = {
 				container: 'General Container Styles',
 				background: 'General Background Styles',
 				themes: 'General Pro Themes',
 			};
 
-			$.alert( {
+			$.alert({
 				backgroundDismiss: true,
-				title: feature + ' ' + wpforms_education.upgrade[ type ].title_plural,
+				title: feature + ' ' + wpforms_education.upgrade[type].title_plural,
 				icon: 'fa fa-lock',
 				content: message,
 				boxWidth: '550px',
 				theme: 'modern,wpforms-education',
 				closeIcon: true,
-				onOpenBefore: function() { // eslint-disable-line object-shorthand
-					this.$btnc.after( '<div class="discount-note">' + wpforms_education.upgrade_bonus + '</div>' );
-					this.$btnc.after( wpforms_education.upgrade[ type ].doc.replace( /%25name%25/g, 'AP - ' + feature ) );
-					this.$body.find( '.jconfirm-content' ).addClass( 'lite-upgrade' );
+				onOpenBefore: function () {
+					// eslint-disable-line object-shorthand
+					this.$btnc.after(
+						'<div class="discount-note">' + wpforms_education.upgrade_bonus + '</div>'
+					);
+					this.$btnc.after(
+						wpforms_education.upgrade[type].doc.replace(/%25name%25/g, 'AP - ' + feature)
+					);
+					this.$body.find('.jconfirm-content').addClass('lite-upgrade');
 				},
 				buttons: {
 					confirm: {
-						text: wpforms_education.upgrade[ type ].button,
+						text: wpforms_education.upgrade[type].button,
 						btnClass: 'btn-confirm',
-						keys: [ 'enter' ],
+						keys: ['enter'],
 						action: () => {
-							window.open( WPFormsEducation.core.getUpgradeURL( utmContent[ panel ], type ), '_blank' );
-							WPFormsEducation.core.upgradeModalThankYou( type );
+							window.open(WPFormsEducation.core.getUpgradeURL(utmContent[panel], type), '_blank');
+							WPFormsEducation.core.upgradeModalThankYou(type);
 						},
 					},
 				},
-			} );
+			});
 		},
 
 		/**
@@ -806,8 +858,8 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @param {string} fieldName  Field name.
 		 * @param {string} utmContent UTM content.
 		 */
-		showLicenseModal( feature, fieldName, utmContent ) {
-			WPFormsEducation.proCore.licenseModal( feature, fieldName, utmContent );
+		showLicenseModal(feature, fieldName, utmContent) {
+			WPFormsEducation.proCore.licenseModal(feature, fieldName, utmContent);
 		},
 
 		/**
@@ -818,7 +870,7 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		runChecks() {
 			app.checkForClassicStyles();
 
-			if ( isPro && isLicenseActive && isModern && isFullStyles ) {
+			if (isPro && isLicenseActive && isModern && isFullStyles) {
 				app.checkForFormFeatures();
 			}
 
@@ -831,13 +883,13 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @since 1.9.7
 		 */
 		checkForClassicStyles() {
-			const $notice = $( '.wpforms-builder-themes-style-notice' );
-			const $previewNotice = $( '.wpforms-builder-themes-preview-notice' );
+			const $notice = $('.wpforms-builder-themes-style-notice');
+			const $previewNotice = $('.wpforms-builder-themes-preview-notice');
 
-			if ( ! isModern || ! isFullStyles ) {
+			if (!isModern || !isFullStyles) {
 				app.blockAllSections();
-				$notice.removeClass( 'wpforms-hidden' );
-				$previewNotice.addClass( 'wpforms-hidden' );
+				$notice.removeClass('wpforms-hidden');
+				$previewNotice.addClass('wpforms-hidden');
 			}
 		},
 
@@ -847,39 +899,39 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @since 1.9.7
 		 */
 		checkForFormFeatures() {
-			const $LFSwitch = $( '#wpforms-panel-field-lead_forms-enable' );
-			const $CFSwitch = $( '#wpforms-panel-field-settings-conversational_forms_enable' );
-			const isLFEnabled = $LFSwitch.prop( 'checked' ) ?? false;
-			const isCFEnabled = $CFSwitch.prop( 'checked' ) ?? false;
-			const $LFNotice = $( '.wpforms-builder-themes-lf-notice' );
-			const $CFNotice = $( '.wpforms-builder-themes-cf-notice' );
-			const $previewNotice = $( '.wpforms-builder-themes-preview-notice' );
+			const $LFSwitch = $('#wpforms-panel-field-lead_forms-enable');
+			const $CFSwitch = $('#wpforms-panel-field-settings-conversational_forms_enable');
+			const isLFEnabled = $LFSwitch.prop('checked') ?? false;
+			const isCFEnabled = $CFSwitch.prop('checked') ?? false;
+			const $LFNotice = $('.wpforms-builder-themes-lf-notice');
+			const $CFNotice = $('.wpforms-builder-themes-cf-notice');
+			const $previewNotice = $('.wpforms-builder-themes-preview-notice');
 
 			// Handle Lead Forms notice visibility
-			if ( isLFEnabled ) {
-				$LFNotice.removeClass( 'wpforms-hidden' );
+			if (isLFEnabled) {
+				$LFNotice.removeClass('wpforms-hidden');
 			} else {
-				$LFNotice.addClass( 'wpforms-hidden' );
+				$LFNotice.addClass('wpforms-hidden');
 			}
 
 			// Handle Conversational Forms notice visibility
-			if ( isCFEnabled ) {
-				$CFNotice.removeClass( 'wpforms-hidden' );
+			if (isCFEnabled) {
+				$CFNotice.removeClass('wpforms-hidden');
 			} else {
-				$CFNotice.addClass( 'wpforms-hidden' );
+				$CFNotice.addClass('wpforms-hidden');
 			}
 
 			// If either feature is enabled, hide preview and block sections
-			if ( isLFEnabled || isCFEnabled ) {
-				$previewNotice.addClass( 'wpforms-hidden' );
-				el.$preview.addClass( 'wpforms-hidden' );
+			if (isLFEnabled || isCFEnabled) {
+				$previewNotice.addClass('wpforms-hidden');
+				el.$preview.addClass('wpforms-hidden');
 				app.blockAllSections();
 			} else {
 				// Only if both features are disabled, show preview and unblock sections
-				el.$preview.removeClass( 'wpforms-hidden' );
-				if ( isModern && isFullStyles ) {
-					app.blockAllSections( true );
-					$previewNotice.removeClass( 'wpforms-hidden' );
+				el.$preview.removeClass('wpforms-hidden');
+				if (isModern && isFullStyles) {
+					app.blockAllSections(true);
+					$previewNotice.removeClass('wpforms-hidden');
 				}
 			}
 
@@ -894,8 +946,12 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 */
 		setupFormFeatureEventHandlers() {
 			// Set up notice link handlers
-			$( '.wpforms-builder-themes-lf-notice a' ).off( 'click', app.openLFSettings ).on( 'click', app.openLFSettings );
-			$( '.wpforms-builder-themes-cf-notice a' ).off( 'click', app.openCFSettings ).on( 'click', app.openCFSettings );
+			$('.wpforms-builder-themes-lf-notice a')
+				.off('click', app.openLFSettings)
+				.on('click', app.openLFSettings);
+			$('.wpforms-builder-themes-cf-notice a')
+				.off('click', app.openCFSettings)
+				.on('click', app.openCFSettings);
 		},
 
 		/**
@@ -904,13 +960,13 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @since 1.9.7
 		 */
 		checkForOldFP() {
-			const $FPContent = $( '#wpforms-form-pages-content-block' );
-			const $notice = $( '#wpforms-page-forms-fbst-notice' );
+			const $FPContent = $('#wpforms-form-pages-content-block');
+			const $notice = $('#wpforms-page-forms-fbst-notice');
 
-			if ( $FPContent.length ) {
-				if ( isLowFormPagesVersion ) {
-					$FPContent.prepend( $notice );
-					$notice.removeClass( 'wpforms-hidden' );
+			if ($FPContent.length) {
+				if (isLowFormPagesVersion) {
+					$FPContent.prepend($notice);
+					$notice.removeClass('wpforms-hidden');
 				}
 			}
 		},
@@ -922,10 +978,10 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 *
 		 * @param {Object} event Event object.
 		 */
-		openLFSettings( event ) {
-			app.handleClosePreviewSidebar( event );
+		openLFSettings(event) {
+			app.handleClosePreviewSidebar(event);
 
-			$( 'a.wpforms-panel-sidebar-section-lead_forms' ).click();
+			$('a.wpforms-panel-sidebar-section-lead_forms').click();
 		},
 
 		/**
@@ -935,10 +991,10 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 *
 		 * @param {Object} event Event object.
 		 */
-		openCFSettings( event ) {
-			app.handleClosePreviewSidebar( event );
+		openCFSettings(event) {
+			app.handleClosePreviewSidebar(event);
 
-			$( 'a.wpforms-panel-sidebar-section-conversational_forms' ).click();
+			$('a.wpforms-panel-sidebar-section-conversational_forms').click();
 		},
 
 		/**
@@ -947,7 +1003,7 @@ export default function( document, window, $ ) {// eslint-disable-line max-lines
 		 * @return {boolean} True if the user is on a Mac.
 		 */
 		isMac() {
-			return navigator.userAgent.includes( 'Macintosh' );
+			return navigator.userAgent.includes('Macintosh');
 		},
 	};
 

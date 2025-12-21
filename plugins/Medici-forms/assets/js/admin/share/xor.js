@@ -49,18 +49,18 @@
  */
 /* eslint-enable */
 
-( function( root, factory ) {
+(function (root, factory) {
 	const pluginName = 'WPFormsXOR';
 
-	if ( typeof define === 'function' && define.amd ) {
-		define( [], factory( pluginName ) );
-	} else if ( typeof exports === 'object' ) {
-		module.exports = factory( pluginName );
+	if (typeof define === 'function' && define.amd) {
+		define([], factory(pluginName));
+	} else if (typeof exports === 'object') {
+		module.exports = factory(pluginName);
 	} else {
-		root[ pluginName ] = factory( pluginName );
+		root[pluginName] = factory(pluginName);
 	}
-// eslint-disable-next-line max-lines-per-function
-}( this, function( pluginName ) {
+	// eslint-disable-next-line max-lines-per-function
+})(this, function (pluginName) {
 	// eslint-disable-next-line strict
 	'use strict';
 
@@ -81,8 +81,8 @@
 		 *
 		 * @param {string} message The error message.
 		 */
-		constructor( message ) {
-			super( message );
+		constructor(message) {
+			super(message);
 
 			this.name = pluginName;
 		}
@@ -112,9 +112,9 @@
 		 *
 		 * @param {Object} args The argument object.
 		 */
-		constructor( args ) {
+		constructor(args) {
 			// Merge the default settings with the provided settings.
-			this.args = Object.assign( {}, Plugin.defaults, args );
+			this.args = Object.assign({}, Plugin.defaults, args);
 		}
 
 		/**
@@ -126,10 +126,10 @@
 		 *
 		 * @return {string} The encrypted object as a string.
 		 */
-		encrypt( obj ) {
+		encrypt(obj) {
 			// Bail if the input is not an object.
-			if ( typeof obj !== 'object' ) {
-				throw new PluginError( 'Invalid input. Expected an object for encryption.' );
+			if (typeof obj !== 'object') {
+				throw new PluginError('Invalid input. Expected an object for encryption.');
 			}
 
 			// Initialize an empty string to store the encrypted result.
@@ -137,17 +137,17 @@
 
 			try {
 				// Convert the object to a JSON string.
-				const jsonString = JSON.stringify( obj );
+				const jsonString = JSON.stringify(obj);
 
 				// Iterate through each character of the JSON string.
-				for ( let i = 0; i < jsonString.length; i++ ) {
+				for (let i = 0; i < jsonString.length; i++) {
 					// XOR each character with the encryption key and append to the result.
 					// eslint-disable-next-line no-bitwise
-					result += String.fromCharCode( jsonString.charCodeAt( i ) ^ this.args.key );
+					result += String.fromCharCode(jsonString.charCodeAt(i) ^ this.args.key);
 				}
-			} catch ( error ) {
+			} catch (error) {
 				// Throw a PluginError if there's an issue during JSON stringification.
-				throw new PluginError( 'Error during encryption. Unable to stringify the object.' );
+				throw new PluginError('Error during encryption. Unable to stringify the object.');
 			}
 
 			return result;
@@ -162,14 +162,14 @@
 		 *
 		 * @return {Object} The decrypted object.
 		 */
-		decrypt( encryptedString = '' ) {
+		decrypt(encryptedString = '') {
 			// Bail if the input is not a string.
-			if ( typeof encryptedString !== 'string' ) {
-				throw new PluginError( 'Invalid input. Expected a string for decryption.' );
+			if (typeof encryptedString !== 'string') {
+				throw new PluginError('Invalid input. Expected a string for decryption.');
 			}
 
 			// Bail if there is no encrypted string.
-			if ( ! encryptedString ) {
+			if (!encryptedString) {
 				return {}; // Return an empty object.
 			}
 
@@ -177,20 +177,20 @@
 
 			try {
 				// Iterate through each character of the encrypted string.
-				for ( let i = 0; i < encryptedString.length; i++ ) {
+				for (let i = 0; i < encryptedString.length; i++) {
 					// XOR each character with the decryption key and append to the result.
 					// eslint-disable-next-line no-bitwise
-					result += String.fromCharCode( encryptedString.charCodeAt( i ) ^ this.args.key );
+					result += String.fromCharCode(encryptedString.charCodeAt(i) ^ this.args.key);
 				}
 
 				// Parse the decrypted result as JSON or return an empty object if parsing fails.
-				return JSON.parse( result || '{}' );
-			} catch ( error ) {
+				return JSON.parse(result || '{}');
+			} catch (error) {
 				// Throw an error if there's an issue during decryption or parsing.
-				throw new PluginError( 'Error during decryption. Unable to parse decrypted data.' );
+				throw new PluginError('Error during decryption. Unable to parse decrypted data.');
 			}
 		}
 	}
 
 	return Plugin;
-} ) );
+});

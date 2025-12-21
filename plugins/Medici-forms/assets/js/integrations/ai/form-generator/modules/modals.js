@@ -39,7 +39,8 @@
  *
  * @return {Object} The preview module object.
  */
-export default function( generator, $ ) { // eslint-disable-line max-lines-per-function
+export default function (generator, $) {
+	// eslint-disable-line max-lines-per-function
 	/**
 	 * Localized strings.
 	 *
@@ -75,8 +76,8 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 * @since 1.9.2
 		 */
 		init() {
-			modals.el.$doc = $( document );
-			modals.el.$templateCard = $( '#wpforms-template-generate' );
+			modals.el.$doc = $(document);
+			modals.el.$templateCard = $('#wpforms-template-generate');
 
 			modals.events();
 		},
@@ -85,7 +86,11 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 * Register events.
 		 */
 		events() {
-			modals.el.$doc.on( 'change', '.wpforms-ai-forms-install-addons-modal-dismiss', modals.dismissAddonsModal );
+			modals.el.$doc.on(
+				'change',
+				'.wpforms-ai-forms-install-addons-modal-dismiss',
+				modals.dismissAddonsModal
+			);
 		},
 
 		/**
@@ -95,10 +100,12 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 *
 		 * @param {Object} e Event object.
 		 */
-		openAddonsModal( e ) { // eslint-disable-line max-lines-per-function
+		openAddonsModal(e) {
+			// eslint-disable-line max-lines-per-function
 			e?.preventDefault();
 
-			const spinner = '<i class="wpforms-loading-spinner wpforms-loading-white wpforms-loading-inline"></i>';
+			const spinner =
+				'<i class="wpforms-loading-spinner wpforms-loading-white wpforms-loading-inline"></i>';
 			const isInstall = strings.addonsAction === 'install';
 			const content = isInstall ? strings.addons.installContent : strings.addons.activateContent;
 
@@ -109,31 +116,33 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 				icon: 'fa fa-info-circle',
 				buttons: {
 					confirm: {
-						text: isInstall ? strings.addons.installConfirmButton : strings.addons.activateConfirmButton,
+						text: isInstall
+							? strings.addons.installConfirmButton
+							: strings.addons.activateConfirmButton,
 						btnClass: 'btn-confirm',
-						keys: [ 'enter' ],
+						keys: ['enter'],
 						action() {
 							const label = isInstall ? strings.addons.installing : strings.addons.activating;
 
-							this.$$confirm.prop( 'disabled', true ).html( spinner + label );
-							this.$$cancel.prop( 'disabled', true );
+							this.$$confirm.prop('disabled', true).html(spinner + label);
+							this.$$cancel.prop('disabled', true);
 
-							modals.installAddonsAjax( this );
+							modals.installAddonsAjax(this);
 
 							return false;
 						},
 					},
 					cancel: {
 						text: strings.addons.cancelButton,
-						keys: [ 'esc' ],
+						keys: ['esc'],
 						btnClass: 'btn-cancel',
 						action() {
-							modals.updateGenerateFormButton( false );
+							modals.updateGenerateFormButton(false);
 
 							// Open the Form Generator panel.
-							setTimeout( () => {
+							setTimeout(() => {
 								generator.state.panelOpen = true;
-							}, 250 );
+							}, 250);
 						},
 					},
 				},
@@ -142,18 +151,18 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 					const dontShowAgain = `
 						<label class="jconfirm-checkbox">
 							<input type="checkbox" class="jconfirm-checkbox-input wpforms-ai-forms-install-addons-modal-dismiss">
-							${ strings.addons.dontShow }
+							${strings.addons.dontShow}
 						</label>
 					`;
 
 					this.$body
-						.addClass( 'wpforms-ai-forms-install-addons-modal' )
-						.find( '.jconfirm-buttons' )
-						.after( dontShowAgain );
+						.addClass('wpforms-ai-forms-install-addons-modal')
+						.find('.jconfirm-buttons')
+						.after(dontShowAgain);
 				},
 			};
 
-			$.confirm( options );
+			$.confirm(options);
 		},
 
 		/**
@@ -163,27 +172,31 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 *
 		 * @param {Object} previousModal Previous modal instance.
 		 */
-		installAddonsAjax( previousModal ) { // eslint-disable-line max-lines-per-function
+		installAddonsAjax(previousModal) {
+			// eslint-disable-line max-lines-per-function
 			let chain = null;
 			let errorDisplayed = false;
 
-			const postDone = function( res ) {
-				if ( ! res.success ) {
-					wpf.debug( modals.ajaxError, res.data.error ?? res.data );
+			const postDone = function (res) {
+				if (!res.success) {
+					wpf.debug(modals.ajaxError, res.data.error ?? res.data);
 				}
 
-				if ( ! res.success && ! errorDisplayed ) {
+				if (!res.success && !errorDisplayed) {
 					errorDisplayed = true;
 
-					modals.openErrorModal( {
-						title: strings.addonsAction === 'install' ? strings.addons.addonsInstallErrorTitle : strings.addons.addonsActivateErrorTitle,
+					modals.openErrorModal({
+						title:
+							strings.addonsAction === 'install'
+								? strings.addons.addonsInstallErrorTitle
+								: strings.addons.addonsActivateErrorTitle,
 						content: strings.addons.addonsInstallError,
-					} );
+					});
 				}
 			};
 
-			const postFail = function( xhr ) {
-				if ( errorDisplayed ) {
+			const postFail = function (xhr) {
+				if (errorDisplayed) {
 					return;
 				}
 
@@ -192,51 +205,54 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 
 				content += error && error !== 'error' ? '<br>' + error : '';
 
-				wpf.debug( modals.ajaxError, content );
+				wpf.debug(modals.ajaxError, content);
 
-				modals.openErrorModal( {
-					title: strings.addonsAction === 'install' ? strings.addons.addonsInstallErrorTitle : strings.addons.addonsActivateErrorTitle,
+				modals.openErrorModal({
+					title:
+						strings.addonsAction === 'install'
+							? strings.addons.addonsInstallErrorTitle
+							: strings.addons.addonsActivateErrorTitle,
 					content,
-				} );
+				});
 
 				errorDisplayed = true;
 			};
 
 			// Do not display the alert about unsaved changes.
-			WPFormsBuilder.setCloseConfirmation( false );
+			WPFormsBuilder.setCloseConfirmation(false);
 
 			// Loop through all addons and make a chained AJAX calls.
-			for ( const slug in strings.addonsData ) {
-				const url = strings.addonsData[ slug ]?.url;
+			for (const slug in strings.addonsData) {
+				const url = strings.addonsData[slug]?.url;
 				const data = {
 					action: url ? 'wpforms_install_addon' : 'wpforms_activate_addon',
-					nonce : strings.adminNonce,
-					plugin: url ? url : strings.addonsData[ slug ]?.path,
-					type  : 'addon',
+					nonce: strings.adminNonce,
+					plugin: url ? url : strings.addonsData[slug]?.path,
+					type: 'addon',
 				};
 
-				if ( chain === null ) {
-					chain = $.post( strings.ajaxUrl, data, postDone );
+				if (chain === null) {
+					chain = $.post(strings.ajaxUrl, data, postDone);
 				} else {
-					chain = chain.then( () => {
-						return $.post( strings.ajaxUrl, data, postDone );
-					} );
+					chain = chain.then(() => {
+						return $.post(strings.ajaxUrl, data, postDone);
+					});
 				}
 
-				chain.fail( postFail );
+				chain.fail(postFail);
 			}
 
 			// Open the Addons Installed modal after the last AJAX call.
 			chain
-				.then( () => {
-					if ( ! errorDisplayed ) {
+				.then(() => {
+					if (!errorDisplayed) {
 						modals.openAddonsInstalledModal();
 					}
-				} )
-				.always( () => {
+				})
+				.always(() => {
 					previousModal.close();
-					modals.updateGenerateFormButton( false );
-				} );
+					modals.updateGenerateFormButton(false);
+				});
 		},
 
 		/**
@@ -245,8 +261,8 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 * @since 1.9.2
 		 */
 		dismissAddonsModal() {
-			const $checkbox = $( this );
-			const isChecked = $checkbox.prop( 'checked' );
+			const $checkbox = $(this);
+			const isChecked = $checkbox.prop('checked');
 
 			const data = {
 				action: 'wpforms_dismiss_ai_form',
@@ -255,29 +271,30 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 				dismiss: isChecked,
 			};
 
-			modals.updateGenerateFormButton( ! isChecked );
+			modals.updateGenerateFormButton(!isChecked);
 
-			$.post( strings.ajaxUrl, data )
-				.done( function( res ) {
-					if ( res.success ) {
+			$.post(strings.ajaxUrl, data)
+				.done(function (res) {
+					if (res.success) {
 						return;
 					}
 
-					modals.openErrorModal( {
+					modals.openErrorModal({
 						title: strings.addons.dismissErrorTitle,
 						content: strings.addons.dismissError,
-					} );
+					});
 
-					wpf.debug( modals.ajaxError, res.data.error ?? res.data );
-				} )
-				.fail( function( xhr ) {
-					modals.openErrorModal( {
+					wpf.debug(modals.ajaxError, res.data.error ?? res.data);
+				})
+				.fail(function (xhr) {
+					modals.openErrorModal({
 						title: strings.addons.dismissErrorTitle,
-						content: strings.addons.dismissError + '<br>' + strings.addons.addonsInstallErrorNetwork,
-					} );
+						content:
+							strings.addons.dismissError + '<br>' + strings.addons.addonsInstallErrorNetwork,
+					});
 
-					wpf.debug( modals.ajaxError, xhr.responseText ?? xhr.statusText );
-				} );
+					wpf.debug(modals.ajaxError, xhr.responseText ?? xhr.statusText);
+				});
 		},
 
 		/**
@@ -287,15 +304,15 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 *
 		 * @param {boolean} shouldInstallAddons Should open install addons modal.
 		 */
-		updateGenerateFormButton( shouldInstallAddons ) {
-			if ( shouldInstallAddons ) {
-				$( '.wpforms-template-generate' )
-					.removeClass( 'wpforms-template-generate' )
-					.addClass( 'wpforms-template-generate-install-addons' );
+		updateGenerateFormButton(shouldInstallAddons) {
+			if (shouldInstallAddons) {
+				$('.wpforms-template-generate')
+					.removeClass('wpforms-template-generate')
+					.addClass('wpforms-template-generate-install-addons');
 			} else {
-				$( '.wpforms-template-generate-install-addons' )
-					.removeClass( 'wpforms-template-generate-install-addons' )
-					.addClass( 'wpforms-template-generate' );
+				$('.wpforms-template-generate-install-addons')
+					.removeClass('wpforms-template-generate-install-addons')
+					.addClass('wpforms-template-generate');
 			}
 		},
 
@@ -306,7 +323,10 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 */
 		openAddonsInstalledModal() {
 			const options = {
-				title: strings.addonsAction === 'install' ? strings.addons.addonsInstalledTitle : strings.addons.addonsActivatedTitle,
+				title:
+					strings.addonsAction === 'install'
+						? strings.addons.addonsInstalledTitle
+						: strings.addons.addonsActivatedTitle,
 				content: strings.addons.addonsInstalledContent,
 				icon: 'fa fa-check-circle',
 				type: 'green',
@@ -314,7 +334,7 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 					confirm: {
 						text: strings.addons.okay,
 						btnClass: 'btn-confirm',
-						keys: [ 'enter' ],
+						keys: ['enter'],
 						action() {
 							WPFormsBuilder.showLoadingOverlay();
 							window.location = window.location + '&ai-form';
@@ -322,12 +342,11 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 					},
 				},
 				onOpenBefore() {
-					this.$body
-						.addClass( 'wpforms-ai-forms-addons-installed-modal' );
+					this.$body.addClass('wpforms-ai-forms-addons-installed-modal');
 				},
 			};
 
-			$.confirm( options );
+			$.confirm(options);
 		},
 
 		/**
@@ -337,8 +356,8 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 *
 		 * @param {jQuery} $button The "Use This Form" button.
 		 */
-		openExistingFormModal( $button ) {
-			$.confirm( {
+		openExistingFormModal($button) {
+			$.confirm({
 				title: wpforms_builder.heads_up,
 				content: strings.misc.warningExistingForm,
 				icon: 'fa fa-exclamation-circle',
@@ -347,16 +366,16 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 					confirm: {
 						text: wpforms_builder.ok,
 						btnClass: 'btn-confirm',
-						keys: [ 'enter' ],
+						keys: ['enter'],
 						action() {
-							generator.main.useFormAjax( $button );
+							generator.main.useFormAjax($button);
 						},
 					},
 					cancel: {
 						text: wpforms_builder.cancel,
 					},
 				},
-			} );
+			});
 		},
 
 		/**
@@ -366,7 +385,7 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 		 *
 		 * @param {Object} args Arguments.
 		 */
-		openErrorModal( args ) {
+		openErrorModal(args) {
 			const options = {
 				title: args.title ?? false,
 				content: args.content ?? false,
@@ -376,12 +395,12 @@ export default function( generator, $ ) { // eslint-disable-line max-lines-per-f
 					confirm: {
 						text: strings.addons.okay,
 						btnClass: 'btn-confirm',
-						keys: [ 'enter' ],
+						keys: ['enter'],
 					},
 				},
 			};
 
-			$.confirm( options );
+			$.confirm(options);
 		},
 	};
 

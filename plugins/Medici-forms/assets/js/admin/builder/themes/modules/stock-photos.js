@@ -12,7 +12,8 @@
  * @return {Object} Public functions and properties.
  */
 // eslint-disable-next-line max-lines-per-function
-export default function( document, window, $ ) { // eslint-disable-line no-unused-vars
+export default function (document, window, $) {
+	// eslint-disable-line no-unused-vars
 	const WPForms = window.WPForms || {};
 	const WPFormsBuilderThemes = WPForms.Admin.Builder.Themes || {};
 
@@ -41,7 +42,8 @@ export default function( document, window, $ ) { // eslint-disable-line no-unuse
 	 *
 	 * @type {string}
 	 */
-	const spinner = '<i class="wpforms-loading-spinner wpforms-loading-white wpforms-loading-inline"></i>';
+	const spinner =
+		'<i class="wpforms-loading-spinner wpforms-loading-white wpforms-loading-inline"></i>';
 
 	/**
 	 * Runtime state.
@@ -76,7 +78,6 @@ export default function( document, window, $ ) { // eslint-disable-line no-unuse
 	 * @since 1.9.7
 	 */
 	const app = {
-
 		/**
 		 * Start the engine.
 		 *
@@ -93,7 +94,7 @@ export default function( document, window, $ ) { // eslint-disable-line no-unuse
 		 * @since 1.9.7
 		 */
 		setup() {
-			el.$builder = $( '#wpforms-builder' );
+			el.$builder = $('#wpforms-builder');
 		},
 
 		/**
@@ -101,8 +102,7 @@ export default function( document, window, $ ) { // eslint-disable-line no-unuse
 		 *
 		 * @since 1.9.7
 		 */
-		events() {
-		},
+		events() {},
 
 		/**
 		 * Open stock photos modal.
@@ -111,14 +111,14 @@ export default function( document, window, $ ) { // eslint-disable-line no-unuse
 		 *
 		 * @param {string} from From where the modal was triggered, `themes` or `bg-styles`.
 		 */
-		openModal( from ) {
-			if ( app.isPicturesAvailable() ) {
+		openModal(from) {
+			if (app.isPicturesAvailable()) {
 				app.picturesModal();
 
 				return;
 			}
 
-			app.installModal( from );
+			app.installModal(from);
 		},
 
 		/**
@@ -128,23 +128,23 @@ export default function( document, window, $ ) { // eslint-disable-line no-unuse
 		 *
 		 * @param {string} themeSlug The theme slug.
 		 */
-		onSelectTheme( themeSlug ) {
+		onSelectTheme(themeSlug) {
 			const themesModule = WPFormsBuilderThemes.themes;
 
-			if ( app.isPicturesAvailable() ) {
+			if (app.isPicturesAvailable()) {
 				return;
 			}
 
 			// Check only WPForms themes.
-			if ( ! themesModule?.isWPFormsTheme( themeSlug ) ) {
+			if (!themesModule?.isWPFormsTheme(themeSlug)) {
 				return;
 			}
 
-			const theme = themesModule?.getTheme( themeSlug );
+			const theme = themesModule?.getTheme(themeSlug);
 			const bgUrl = theme.settings?.backgroundUrl;
 
-			if ( bgUrl?.length && bgUrl !== 'url()' ) {
-				app.installModal( 'themes' );
+			if (bgUrl?.length && bgUrl !== 'url()') {
+				app.installModal('themes');
 			}
 		},
 
@@ -155,10 +155,10 @@ export default function( document, window, $ ) { // eslint-disable-line no-unuse
 		 *
 		 * @param {string} from From where the modal was triggered, `themes` or `bg-styles`.
 		 */
-		installModal( from ) {
+		installModal(from) {
 			const installStr = from === 'themes' ? strings.stockInstallTheme : strings.stockInstallBg;
 
-			$.confirm( {
+			$.confirm({
 				title: strings.heads_up,
 				content: installStr + ' ' + strings.stockInstall,
 				icon: 'wpforms-exclamation-circle',
@@ -167,27 +167,25 @@ export default function( document, window, $ ) { // eslint-disable-line no-unuse
 					continue: {
 						text: strings.continue,
 						btnClass: 'btn-confirm',
-						keys: [ 'enter' ],
+						keys: ['enter'],
 						action() {
 							// noinspection JSUnresolvedReference
-							this.$$continue.prop( 'disabled', true )
-								.html( spinner + strings.installing );
+							this.$$continue.prop('disabled', true).html(spinner + strings.installing);
 
 							// noinspection JSUnresolvedReference
-							this.$$cancel
-								.prop( 'disabled', true );
+							this.$$cancel.prop('disabled', true);
 
-							app.install( this, from );
+							app.install(this, from);
 
 							return false;
 						},
 					},
 					cancel: {
 						text: strings.cancel,
-						keys: [ 'esc' ],
+						keys: ['esc'],
 					},
 				},
-			} );
+			});
 		},
 
 		/**
@@ -197,20 +195,20 @@ export default function( document, window, $ ) { // eslint-disable-line no-unuse
 		 *
 		 * @param {string} error Error message.
 		 */
-		errorModal( error ) {
-			$.alert( {
+		errorModal(error) {
+			$.alert({
 				title: strings.uhoh,
 				content: error || strings.commonError,
 				icon: 'fa fa-exclamation-circle',
 				type: 'red',
 				buttons: {
 					cancel: {
-						text    : strings.close,
+						text: strings.close,
 						btnClass: 'btn-confirm',
-						keys    : [ 'enter' ],
+						keys: ['enter'],
 					},
 				},
-			} );
+			});
 		},
 
 		/**
@@ -219,8 +217,8 @@ export default function( document, window, $ ) { // eslint-disable-line no-unuse
 		 * @since 1.9.7
 		 */
 		picturesModal() {
-			state.picturesModal = $.alert( {
-				title : `${ strings.picturesTitle }<p>${ strings.picturesSubTitle }</p>`,
+			state.picturesModal = $.alert({
+				title: `${strings.picturesTitle}<p>${strings.picturesSubTitle}</p>`,
 				content: app.getPictureMarkup(),
 				type: 'picture-selector wpforms-builder-themes-modal',
 				boxWidth: '800px',
@@ -230,10 +228,10 @@ export default function( document, window, $ ) { // eslint-disable-line no-unuse
 				buttons: false,
 				onOpen() {
 					this.$content
-						.off( 'click' )
-						.on( 'click', '.wpforms-builder-stock-photos-picture', app.selectPicture );
+						.off('click')
+						.on('click', '.wpforms-builder-stock-photos-picture', app.selectPicture);
 				},
-			} );
+			});
 		},
 
 		/**
@@ -244,9 +242,9 @@ export default function( document, window, $ ) { // eslint-disable-line no-unuse
 		 * @param {Object} modal The jQuery-confirm a modal window object.
 		 * @param {string} from  From where the modal was triggered, `themes` or `bg-styles`.
 		 */
-		install( modal, from ) {
+		install(modal, from) {
 			// If a fetch is already in progress, exit the function.
-			if ( state.isInstalling ) {
+			if (state.isInstalling) {
 				return;
 			}
 
@@ -255,42 +253,47 @@ export default function( document, window, $ ) { // eslint-disable-line no-unuse
 
 			try {
 				// Fetch themes data.
-				wp.apiFetch( {
+				wp.apiFetch({
 					path: routeNamespace + 'stock-photos/install/',
 					method: 'POST',
 					cache: 'no-cache',
-				} ).then( ( response ) => {
-					if ( ! response.result ) {
-						app.errorModal( response.error );
+				})
+					.then((response) => {
+						if (!response.result) {
+							app.errorModal(response.error);
 
-						return;
-					}
+							return;
+						}
 
-					// Store the pictures' data.
-					pictures = response.pictures || [];
+						// Store the pictures' data.
+						pictures = response.pictures || [];
 
-					// Update the theme or open the picture selector modal.
-					if ( from === 'themes' ) {
-						WPFormsBuilderThemes.store.set( 'backgroundUrl', 'url()' );
-						WPFormsBuilderThemes.themes.setFormTheme( WPFormsBuilderThemes.store.get( 'wpformsTheme' ) );
-					} else {
-						app.picturesModal();
-					}
-				} ).catch( ( error ) => {
-					// eslint-disable-next-line no-console
-					console.error( error?.message );
-					app.errorModal( `<p>${ strings.commonError }</p><p>${ error?.message }</p>` );
-				} ).finally( () => {
-					state.isInstalling = false;
+						// Update the theme or open the picture selector modal.
+						if (from === 'themes') {
+							WPFormsBuilderThemes.store.set('backgroundUrl', 'url()');
+							WPFormsBuilderThemes.themes.setFormTheme(
+								WPFormsBuilderThemes.store.get('wpformsTheme')
+							);
+						} else {
+							app.picturesModal();
+						}
+					})
+					.catch((error) => {
+						// eslint-disable-next-line no-console
+						console.error(error?.message);
+						app.errorModal(`<p>${strings.commonError}</p><p>${error?.message}</p>`);
+					})
+					.finally(() => {
+						state.isInstalling = false;
 
-					// Close the modal window.
-					modal.close();
-				} );
-			} catch ( error ) {
+						// Close the modal window.
+						modal.close();
+					});
+			} catch (error) {
 				state.isInstalling = false;
 				// eslint-disable-next-line no-console
-				console.error( error );
-				app.errorModal( strings.commonError + '<br>' + error );
+				console.error(error);
+				app.errorModal(strings.commonError + '<br>' + error);
 			}
 		},
 
@@ -302,7 +305,7 @@ export default function( document, window, $ ) { // eslint-disable-line no-unuse
 		 * @return {boolean} True if pictures' data available, false otherwise.
 		 */
 		isPicturesAvailable() {
-			return Boolean( pictures?.length );
+			return Boolean(pictures?.length);
 		},
 
 		/**
@@ -313,24 +316,24 @@ export default function( document, window, $ ) { // eslint-disable-line no-unuse
 		 * @return {string} Pictures' selector markup.
 		 */
 		getPictureMarkup() {
-			if ( ! app.isPicturesAvailable() ) {
+			if (!app.isPicturesAvailable()) {
 				return '';
 			}
 
-			if ( picturesMarkup !== '' ) {
+			if (picturesMarkup !== '') {
 				return picturesMarkup;
 			}
 
-			pictures.forEach( ( picture ) => {
+			pictures.forEach((picture) => {
 				const pictureUrl = pictureUrlPath + picture;
 
 				picturesMarkup += `<div class="wpforms-builder-stock-photos-picture"
-					data-url="${ pictureUrl }"
-					style="background-image: url( '${ pictureUrl }' )"
+					data-url="${pictureUrl}"
+					style="background-image: url( '${pictureUrl}' )"
 				></div>`;
-			} );
+			});
 
-			picturesMarkup = `<div class="wpforms-builder-stock-photos-pictures-wrap">${ picturesMarkup }</div>`;
+			picturesMarkup = `<div class="wpforms-builder-stock-photos-pictures-wrap">${picturesMarkup}</div>`;
 
 			return picturesMarkup;
 		},
@@ -341,15 +344,14 @@ export default function( document, window, $ ) { // eslint-disable-line no-unuse
 		 * @since 1.9.7
 		 */
 		selectPicture() {
-			const pictureUrl = $( this ).data( 'url' );
+			const pictureUrl = $(this).data('url');
 
 			// Update the settings.
-			WPFormsBuilderThemes.store.set( 'backgroundUrl', pictureUrl );
+			WPFormsBuilderThemes.store.set('backgroundUrl', pictureUrl);
 
 			// Close the modal window.
 			state.picturesModal?.close();
 		},
-
 	};
 
 	return app;

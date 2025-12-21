@@ -8,252 +8,261 @@
 
 'use strict';
 
-var WPFormsPagesSMTP = window.WPFormsPagesSMTP || ( function( document, window, $ ) {
-
-	/**
-	 * Elements.
-	 *
-	 * @since 1.5.7
-	 *
-	 * @type {object}
-	 */
-	var el = {};
-
-	/**
-	 * Public functions and properties.
-	 *
-	 * @since 1.5.7
-	 *
-	 * @type {object}
-	 */
-	var app = {
-
+var WPFormsPagesSMTP =
+	window.WPFormsPagesSMTP ||
+	(function (document, window, $) {
 		/**
-		 * Start the engine.
+		 * Elements.
 		 *
 		 * @since 1.5.7
+		 *
+		 * @type {object}
 		 */
-		init: function() {
-
-			$( app.ready );
-		},
+		var el = {};
 
 		/**
-		 * Document ready.
+		 * Public functions and properties.
 		 *
 		 * @since 1.5.7
-		 */
-		ready: function() {
-
-			app.initVars();
-			app.events();
-		},
-
-		/**
-		 * Init variables.
 		 *
-		 * @since 1.5.7
+		 * @type {object}
 		 */
-		initVars: function() {
+		var app = {
+			/**
+			 * Start the engine.
+			 *
+			 * @since 1.5.7
+			 */
+			init: function () {
+				$(app.ready);
+			},
 
-			el = {
-				$stepInstall:    $( 'section.step-install' ),
-				$stepInstallNum: $( 'section.step-install .num img' ),
-				$stepSetup:      $( 'section.step-setup' ),
-				$stepSetupNum:   $( 'section.step-setup .num img' ),
-			};
-		},
+			/**
+			 * Document ready.
+			 *
+			 * @since 1.5.7
+			 */
+			ready: function () {
+				app.initVars();
+				app.events();
+			},
 
-		/**
-		 * Register JS events.
-		 *
-		 * @since 1.5.7
-		 */
-		events: function() {
+			/**
+			 * Init variables.
+			 *
+			 * @since 1.5.7
+			 */
+			initVars: function () {
+				el = {
+					$stepInstall: $('section.step-install'),
+					$stepInstallNum: $('section.step-install .num img'),
+					$stepSetup: $('section.step-setup'),
+					$stepSetupNum: $('section.step-setup .num img'),
+				};
+			},
 
-			// Step 'Install' button click.
-			el.$stepInstall.on( 'click', 'button', app.stepInstallClick );
+			/**
+			 * Register JS events.
+			 *
+			 * @since 1.5.7
+			 */
+			events: function () {
+				// Step 'Install' button click.
+				el.$stepInstall.on('click', 'button', app.stepInstallClick);
 
-			// Step 'Setup' button click.
-			el.$stepSetup.on( 'click', 'button', app.gotoURL );
-		},
+				// Step 'Setup' button click.
+				el.$stepSetup.on('click', 'button', app.gotoURL);
+			},
 
-		/**
-		 * Step 'Install' button click.
-		 *
-		 * @since 1.5.7
-		 */
-		stepInstallClick: function() {
+			/**
+			 * Step 'Install' button click.
+			 *
+			 * @since 1.5.7
+			 */
+			stepInstallClick: function () {
+				const $btn = $(this);
 
-			const $btn = $( this );
-
-			if ( $btn.hasClass( 'disabled' ) ) {
-				return;
-			}
-
-			const action = $btn.attr( 'data-action' );
-			let ajaxAction = '';
-
-			switch ( action ) {
-				case 'activate':
-					ajaxAction = 'wpforms_activate_addon';
-					$btn.text( wpforms_pluginlanding.activating );
-					break;
-
-				case 'install':
-					ajaxAction = 'wpforms_install_addon';
-					$btn.text( wpforms_pluginlanding.installing );
-					break;
-
-				case 'goto-url':
-					window.location.href = $btn.attr( 'data-url' );
+				if ($btn.hasClass('disabled')) {
 					return;
+				}
 
-				default:
+				const action = $btn.attr('data-action');
+				let ajaxAction = '';
+
+				switch (action) {
+					case 'activate':
+						ajaxAction = 'wpforms_activate_addon';
+						$btn.text(wpforms_pluginlanding.activating);
+						break;
+
+					case 'install':
+						ajaxAction = 'wpforms_install_addon';
+						$btn.text(wpforms_pluginlanding.installing);
+						break;
+
+					case 'goto-url':
+						window.location.href = $btn.attr('data-url');
+						return;
+
+					default:
+						return;
+				}
+
+				$btn.addClass('disabled');
+				app.showSpinner(el.$stepInstallNum);
+
+				const plugin = $btn.attr('data-plugin'),
+					source = $btn.attr('data-source');
+
+				const data = {
+					action: ajaxAction,
+					nonce: wpforms_admin.nonce,
+					plugin,
+					type: 'plugin',
+					source,
+				};
+
+				$.post(wpforms_admin.ajax_url, data)
+					.done(function (res) {
+						app.stepInstallDone(res, $btn, action);
+					})
+					.always(function () {
+						app.hideSpinner(el.$stepInstallNum);
+					});
+			},
+
+			/**
+			 * Done part of the 'Install' step.
+			 *
+			 * @since 1.5.7
+			 *
+			 * @param {object} res    Result of $.post() query.
+			 * @param {jQuery} $btn   Button.
+			 * @param {string} action Action (for more info look at the app.stepInstallClick() function).
+			 */
+			stepInstallDone: function (res, $btn, action) {
+				var success = 'install' === action ? res.success && res.data.is_activated : res.success;
+
+				if (success) {
+					el.$stepInstallNum.attr(
+						'src',
+						el.$stepInstallNum.attr('src').replace('step-1.', 'step-complete.')
+					);
+					$btn.addClass('grey').removeClass('button-primary').text(wpforms_pluginlanding.activated);
+					app.stepInstallPluginStatus();
+
 					return;
-			}
+				}
 
-			$btn.addClass( 'disabled' );
-			app.showSpinner( el.$stepInstallNum );
+				var activationFail =
+						('install' === action && res.success && !res.data.is_activated) ||
+						'activate' === action,
+					url = !activationFail
+						? wpforms_pluginlanding.manual_install_url
+						: wpforms_pluginlanding.manual_activate_url,
+					msg = !activationFail
+						? wpforms_pluginlanding.error_could_not_install
+						: wpforms_pluginlanding.error_could_not_activate,
+					btn = !activationFail
+						? wpforms_pluginlanding.download_now
+						: wpforms_pluginlanding.plugins_page;
 
-			const plugin = $btn.attr( 'data-plugin' ),
-				source = $btn.attr( 'data-source' );
+				$btn
+					.removeClass('grey disabled')
+					.text(btn)
+					.attr('data-action', 'goto-url')
+					.attr('data-url', url);
+				$btn.after('<p class="error">' + msg + '</p>');
+			},
 
-			const data = {
-				action: ajaxAction,
-				nonce: wpforms_admin.nonce,
-				plugin,
-				type: 'plugin',
-				source,
-			};
+			/**
+			 * Callback for step 'Install' completion.
+			 *
+			 * @since 1.5.7
+			 */
+			stepInstallPluginStatus: function () {
+				var data = {
+					action: 'wpforms_smtp_page_check_plugin_status',
+					nonce: wpforms_admin.nonce,
+				};
 
-			$.post( wpforms_admin.ajax_url, data )
-				.done( function( res ) {
-					app.stepInstallDone( res, $btn, action );
-				} )
-				.always( function() {
-					app.hideSpinner( el.$stepInstallNum );
-				} );
-		},
+				$.post(wpforms_admin.ajax_url, data).done(app.stepInstallPluginStatusDone);
+			},
 
-		/**
-		 * Done part of the 'Install' step.
-		 *
-		 * @since 1.5.7
-		 *
-		 * @param {object} res    Result of $.post() query.
-		 * @param {jQuery} $btn   Button.
-		 * @param {string} action Action (for more info look at the app.stepInstallClick() function).
-		 */
-		stepInstallDone: function( res, $btn, action ) {
+			/**
+			 * Done part of the callback for step 'Install' completion.
+			 *
+			 * @since 1.5.7
+			 *
+			 * @param {object} res Result of $.post() query.
+			 */
+			stepInstallPluginStatusDone: function (res) {
+				if (!res.success) {
+					return;
+				}
 
-			var success = 'install' === action ? res.success && res.data.is_activated : res.success;
+				el.$stepSetup.removeClass('grey');
+				el.$stepSetupBtn = el.$stepSetup.find('button');
+				el.$stepSetupBtn.removeClass('grey disabled').addClass('button-primary');
 
-			if ( success ) {
-				el.$stepInstallNum.attr( 'src', el.$stepInstallNum.attr( 'src' ).replace( 'step-1.', 'step-complete.' ) );
-				$btn.addClass( 'grey' ).removeClass( 'button-primary' ).text( wpforms_pluginlanding.activated );
-				app.stepInstallPluginStatus();
+				if (res.data.setup_status > 0) {
+					el.$stepSetupNum.attr(
+						'src',
+						el.$stepSetupNum.attr('src').replace('step-2.svg', 'step-complete.svg')
+					);
+					el.$stepSetupBtn
+						.attr('data-url', wpforms_pluginlanding.smtp_settings_url)
+						.text(wpforms_pluginlanding.smtp_settings);
 
-				return;
-			}
+					return;
+				}
 
-			var activationFail = ( 'install' === action && res.success && ! res.data.is_activated ) || 'activate' === action,
-				url            = ! activationFail ? wpforms_pluginlanding.manual_install_url : wpforms_pluginlanding.manual_activate_url,
-				msg            = ! activationFail ? wpforms_pluginlanding.error_could_not_install : wpforms_pluginlanding.error_could_not_activate,
-				btn            = ! activationFail ? wpforms_pluginlanding.download_now : wpforms_pluginlanding.plugins_page;
+				el.$stepSetupBtn
+					.attr('data-url', wpforms_pluginlanding.smtp_wizard_url)
+					.text(wpforms_pluginlanding.smtp_wizard);
+			},
 
-			$btn.removeClass( 'grey disabled' ).text( btn ).attr( 'data-action', 'goto-url' ).attr( 'data-url', url );
-			$btn.after( '<p class="error">' + msg + '</p>' );
-		},
+			/**
+			 * Go to URL by click on the button.
+			 *
+			 * @since 1.5.7
+			 */
+			gotoURL: function () {
+				var $btn = $(this);
 
-		/**
-		 * Callback for step 'Install' completion.
-		 *
-		 * @since 1.5.7
-		 */
-		stepInstallPluginStatus: function() {
+				if ($btn.hasClass('disabled')) {
+					return;
+				}
 
-			var data = {
-				action: 'wpforms_smtp_page_check_plugin_status',
-				nonce : wpforms_admin.nonce,
-			};
+				window.location.href = $btn.attr('data-url');
+			},
 
-			$.post( wpforms_admin.ajax_url, data )
-				.done( app.stepInstallPluginStatusDone );
-		},
+			/**
+			 * Display spinner.
+			 *
+			 * @since 1.5.7
+			 *
+			 * @param {jQuery} $el Section number image jQuery object.
+			 */
+			showSpinner: function ($el) {
+				$el.siblings('.loader').removeClass('hidden');
+			},
 
-		/**
-		 * Done part of the callback for step 'Install' completion.
-		 *
-		 * @since 1.5.7
-		 *
-		 * @param {object} res Result of $.post() query.
-		 */
-		stepInstallPluginStatusDone: function( res ) {
+			/**
+			 * Hide spinner.
+			 *
+			 * @since 1.5.7
+			 *
+			 * @param {jQuery} $el Section number image jQuery object.
+			 */
+			hideSpinner: function ($el) {
+				$el.siblings('.loader').addClass('hidden');
+			},
+		};
 
-			if ( ! res.success ) {
-				return;
-			}
-
-			el.$stepSetup.removeClass( 'grey' );
-			el.$stepSetupBtn = el.$stepSetup.find( 'button' );
-			el.$stepSetupBtn.removeClass( 'grey disabled' ).addClass( 'button-primary' );
-
-			if ( res.data.setup_status > 0 ) {
-				el.$stepSetupNum.attr( 'src', el.$stepSetupNum.attr( 'src' ).replace( 'step-2.svg', 'step-complete.svg' ) );
-				el.$stepSetupBtn.attr( 'data-url', wpforms_pluginlanding.smtp_settings_url ).text( wpforms_pluginlanding.smtp_settings );
-
-				return;
-			}
-
-			el.$stepSetupBtn.attr( 'data-url', wpforms_pluginlanding.smtp_wizard_url ).text( wpforms_pluginlanding.smtp_wizard );
-		},
-
-		/**
-		 * Go to URL by click on the button.
-		 *
-		 * @since 1.5.7
-		 */
-		gotoURL: function() {
-
-			var $btn = $( this );
-
-			if ( $btn.hasClass( 'disabled' ) ) {
-				return;
-			}
-
-			window.location.href = $btn.attr( 'data-url' );
-		},
-
-		/**
-		 * Display spinner.
-		 *
-		 * @since 1.5.7
-		 *
-		 * @param {jQuery} $el Section number image jQuery object.
-		 */
-		showSpinner: function( $el ) {
-
-			$el.siblings( '.loader' ).removeClass( 'hidden' );
-		},
-
-		/**
-		 * Hide spinner.
-		 *
-		 * @since 1.5.7
-		 *
-		 * @param {jQuery} $el Section number image jQuery object.
-		 */
-		hideSpinner: function( $el ) {
-
-			$el.siblings( '.loader' ).addClass( 'hidden' );
-		},
-	};
-
-	// Provide access to public functions/properties.
-	return app;
-
-}( document, window, jQuery ) );
+		// Provide access to public functions/properties.
+		return app;
+	})(document, window, jQuery);
 
 // Initialize.
 WPFormsPagesSMTP.init();

@@ -18,7 +18,7 @@
  *
  * @since 1.8.8
  */
-export default ( ( function() {
+export default (function () {
 	/**
 	 * WP core components.
 	 *
@@ -99,85 +99,98 @@ export default ( ( function() {
 		 *
 		 * @return {Object}  Field styles JSX code.
 		 */
-		getFieldStyles( props, handlers, sizeOptions, formSelectorCommon ) { // eslint-disable-line max-lines-per-function
+		getFieldStyles(props, handlers, sizeOptions, formSelectorCommon) {
+			// eslint-disable-line max-lines-per-function
 			return (
-				<PanelBody className={ formSelectorCommon.getPanelClass( props ) } title={ strings.field_styles }>
-					<Flex gap={ 4 } align="flex-start" className={ 'wpforms-gutenberg-form-selector-flex' } justify="space-between">
+				<PanelBody className={formSelectorCommon.getPanelClass(props)} title={strings.field_styles}>
+					<Flex
+						gap={4}
+						align="flex-start"
+						className={'wpforms-gutenberg-form-selector-flex'}
+						justify="space-between"
+					>
 						<FlexBlock>
 							<SelectControl
-								label={ strings.size }
-								value={ props.attributes.fieldSize }
-								options={ sizeOptions }
-								onChange={ ( value ) => handlers.styleAttrChange( 'fieldSize', value ) }
+								label={strings.size}
+								value={props.attributes.fieldSize}
+								options={sizeOptions}
+								onChange={(value) => handlers.styleAttrChange('fieldSize', value)}
 							/>
 						</FlexBlock>
 						<FlexBlock>
 							<SelectControl
-								label={ strings.border }
-								value={ props.attributes.fieldBorderStyle }
-								options={
-									[
-										{ label: strings.none, value: 'none' },
-										{ label: strings.solid, value: 'solid' },
-										{ label: strings.dashed, value: 'dashed' },
-										{ label: strings.dotted, value: 'dotted' },
-									]
-								}
-								onChange={ ( value ) => handlers.styleAttrChange( 'fieldBorderStyle', value ) }
+								label={strings.border}
+								value={props.attributes.fieldBorderStyle}
+								options={[
+									{ label: strings.none, value: 'none' },
+									{ label: strings.solid, value: 'solid' },
+									{ label: strings.dashed, value: 'dashed' },
+									{ label: strings.dotted, value: 'dotted' },
+								]}
+								onChange={(value) => handlers.styleAttrChange('fieldBorderStyle', value)}
 							/>
 						</FlexBlock>
 					</Flex>
-					<Flex gap={ 4 } align="flex-start" className={ 'wpforms-gutenberg-form-selector-flex' } justify="space-between">
+					<Flex
+						gap={4}
+						align="flex-start"
+						className={'wpforms-gutenberg-form-selector-flex'}
+						justify="space-between"
+					>
 						<FlexBlock>
 							<__experimentalUnitControl
-								label={ strings.border_size }
-								value={ props.attributes.fieldBorderStyle === 'none' ? '' : props.attributes.fieldBorderSize }
-								min={ 0 }
-								disabled={ props.attributes.fieldBorderStyle === 'none' }
-								onChange={ ( value ) => handlers.styleAttrChange( 'fieldBorderSize', value ) }
+								label={strings.border_size}
+								value={
+									props.attributes.fieldBorderStyle === 'none'
+										? ''
+										: props.attributes.fieldBorderSize
+								}
+								min={0}
+								disabled={props.attributes.fieldBorderStyle === 'none'}
+								onChange={(value) => handlers.styleAttrChange('fieldBorderSize', value)}
 								isUnitSelectTabbable
 							/>
 						</FlexBlock>
 						<FlexBlock>
 							<__experimentalUnitControl
-								label={ strings.border_radius }
-								value={ props.attributes.fieldBorderRadius }
-								min={ 0 }
+								label={strings.border_radius}
+								value={props.attributes.fieldBorderRadius}
+								min={0}
 								isUnitSelectTabbable
-								onChange={ ( value ) => handlers.styleAttrChange( 'fieldBorderRadius', value ) }
+								onChange={(value) => handlers.styleAttrChange('fieldBorderRadius', value)}
 							/>
 						</FlexBlock>
 					</Flex>
 
 					<div className="wpforms-gutenberg-form-selector-color-picker">
-						<div className="wpforms-gutenberg-form-selector-control-label">{ strings.colors }</div>
+						<div className="wpforms-gutenberg-form-selector-control-label">{strings.colors}</div>
 						<PanelColorSettings
 							__experimentalIsRenderedInSidebar
 							enableAlpha
-							showTitle={ false }
-							className={ formSelectorCommon.getColorPanelClass( props.attributes.fieldBorderStyle ) }
-							colorSettings={ [
+							showTitle={false}
+							className={formSelectorCommon.getColorPanelClass(props.attributes.fieldBorderStyle)}
+							colorSettings={[
 								{
 									value: props.attributes.fieldBackgroundColor,
-									onChange: ( value ) => handlers.styleAttrChange( 'fieldBackgroundColor', value ),
+									onChange: (value) => handlers.styleAttrChange('fieldBackgroundColor', value),
 									label: strings.background,
 								},
 								{
 									value: props.attributes.fieldBorderColor,
-									onChange: ( value ) => handlers.styleAttrChange( 'fieldBorderColor', value ),
+									onChange: (value) => handlers.styleAttrChange('fieldBorderColor', value),
 									label: strings.border,
 								},
 								{
 									value: props.attributes.fieldTextColor,
-									onChange: ( value ) => handlers.styleAttrChange( 'fieldTextColor', value ),
+									onChange: (value) => handlers.styleAttrChange('fieldTextColor', value),
 									label: strings.text,
 								},
 								{
 									value: props.attributes.fieldMenuColor,
-									onChange: ( value ) => handlers.styleAttrChange( 'fieldMenuColor', value ),
+									onChange: (value) => handlers.styleAttrChange('fieldMenuColor', value),
 									label: strings.menu,
 								},
-							] }
+							]}
 						/>
 					</div>
 				</PanelBody>
@@ -186,4 +199,4 @@ export default ( ( function() {
 	};
 
 	return app;
-} )() );
+})();
