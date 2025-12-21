@@ -560,4 +560,65 @@ class Medici_Forms_Advanced_Frontend {
 
 		return $form_data;
 	}
+
+	/**
+	 * Render email template
+	 *
+	 * @since 1.0.0
+	 * @param string $template_style Template style (modern, classic, minimal)
+	 * @param string $form_title Form title
+	 * @param array<string, mixed> $fields Form fields data
+	 * @return string Rendered HTML email
+	 */
+	public function render_email_template( string $template_style, string $form_title, array $fields ): string {
+		// Check if custom templates enabled
+		if ( ! $this->settings->get( 'email', 'custom_templates', false ) ) {
+			return $this->render_default_email( $form_title, $fields );
+		}
+
+		// Get template file
+		$template_file = match ( $template_style ) {
+			'classic' => 'email-classic.php',
+			'minimal' => 'email-minimal.php',
+			default   => 'email-modern.php',
+		};
+
+		$template_path = __DIR__ . '/templates/' . $template_file;
+
+		if ( ! file_exists( $template_path ) ) {
+			return $this->render_default_email( $form_title, $fields );
+		}
+
+		// Prepare template variables
+		$logo_url    = $this->settings->get( 'email', 'logo_url', '' );
+		$footer_text = $this->settings->get( 'email', 'footer_text', '' );
+		$site_name   = get_bloginfo( 'name' );
+		$site_url    = home_url();
+
+		// Render template
+		ob_start();
+		include $template_path;
+		return (string) ob_get_clean();
+	}
+
+	/**
+	 * Render default email (fallback)
+	 *
+	 * @since 1.0.0
+	 * @param string $form_title Form title
+	 * @param array<string, mixed> $fields Form fields data
+	 * @return string Rendered HTML email
+	 */
+	private function render_default_email( string $form_title, array $fields ): string {
+		$html = '<h2>' . esc_html( $form_title ) . '</h2>';
+		$html .= '<p><strong>Дата:</strong> ' . esc_html( gmdate( 'd.m.Y H:i' ) ) . '</p>';
+		$html .= '<hr>';
+
+		foreach ( $fields as $label => $value ) {
+			$html .= '<p><strong>' . esc_html( $label ) . ':</strong><br>';
+			$html .= wp_kses_post( nl2br( $value ) ) . '</p>';
+		}
+
+		return $html;
+	}
 }
