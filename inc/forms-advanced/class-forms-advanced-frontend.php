@@ -74,6 +74,11 @@ class Medici_Forms_Advanced_Frontend {
 	 * @return void
 	 */
 	public function enqueue_assets(): void {
+		// CRITICAL: Do NOT load if WPForms is not active
+		if ( ! function_exists( 'wpforms' ) ) {
+			return;
+		}
+
 		// Перевірка чи завантажувати CSS
 		if ( ! $this->settings->get( 'advanced', 'load_css', true ) ) {
 			return;
