@@ -329,6 +329,18 @@ class Settings {
 				'description' => __( 'Мінімальний score для v3 (0.0 - 1.0, рекомендовано 0.5).', 'medici-forms-pro' ),
 			)
 		);
+
+		add_settings_field(
+			'enable_bot_detection',
+			__( 'Детекція ботів', 'medici-forms-pro' ),
+			array( $this, 'render_checkbox_field' ),
+			'medici_forms_antispam',
+			'medici_forms_antispam',
+			array(
+				'id'          => 'enable_bot_detection',
+				'description' => __( 'Автоматична детекція ботів/crawlers за User-Agent для покращення захисту.', 'medici-forms-pro' ),
+			)
+		);
 	}
 
 	/**
@@ -774,7 +786,7 @@ class Settings {
 		// Define checkboxes per tab.
 		$checkboxes_by_tab = array(
 			'general'      => array( 'enable_ajax', 'load_styles', 'load_scripts' ),
-			'antispam'     => array( 'enable_honeypot', 'enable_time_check', 'enable_recaptcha' ),
+			'antispam'     => array( 'enable_honeypot', 'enable_time_check', 'enable_recaptcha', 'enable_bot_detection' ),
 			'integrations' => array( 'webhook_enabled' ),
 			'styling'      => array( 'enable_autogrow_textarea' ),
 			'advanced'     => array( 'log_entries', 'delete_data_on_uninstall' ),

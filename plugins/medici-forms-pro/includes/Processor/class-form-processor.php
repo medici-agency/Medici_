@@ -13,6 +13,7 @@ namespace MediciForms\Processor;
 use MediciForms\Helpers;
 use MediciForms\Security;
 use MediciForms\Plugin;
+use MediciForms\Bot_Detect;
 use MediciForms\Notifications\Email;
 use MediciForms\Notifications\Webhook;
 use MediciForms\Entries\Entries;
@@ -143,6 +144,17 @@ class Form_Processor {
 	 * @return array{passed: bool, message: string}
 	 */
 	private function check_spam( array $data, int $form_id, array $settings ): array {
+		// Bot detection check.
+		if ( Plugin::get_option( 'enable_bot_detection', true ) ) {
+			$bot_detector = Bot_Detect::get_instance();
+			if ( $bot_detector->is_bot() ) {
+				return array(
+					'passed'  => false,
+					'message' => __( 'Автоматичні запити не дозволені.', 'medici-forms-pro' ),
+				);
+			}
+		}
+
 		// Honeypot check.
 		if ( ! empty( $settings['enable_honeypot'] ) ) {
 			if ( ! Security::verify_honeypot( $data ) ) {

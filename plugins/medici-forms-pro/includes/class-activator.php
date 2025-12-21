@@ -112,6 +112,7 @@ class Activator {
 			'recaptcha_secret_key'   => '',
 			'recaptcha_version'      => 'v3',
 			'recaptcha_threshold'    => 0.5,
+			'enable_bot_detection'   => true,
 
 			// Integrations.
 			'webhook_enabled'        => false,
@@ -125,11 +126,12 @@ class Activator {
 			'entry_retention_days'   => 365,
 
 			// Styling.
-			'form_style'             => 'modern',
-			'primary_color'          => '#2563eb',
-			'success_color'          => '#16a34a',
-			'error_color'            => '#dc2626',
-			'border_radius'          => '8',
+			'form_style'               => 'modern',
+			'primary_color'            => '#2563eb',
+			'success_color'            => '#16a34a',
+			'error_color'              => '#dc2626',
+			'border_radius'            => '8',
+			'enable_autogrow_textarea' => false,
 		);
 
 		$existing = get_option( 'medici_forms_settings', array() );
