@@ -595,6 +595,15 @@
 	line-height: 1.5;
 }
 
+/* Twemoji іконки у TOC лінках */
+.toc-list a img.emoji {
+	display: inline-block;
+	width: 1.1em; /* Трохи більше для кращої видимості */
+	height: 1.1em;
+	margin: 0 0.15em; /* Відступи зліва та справа */
+	vertical-align: -0.1em; /* Вирівнювання з текстом */
+}
+
 .toc-list a:hover {
 	background: var(--bg-secondary);
 	color: var(--accent);

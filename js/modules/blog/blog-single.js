@@ -128,8 +128,9 @@
 			const link = document.createElement('a');
 
 			link.href = `#${heading.id}`;
-			// Використовуємо innerText замість textContent для коректного відображення після Twemoji parse
-			link.textContent = heading.innerText || heading.textContent;
+			// Копіюємо HTML вміст включаючи Twemoji іконки (img теги)
+			// innerHTML безпечний тут, оскільки заголовки вже пройшли WordPress санітизацію
+			link.innerHTML = heading.innerHTML;
 			link.dataset.target = heading.id;
 
 			// Додати відступ для H3
