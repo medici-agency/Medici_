@@ -79,11 +79,15 @@ class Medici_Forms_Advanced_Frontend {
 			return;
 		}
 
+		// Реєструємо власний handle (завжди працює, навіть якщо WPForms CSS вимкнено)
+		wp_register_style( 'medici-forms-advanced-styles', false, [], Medici_Forms_Advanced::VERSION );
+		wp_enqueue_style( 'medici-forms-advanced-styles' );
+
 		// Генеруємо CSS динамічно на основі налаштувань
 		$custom_css = $this->generate_custom_css();
 
 		// Додаємо inline CSS (економія файлів згідно з CLAUDE.md policy)
-		wp_add_inline_style( 'wpforms-full', $custom_css );
+		wp_add_inline_style( 'medici-forms-advanced-styles', $custom_css );
 	}
 
 	/**
@@ -97,7 +101,7 @@ class Medici_Forms_Advanced_Frontend {
 		$styling = $this->settings->get_group( 'styling' );
 
 		$css = <<<CSS
-		/* Medici Forms Advanced - Custom Styles */
+		/* Medici Forms Advanced - Custom Styles (v1.0.0) */
 
 		/* Layout Settings */
 		.wpforms-container {
@@ -108,6 +112,7 @@ class Medici_Forms_Advanced_Frontend {
 
 		.wpforms-form .wpforms-field {
 			gap: {$layout['field_gap']} !important;
+			margin-bottom: {$layout['field_gap']} !important;
 		}
 
 		.wpforms-form input[type="text"],
@@ -115,14 +120,18 @@ class Medici_Forms_Advanced_Frontend {
 		.wpforms-form input[type="tel"],
 		.wpforms-form input[type="url"],
 		.wpforms-form input[type="number"],
+		.wpforms-form input[type="password"],
+		.wpforms-form input[type="date"],
 		.wpforms-form select,
 		.wpforms-form textarea {
 			width: {$layout['field_width']} !important;
 			max-width: 100% !important;
+			box-sizing: border-box !important;
 		}
 
 		.wpforms-form button[type="submit"],
-		.wpforms-form .wpforms-submit-container button {
+		.wpforms-form .wpforms-submit-container button,
+		.wpforms-form .wpforms-page-button {
 			width: {$layout['button_width']} !important;
 			max-width: {$layout['button_max_width']} !important;
 		}
@@ -131,12 +140,14 @@ class Medici_Forms_Advanced_Frontend {
 			text-align: {$this->get_button_alignment_css( $layout['button_alignment'] )} !important;
 		}
 
-		/* Field Styling */
+		/* Field Styling - Light Theme (HIGH CONTRAST) */
 		.wpforms-form input[type="text"],
 		.wpforms-form input[type="email"],
 		.wpforms-form input[type="tel"],
 		.wpforms-form input[type="url"],
 		.wpforms-form input[type="number"],
+		.wpforms-form input[type="password"],
+		.wpforms-form input[type="date"],
 		.wpforms-form select,
 		.wpforms-form textarea {
 			background-color: {$styling['field_bg_color']} !important;
@@ -145,6 +156,8 @@ class Medici_Forms_Advanced_Frontend {
 			color: {$styling['field_text_color']} !important;
 			font-size: {$styling['field_font_size']} !important;
 			padding: {$styling['field_padding']} !important;
+			transition: all 0.2s ease !important;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
 		}
 
 		.wpforms-form input:focus,
@@ -153,11 +166,19 @@ class Medici_Forms_Advanced_Frontend {
 			border-color: {$styling['field_focus_border_color']} !important;
 			box-shadow: {$styling['field_focus_shadow']} !important;
 			outline: none !important;
+			background-color: #ffffff !important;
 		}
 
-		/* Button Styling */
+		.wpforms-form input::placeholder,
+		.wpforms-form textarea::placeholder {
+			color: #9ca3af !important;
+			opacity: 1 !important;
+		}
+
+		/* Button Styling - Modern & Accessible */
 		.wpforms-form button[type="submit"],
-		.wpforms-form .wpforms-submit-container button {
+		.wpforms-form .wpforms-submit-container button,
+		.wpforms-form .wpforms-page-button {
 			background-color: {$styling['button_bg_color']} !important;
 			color: {$styling['button_text_color']} !important;
 			border: none !important;
@@ -166,36 +187,96 @@ class Medici_Forms_Advanced_Frontend {
 			font-weight: {$styling['button_font_weight']} !important;
 			padding: {$styling['button_padding']} !important;
 			transition: all 0.2s ease !important;
+			cursor: pointer !important;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
 		}
 
 		.wpforms-form button[type="submit"]:hover,
-		.wpforms-form .wpforms-submit-container button:hover {
+		.wpforms-form .wpforms-submit-container button:hover,
+		.wpforms-form .wpforms-page-button:hover {
 			background-color: {$styling['button_hover_bg_color']} !important;
 			transform: {$styling['button_hover_transform']} !important;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06) !important;
 		}
 
-		/* Label Styling */
+		.wpforms-form button[type="submit"]:focus,
+		.wpforms-form .wpforms-submit-container button:focus,
+		.wpforms-form .wpforms-page-button:focus {
+			outline: 2px solid {$styling['button_bg_color']} !important;
+			outline-offset: 2px !important;
+		}
+
+		/* Label Styling - High Contrast */
 		.wpforms-form .wpforms-field-label {
 			color: {$styling['label_color']} !important;
 			font-size: {$styling['label_font_size']} !important;
 			font-weight: {$styling['label_font_weight']} !important;
+			margin-bottom: 0.5rem !important;
 		}
 
-		/* Dark Theme Support */
+		.wpforms-form .wpforms-field-sublabel {
+			color: #6b7280 !important;
+			font-size: 0.875rem !important;
+		}
+
+		/* Required Field Indicator */
+		.wpforms-form .wpforms-required-label {
+			color: #dc2626 !important;
+			font-weight: 600 !important;
+		}
+
+		/* Dark Theme Support - HIGH CONTRAST для доступності */
 		[data-theme="dark"] .wpforms-form input[type="text"],
 		[data-theme="dark"] .wpforms-form input[type="email"],
 		[data-theme="dark"] .wpforms-form input[type="tel"],
 		[data-theme="dark"] .wpforms-form input[type="url"],
 		[data-theme="dark"] .wpforms-form input[type="number"],
+		[data-theme="dark"] .wpforms-form input[type="password"],
+		[data-theme="dark"] .wpforms-form input[type="date"],
 		[data-theme="dark"] .wpforms-form select,
 		[data-theme="dark"] .wpforms-form textarea {
 			background-color: {$styling['dark_field_bg_color']} !important;
 			border-color: {$styling['dark_field_border_color']} !important;
 			color: {$styling['dark_field_text_color']} !important;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+		}
+
+		[data-theme="dark"] .wpforms-form input:focus,
+		[data-theme="dark"] .wpforms-form select:focus,
+		[data-theme="dark"] .wpforms-form textarea:focus {
+			border-color: #60a5fa !important;
+			background-color: #1e293b !important;
+			box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2) !important;
+		}
+
+		[data-theme="dark"] .wpforms-form input::placeholder,
+		[data-theme="dark"] .wpforms-form textarea::placeholder {
+			color: #94a3b8 !important;
 		}
 
 		[data-theme="dark"] .wpforms-form .wpforms-field-label {
 			color: {$styling['dark_label_color']} !important;
+		}
+
+		[data-theme="dark"] .wpforms-form .wpforms-field-sublabel {
+			color: #94a3b8 !important;
+		}
+
+		/* Error States - High Visibility */
+		.wpforms-form .wpforms-error,
+		.wpforms-form input.wpforms-error,
+		.wpforms-form textarea.wpforms-error,
+		.wpforms-form select.wpforms-error {
+			border-color: #dc2626 !important;
+			background-color: #fef2f2 !important;
+		}
+
+		[data-theme="dark"] .wpforms-form .wpforms-error,
+		[data-theme="dark"] .wpforms-form input.wpforms-error,
+		[data-theme="dark"] .wpforms-form textarea.wpforms-error,
+		[data-theme="dark"] .wpforms-form select.wpforms-error {
+			border-color: #ef4444 !important;
+			background-color: #7f1d1d !important;
 		}
 
 		/* Responsive - mobile font size 16px to prevent zoom on iOS */
@@ -205,10 +286,24 @@ class Medici_Forms_Advanced_Frontend {
 			.wpforms-form input[type="tel"],
 			.wpforms-form input[type="url"],
 			.wpforms-form input[type="number"],
+			.wpforms-form input[type="password"],
+			.wpforms-form input[type="date"],
 			.wpforms-form select,
 			.wpforms-form textarea {
 				font-size: 16px !important;
 			}
+
+			.wpforms-form button[type="submit"],
+			.wpforms-form .wpforms-submit-container button {
+				width: 100% !important;
+				max-width: 100% !important;
+			}
+		}
+
+		/* Accessibility - Focus Visible */
+		.wpforms-form *:focus-visible {
+			outline: 2px solid #3b82f6 !important;
+			outline-offset: 2px !important;
 		}
 		CSS;
 

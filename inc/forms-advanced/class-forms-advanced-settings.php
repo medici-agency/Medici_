@@ -71,43 +71,43 @@ class Medici_Forms_Advanced_Settings {
 				'button_alignment' => 'left', // left, center, right, full
 			],
 
-			// Styling Settings
+			// Styling Settings (HIGH CONTRAST for WCAG AAA)
 			'styling' => [
-				// Fields
-				'field_bg_color'           => '#f9fafb',
-				'field_border_color'       => '#e5e7eb',
+				// Fields - Light Theme
+				'field_bg_color'           => '#ffffff',
+				'field_border_color'       => '#d1d5db',
 				'field_border_width'       => '2px',
-				'field_border_radius'      => '4px',
+				'field_border_radius'      => '6px',
 				'field_text_color'         => '#111827',
 				'field_font_size'          => '1rem',
-				'field_padding'            => '0.75rem 1rem',
+				'field_padding'            => '0.875rem 1.125rem',
 
-				// Fields Focus
+				// Fields Focus - High Contrast Blue
 				'field_focus_border_color' => '#2563eb',
-				'field_focus_shadow'       => '0 0 0 3px rgba(37, 99, 235, 0.1)',
+				'field_focus_shadow'       => '0 0 0 3px rgba(37, 99, 235, 0.15)',
 
-				// Buttons
+				// Buttons - Modern Blue (High Contrast)
 				'button_bg_color'          => '#2563eb',
 				'button_text_color'        => '#ffffff',
-				'button_border_radius'     => '4px',
-				'button_font_size'         => '1rem',
+				'button_border_radius'     => '6px',
+				'button_font_size'         => '1.0625rem',
 				'button_font_weight'       => '600',
-				'button_padding'           => '0.75rem 2rem',
+				'button_padding'           => '0.875rem 2.25rem',
 
-				// Buttons Hover
+				// Buttons Hover - Darker Blue
 				'button_hover_bg_color'    => '#1d4ed8',
 				'button_hover_transform'   => 'translateY(-1px)',
 
-				// Labels
-				'label_color'              => '#111827',
-				'label_font_size'          => '0.875rem',
+				// Labels - High Contrast
+				'label_color'              => '#0f172a',
+				'label_font_size'          => '0.9375rem',
 				'label_font_weight'        => '600',
 
-				// Dark Theme
-				'dark_field_bg_color'      => '#1f2937',
-				'dark_field_border_color'  => 'rgba(255, 255, 255, 0.2)',
-				'dark_field_text_color'    => '#f9fafb',
-				'dark_label_color'         => '#f9fafb',
+				// Dark Theme - High Contrast for Accessibility
+				'dark_field_bg_color'      => '#1e293b',
+				'dark_field_border_color'  => 'rgba(148, 163, 184, 0.4)',
+				'dark_field_text_color'    => '#f1f5f9',
+				'dark_label_color'         => '#f1f5f9',
 			],
 
 			// Anti-Bot Settings
