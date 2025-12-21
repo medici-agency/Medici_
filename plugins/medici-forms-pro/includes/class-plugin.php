@@ -79,8 +79,23 @@ final class Plugin {
 	 */
 	private function __construct() {
 		$this->load_dependencies();
+		$this->maybe_run_migrations();
 		$this->init_components();
 		$this->register_hooks();
+	}
+
+	/**
+	 * Run migrations if needed.
+	 *
+	 * @since 1.1.0
+	 */
+	private function maybe_run_migrations(): void {
+		$current_version = get_option( 'medici_forms_version', '0.0.0' );
+
+		if ( version_compare( $current_version, MEDICI_FORMS_VERSION, '<' ) ) {
+			// Ensure defaults are set on upgrade.
+			Activator::activate();
+		}
 	}
 
 	/**
@@ -92,6 +107,7 @@ final class Plugin {
 		// Core classes.
 		require_once MEDICI_FORMS_PLUGIN_DIR . 'includes/class-helpers.php';
 		require_once MEDICI_FORMS_PLUGIN_DIR . 'includes/class-security.php';
+		require_once MEDICI_FORMS_PLUGIN_DIR . 'includes/class-bot-detect.php';
 
 		// Post Types.
 		require_once MEDICI_FORMS_PLUGIN_DIR . 'includes/Post_Types/class-form.php';
