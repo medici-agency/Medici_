@@ -107,6 +107,7 @@
 	grid-area: toc-sidebar;
 	max-height: calc(100vh - 120px);
 	max-width: 280px; /* Обмеження ширини для запобігання overflow */
+	min-height: 0; /* Дозволити grid стискати висоту */
 	overflow: hidden; /* Запобігти виходу контенту за межі */
 	box-sizing: border-box; /* Padding включається у ширину */
 }
@@ -535,17 +536,24 @@
 	font-size: 18px;
 	font-weight: var(--font-bold);
 	margin-bottom: 20px;
+	flex-shrink: 0; /* Заголовок не стискається у flex контейнері */
 }
 
 /* TOC Sidebar - мінімальні падінги зліва */
 .medici-toc-sidebar .sidebar-section {
 	padding: 20px 24px 20px 16px; /* Менше зліва */
+	max-height: calc(100vh - 140px); /* Обмеження висоти (100px top + 40px запас) */
+	display: flex;
+	flex-direction: column;
+	overflow: hidden; /* Скрол буде у #medici-toc-container */
 }
 
 /* Table of Contents */
 #medici-toc-container {
-	max-height: 500px; /* Максимальна висота TOC */
-	overflow: hidden auto; /* Додати вертикальну прокрутку */ /* Приховати горизонтальну прокрутку */
+	flex: 1; /* Займати доступний простір у flex контейнері */
+	min-height: 0; /* Дозволити flexbox стискати */
+	overflow-y: auto; /* Вертикальна прокрутка */
+	overflow-x: hidden; /* Приховати горизонтальну прокрутку */
 
 	/* Smooth scrolling for TOC */
 	scroll-behavior: smooth;
