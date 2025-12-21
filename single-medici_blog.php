@@ -61,7 +61,7 @@ $post_date        = get_the_date( 'j F Y' );
 		<aside class="medici-toc-sidebar">
 			<div class="sidebar-section">
 				<h3><?php esc_html_e( 'Зміст статті', 'medici.agency' ); ?></h3>
-				<div id="js-toc-container" class="medici-toc-container">
+				<div id="medici-toc-container">
 					<!-- TOC буде згенеровано JavaScript (blog-single.js) -->
 				</div>
 			</div>
