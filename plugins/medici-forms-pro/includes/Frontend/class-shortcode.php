@@ -307,16 +307,32 @@ class Shortcode {
 	 */
 	private function render_textarea_field( array $field, string $name, array $settings ): void {
 		$rows = $field['rows'] ?? 5;
+		$autogrow_enabled = Plugin::get_option( 'enable_autogrow_textarea', false );
 
 		$this->render_label( $field, $settings );
-		?>
-		<textarea name="<?php echo esc_attr( $name ); ?>"
-				  id="field-<?php echo esc_attr( $field['id'] ); ?>"
-				  class="medici-form-textarea"
-				  rows="<?php echo esc_attr( (string) $rows ); ?>"
-			<?php echo ! empty( $field['required'] ) ? 'required' : ''; ?>
-			<?php echo ! empty( $field['placeholder'] ) ? 'placeholder="' . esc_attr( $field['placeholder'] ) . '"' : ''; ?>></textarea>
-		<?php
+
+		// Wrap in auto-grow container if enabled.
+		if ( $autogrow_enabled ) {
+			?>
+			<div class="medici-form-textarea-wrapper" data-cloned-val="">
+				<textarea name="<?php echo esc_attr( $name ); ?>"
+						  id="field-<?php echo esc_attr( $field['id'] ); ?>"
+						  class="medici-form-textarea"
+						  rows="<?php echo esc_attr( (string) $rows ); ?>"
+					<?php echo ! empty( $field['required'] ) ? 'required' : ''; ?>
+					<?php echo ! empty( $field['placeholder'] ) ? 'placeholder="' . esc_attr( $field['placeholder'] ) . '"' : ''; ?>></textarea>
+			</div>
+			<?php
+		} else {
+			?>
+			<textarea name="<?php echo esc_attr( $name ); ?>"
+					  id="field-<?php echo esc_attr( $field['id'] ); ?>"
+					  class="medici-form-textarea"
+					  rows="<?php echo esc_attr( (string) $rows ); ?>"
+				<?php echo ! empty( $field['required'] ) ? 'required' : ''; ?>
+				<?php echo ! empty( $field['placeholder'] ) ? 'placeholder="' . esc_attr( $field['placeholder'] ) . '"' : ''; ?>></textarea>
+			<?php
+		}
 	}
 
 	/**
