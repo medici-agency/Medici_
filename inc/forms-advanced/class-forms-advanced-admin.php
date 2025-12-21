@@ -996,68 +996,568 @@ class Medici_Forms_Advanced_Admin {
 	}
 
 	/**
-	 * Render Anti-Bot tab (placeholder - буде розширено)
+	 * Render Anti-Bot tab
 	 *
 	 * @since 1.0.0
 	 * @return void
 	 */
 	private function render_tab_antibot(): void {
+		$antibot = $this->settings->get_group( 'antibot' );
+
 		?>
 		<div id="medici-tab-antibot" class="medici-forms-advanced__tab-content">
+			<!-- Enable/Disable Section -->
 			<div class="medici-forms-advanced__section">
-				<h2 class="medici-forms-advanced__section-title"><?php esc_html_e( 'Налаштування Anti-Bot', 'medici' ); ?></h2>
-				<p><?php esc_html_e( 'Cloudflare Turnstile, reCAPTCHA...', 'medici' ); ?></p>
+				<h2 class="medici-forms-advanced__section-title"><?php esc_html_e( 'Загальні налаштування', 'medici' ); ?></h2>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<input
+							type="checkbox"
+							name="antibot[enabled]"
+							value="1"
+							<?php checked( $antibot['enabled'] ?? true ); ?>
+						/>
+						<?php esc_html_e( 'Увімкнути анти-бот захист', 'medici' ); ?>
+					</label>
+					<span class="medici-forms-advanced__field-description">
+						<?php esc_html_e( 'Захист форм від спаму та ботів за допомогою Cloudflare Turnstile або Google reCAPTCHA', 'medici' ); ?>
+					</span>
+				</div>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<?php esc_html_e( 'Провайдер захисту', 'medici' ); ?>
+					</label>
+					<select name="antibot[provider]">
+						<option value="none" <?php selected( $antibot['provider'] ?? 'turnstile', 'none' ); ?>>
+							<?php esc_html_e( 'Вимкнено', 'medici' ); ?>
+						</option>
+						<option value="turnstile" <?php selected( $antibot['provider'] ?? 'turnstile', 'turnstile' ); ?>>
+							<?php esc_html_e( 'Cloudflare Turnstile (рекомендовано)', 'medici' ); ?>
+						</option>
+						<option value="recaptcha" <?php selected( $antibot['provider'] ?? 'turnstile', 'recaptcha' ); ?>>
+							<?php esc_html_e( 'Google reCAPTCHA', 'medici' ); ?>
+						</option>
+					</select>
+					<span class="medici-forms-advanced__field-description">
+						<?php esc_html_e( 'Cloudflare Turnstile безкоштовний та більш privacy-friendly ніж reCAPTCHA', 'medici' ); ?>
+					</span>
+				</div>
+			</div>
+
+			<!-- Cloudflare Turnstile Section -->
+			<div class="medici-forms-advanced__section">
+				<h2 class="medici-forms-advanced__section-title">
+					<?php esc_html_e( 'Cloudflare Turnstile', 'medici' ); ?>
+				</h2>
+
+				<div class="medici-forms-advanced__notice medici-forms-advanced__notice--info">
+					<?php
+					echo wp_kses_post(
+						sprintf(
+							/* translators: %s: Cloudflare dashboard URL */
+							__( 'Отримайте безкоштовні API ключі на <a href="%s" target="_blank">Cloudflare Dashboard</a>', 'medici' ),
+							'https://dash.cloudflare.com/?to=/:account/turnstile'
+						)
+					);
+					?>
+				</div>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<?php esc_html_e( 'Site Key', 'medici' ); ?>
+					</label>
+					<input
+						type="text"
+						name="antibot[turnstile_site_key]"
+						value="<?php echo esc_attr( $antibot['turnstile_site_key'] ?? '' ); ?>"
+						class="regular-text"
+						placeholder="0x4AAAAAAA..."
+					/>
+					<span class="medici-forms-advanced__field-description">
+						<?php esc_html_e( 'Публічний ключ для відображення challenge на сайті', 'medici' ); ?>
+					</span>
+				</div>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<?php esc_html_e( 'Secret Key', 'medici' ); ?>
+					</label>
+					<input
+						type="password"
+						name="antibot[turnstile_secret_key]"
+						value="<?php echo esc_attr( $antibot['turnstile_secret_key'] ?? '' ); ?>"
+						class="regular-text"
+						placeholder="0x4AAAAAAA..."
+					/>
+					<span class="medici-forms-advanced__field-description">
+						<?php esc_html_e( 'Приватний ключ для верифікації на сервері (тримайте в секреті!)', 'medici' ); ?>
+					</span>
+				</div>
+			</div>
+
+			<!-- Google reCAPTCHA Section -->
+			<div class="medici-forms-advanced__section">
+				<h2 class="medici-forms-advanced__section-title">
+					<?php esc_html_e( 'Google reCAPTCHA', 'medici' ); ?>
+				</h2>
+
+				<div class="medici-forms-advanced__notice medici-forms-advanced__notice--info">
+					<?php
+					echo wp_kses_post(
+						sprintf(
+							/* translators: %s: Google reCAPTCHA admin URL */
+							__( 'Зареєструйте сайт на <a href="%s" target="_blank">Google reCAPTCHA Admin</a>', 'medici' ),
+							'https://www.google.com/recaptcha/admin/create'
+						)
+					);
+					?>
+				</div>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<?php esc_html_e( 'Тип reCAPTCHA', 'medici' ); ?>
+					</label>
+					<select name="antibot[recaptcha_type]">
+						<option value="v2" <?php selected( $antibot['recaptcha_type'] ?? 'v2', 'v2' ); ?>>
+							<?php esc_html_e( 'v2 Checkbox', 'medici' ); ?>
+						</option>
+						<option value="v3" <?php selected( $antibot['recaptcha_type'] ?? 'v2', 'v3' ); ?>>
+							<?php esc_html_e( 'v3 Invisible', 'medici' ); ?>
+						</option>
+					</select>
+					<span class="medici-forms-advanced__field-description">
+						<?php esc_html_e( 'v2 показує checkbox "I\'m not a robot", v3 працює непомітно у фоні', 'medici' ); ?>
+					</span>
+				</div>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<?php esc_html_e( 'Site Key', 'medici' ); ?>
+					</label>
+					<input
+						type="text"
+						name="antibot[recaptcha_site_key]"
+						value="<?php echo esc_attr( $antibot['recaptcha_site_key'] ?? '' ); ?>"
+						class="regular-text"
+						placeholder="6Le..."
+					/>
+					<span class="medici-forms-advanced__field-description">
+						<?php esc_html_e( 'Публічний ключ для відображення reCAPTCHA на сайті', 'medici' ); ?>
+					</span>
+				</div>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<?php esc_html_e( 'Secret Key', 'medici' ); ?>
+					</label>
+					<input
+						type="password"
+						name="antibot[recaptcha_secret_key]"
+						value="<?php echo esc_attr( $antibot['recaptcha_secret_key'] ?? '' ); ?>"
+						class="regular-text"
+						placeholder="6Le..."
+					/>
+					<span class="medici-forms-advanced__field-description">
+						<?php esc_html_e( 'Приватний ключ для верифікації на сервері (тримайте в секреті!)', 'medici' ); ?>
+					</span>
+				</div>
 			</div>
 		</div>
 		<?php
 	}
 
 	/**
-	 * Render Email tab (placeholder - буде розширено)
+	 * Render Email tab
 	 *
 	 * @since 1.0.0
 	 * @return void
 	 */
 	private function render_tab_email(): void {
+		$email = $this->settings->get_group( 'email' );
+
 		?>
 		<div id="medici-tab-email" class="medici-forms-advanced__tab-content">
+			<!-- Custom Templates Section -->
 			<div class="medici-forms-advanced__section">
-				<h2 class="medici-forms-advanced__section-title"><?php esc_html_e( 'Налаштування Email', 'medici' ); ?></h2>
-				<p><?php esc_html_e( 'Кастомні шаблони, логотип...', 'medici' ); ?></p>
+				<h2 class="medici-forms-advanced__section-title"><?php esc_html_e( 'Кастомні шаблони листів', 'medici' ); ?></h2>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<input
+							type="checkbox"
+							name="email[custom_templates]"
+							value="1"
+							<?php checked( $email['custom_templates'] ?? false ); ?>
+						/>
+						<?php esc_html_e( 'Використовувати кастомні HTML шаблони', 'medici' ); ?>
+					</label>
+					<span class="medici-forms-advanced__field-description">
+						<?php esc_html_e( 'Професійні HTML email шаблони замість стандартних WordPress листів', 'medici' ); ?>
+					</span>
+				</div>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<?php esc_html_e( 'Стиль шаблону', 'medici' ); ?>
+					</label>
+					<select name="email[template_style]">
+						<option value="modern" <?php selected( $email['template_style'] ?? 'modern', 'modern' ); ?>>
+							<?php esc_html_e( 'Modern (сучасний дизайн)', 'medici' ); ?>
+						</option>
+						<option value="classic" <?php selected( $email['template_style'] ?? 'modern', 'classic' ); ?>>
+							<?php esc_html_e( 'Classic (класичний стиль)', 'medici' ); ?>
+						</option>
+						<option value="minimal" <?php selected( $email['template_style'] ?? 'modern', 'minimal' ); ?>>
+							<?php esc_html_e( 'Minimal (мінімалістичний)', 'medici' ); ?>
+						</option>
+					</select>
+				</div>
+			</div>
+
+			<!-- Branding Section -->
+			<div class="medici-forms-advanced__section">
+				<h2 class="medici-forms-advanced__section-title"><?php esc_html_e( 'Брендинг', 'medici' ); ?></h2>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<?php esc_html_e( 'URL логотипу компанії', 'medici' ); ?>
+					</label>
+					<input
+						type="url"
+						name="email[logo_url]"
+						value="<?php echo esc_url( $email['logo_url'] ?? '' ); ?>"
+						class="regular-text"
+						placeholder="https://example.com/logo.png"
+					/>
+					<span class="medici-forms-advanced__field-description">
+						<?php esc_html_e( 'Логотип відображатиметься у верхній частині email листів', 'medici' ); ?>
+					</span>
+				</div>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<?php esc_html_e( 'Текст футера', 'medici' ); ?>
+					</label>
+					<textarea
+						name="email[footer_text]"
+						rows="3"
+						class="large-text"
+						placeholder="© 2024 Medici Agency. All rights reserved."
+					><?php echo esc_textarea( $email['footer_text'] ?? '' ); ?></textarea>
+					<span class="medici-forms-advanced__field-description">
+						<?php esc_html_e( 'Текст який відображається внизу кожного email листа. HTML дозволено.', 'medici' ); ?>
+					</span>
+				</div>
+			</div>
+
+			<!-- SMTP Info Section -->
+			<div class="medici-forms-advanced__section">
+				<h2 class="medici-forms-advanced__section-title"><?php esc_html_e( 'SMTP налаштування', 'medici' ); ?></h2>
+
+				<div class="medici-forms-advanced__notice medici-forms-advanced__notice--info">
+					<?php
+					echo wp_kses_post(
+						__( 'SMTP налаштування знаходяться в файлі <code>inc/smtp-config.php</code>. Поточний SMTP сервер: <strong>mail.adm.tools:465</strong> (SSL)', 'medici' )
+					);
+					?>
+				</div>
+
+				<p>
+					<?php
+					echo wp_kses_post(
+						sprintf(
+							/* translators: %s: Test email URL */
+							__( 'Для тестування SMTP відправки: <a href="%s" target="_blank">Відправити тестовий email</a>', 'medici' ),
+							admin_url( '?test_smtp=1' )
+						)
+					);
+					?>
+				</p>
 			</div>
 		</div>
 		<?php
 	}
 
 	/**
-	 * Render File Upload tab (placeholder - буде розширено)
+	 * Render File Upload tab
 	 *
 	 * @since 1.0.0
 	 * @return void
 	 */
 	private function render_tab_file_upload(): void {
+		$file_upload = $this->settings->get_group( 'file_upload' );
+
 		?>
 		<div id="medici-tab-file_upload" class="medici-forms-advanced__tab-content">
+			<!-- Enable/Disable Section -->
 			<div class="medici-forms-advanced__section">
-				<h2 class="medici-forms-advanced__section-title"><?php esc_html_e( 'Налаштування File Upload', 'medici' ); ?></h2>
-				<p><?php esc_html_e( 'Максимальний розмір, дозволені типи файлів...', 'medici' ); ?></p>
+				<h2 class="medici-forms-advanced__section-title"><?php esc_html_e( 'Загальні налаштування', 'medici' ); ?></h2>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<input
+							type="checkbox"
+							name="file_upload[enabled]"
+							value="1"
+							<?php checked( $file_upload['enabled'] ?? true ); ?>
+						/>
+						<?php esc_html_e( 'Дозволити завантаження файлів у формах', 'medici' ); ?>
+					</label>
+					<span class="medici-forms-advanced__field-description">
+						<?php esc_html_e( 'Користувачі зможуть прикріплювати файли до форм (CV, портфоліо, медичні документи тощо)', 'medici' ); ?>
+					</span>
+				</div>
+			</div>
+
+			<!-- Size Limits Section -->
+			<div class="medici-forms-advanced__section">
+				<h2 class="medici-forms-advanced__section-title"><?php esc_html_e( 'Обмеження розміру', 'medici' ); ?></h2>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<?php esc_html_e( 'Максимальний розмір файлу (MB)', 'medici' ); ?>
+					</label>
+					<input
+						type="number"
+						name="file_upload[max_size]"
+						value="<?php echo esc_attr( $file_upload['max_size'] ?? 5 ); ?>"
+						min="1"
+						max="50"
+						class="small-text"
+					/>
+					<span class="medici-forms-advanced__field-description">
+						<?php
+						$server_max = ini_get( 'upload_max_filesize' );
+						echo esc_html(
+							sprintf(
+								/* translators: %s: Server max upload size */
+								__( 'Максимум дозволений сервером: %s', 'medici' ),
+								$server_max
+							)
+						);
+						?>
+					</span>
+				</div>
+			</div>
+
+			<!-- Allowed File Types Section -->
+			<div class="medici-forms-advanced__section">
+				<h2 class="medici-forms-advanced__section-title"><?php esc_html_e( 'Дозволені типи файлів', 'medici' ); ?></h2>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<input
+							type="checkbox"
+							name="file_upload[allowed_types][]"
+							value="pdf"
+							<?php checked( in_array( 'pdf', $file_upload['allowed_types'] ?? [ 'pdf', 'doc', 'docx' ], true ) ); ?>
+						/>
+						<?php esc_html_e( 'PDF документи (.pdf)', 'medici' ); ?>
+					</label>
+				</div>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<input
+							type="checkbox"
+							name="file_upload[allowed_types][]"
+							value="doc"
+							<?php checked( in_array( 'doc', $file_upload['allowed_types'] ?? [ 'pdf', 'doc', 'docx' ], true ) ); ?>
+						/>
+						<?php esc_html_e( 'Word документи (.doc)', 'medici' ); ?>
+					</label>
+				</div>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<input
+							type="checkbox"
+							name="file_upload[allowed_types][]"
+							value="docx"
+							<?php checked( in_array( 'docx', $file_upload['allowed_types'] ?? [ 'pdf', 'doc', 'docx' ], true ) ); ?>
+						/>
+						<?php esc_html_e( 'Word документи (.docx)', 'medici' ); ?>
+					</label>
+				</div>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<input
+							type="checkbox"
+							name="file_upload[allowed_types][]"
+							value="jpg"
+							<?php checked( in_array( 'jpg', $file_upload['allowed_types'] ?? [], true ) ); ?>
+						/>
+						<?php esc_html_e( 'JPEG зображення (.jpg, .jpeg)', 'medici' ); ?>
+					</label>
+				</div>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<input
+							type="checkbox"
+							name="file_upload[allowed_types][]"
+							value="png"
+							<?php checked( in_array( 'png', $file_upload['allowed_types'] ?? [], true ) ); ?>
+						/>
+						<?php esc_html_e( 'PNG зображення (.png)', 'medici' ); ?>
+					</label>
+				</div>
+			</div>
+
+			<!-- Upload Path Section -->
+			<div class="medici-forms-advanced__section">
+				<h2 class="medici-forms-advanced__section-title"><?php esc_html_e( 'Шлях збереження', 'medici' ); ?></h2>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<?php esc_html_e( 'Папка для завантажень', 'medici' ); ?>
+					</label>
+					<input
+						type="text"
+						name="file_upload[upload_path]"
+						value="<?php echo esc_attr( $file_upload['upload_path'] ?? 'wpforms-uploads' ); ?>"
+						class="regular-text"
+					/>
+					<span class="medici-forms-advanced__field-description">
+						<?php
+						$upload_dir = wp_upload_dir();
+						echo esc_html(
+							sprintf(
+								/* translators: %s: Upload base directory */
+								__( 'Відносно wp-content/uploads/. Повний шлях: %s/[папка]', 'medici' ),
+								$upload_dir['basedir']
+							)
+						);
+						?>
+					</span>
+				</div>
 			</div>
 		</div>
 		<?php
 	}
 
 	/**
-	 * Render Advanced tab (placeholder - буде розширено)
+	 * Render Advanced tab
 	 *
 	 * @since 1.0.0
 	 * @return void
 	 */
 	private function render_tab_advanced(): void {
+		$advanced = $this->settings->get_group( 'advanced' );
+
 		?>
 		<div id="medici-tab-advanced" class="medici-forms-advanced__tab-content">
+			<!-- Custom CSS Section -->
 			<div class="medici-forms-advanced__section">
-				<h2 class="medici-forms-advanced__section-title"><?php esc_html_e( 'Розширені налаштування', 'medici' ); ?></h2>
-				<p><?php esc_html_e( 'Custom CSS, налаштування завантаження скриптів...', 'medici' ); ?></p>
+				<h2 class="medici-forms-advanced__section-title"><?php esc_html_e( 'Власний CSS', 'medici' ); ?></h2>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<?php esc_html_e( 'Custom CSS код', 'medici' ); ?>
+					</label>
+					<textarea
+						name="advanced[custom_css]"
+						rows="15"
+						class="large-text code"
+						style="font-family: monospace; font-size: 13px;"
+						placeholder="/* Ваш кастомний CSS тут */"
+					><?php echo esc_textarea( $advanced['custom_css'] ?? '' ); ?></textarea>
+					<span class="medici-forms-advanced__field-description">
+						<?php esc_html_e( 'CSS код буде додано до всіх форм на сайті. Не потрібні <style> теги.', 'medici' ); ?>
+					</span>
+				</div>
+
+				<div class="medici-forms-advanced__notice medici-forms-advanced__notice--info">
+					<strong><?php esc_html_e( 'Приклад:', 'medici' ); ?></strong>
+					<pre style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-left: 3px solid #2563eb;">
+.wpforms-form .wpforms-field-label {
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.wpforms-form button[type="submit"] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}</pre>
+				</div>
+			</div>
+
+			<!-- Performance Section -->
+			<div class="medici-forms-advanced__section">
+				<h2 class="medici-forms-advanced__section-title"><?php esc_html_e( 'Продуктивність', 'medici' ); ?></h2>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<input
+							type="checkbox"
+							name="advanced[load_css]"
+							value="1"
+							<?php checked( $advanced['load_css'] ?? true ); ?>
+						/>
+						<?php esc_html_e( 'Завантажувати CSS стилі модуля', 'medici' ); ?>
+					</label>
+					<span class="medici-forms-advanced__field-description">
+						<?php esc_html_e( 'Вимкніть якщо хочете використовувати тільки власні стилі', 'medici' ); ?>
+					</span>
+				</div>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<input
+							type="checkbox"
+							name="advanced[load_js]"
+							value="1"
+							<?php checked( $advanced['load_js'] ?? true ); ?>
+						/>
+						<?php esc_html_e( 'Завантажувати JavaScript модуля', 'medici' ); ?>
+					</label>
+					<span class="medici-forms-advanced__field-description">
+						<?php esc_html_e( 'Потрібно для роботи анті-бот захисту', 'medici' ); ?>
+					</span>
+				</div>
+			</div>
+
+			<!-- Debug Section -->
+			<div class="medici-forms-advanced__section">
+				<h2 class="medici-forms-advanced__section-title"><?php esc_html_e( 'Налагодження', 'medici' ); ?></h2>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<?php esc_html_e( 'Поточна версія модуля', 'medici' ); ?>
+					</label>
+					<input
+						type="text"
+						value="<?php echo esc_attr( Medici_Forms_Advanced::VERSION ); ?>"
+						class="regular-text"
+						readonly
+					/>
+				</div>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<?php esc_html_e( 'WPForms версія', 'medici' ); ?>
+					</label>
+					<input
+						type="text"
+						value="<?php echo esc_attr( defined( 'WPFORMS_VERSION' ) ? WPFORMS_VERSION : 'Not installed' ); ?>"
+						class="regular-text"
+						readonly
+					/>
+				</div>
+
+				<div class="medici-forms-advanced__field">
+					<label class="medici-forms-advanced__field-label">
+						<?php esc_html_e( 'PHP версія', 'medici' ); ?>
+					</label>
+					<input
+						type="text"
+						value="<?php echo esc_attr( PHP_VERSION ); ?>"
+						class="regular-text"
+						readonly
+					/>
+				</div>
 			</div>
 		</div>
 		<?php
