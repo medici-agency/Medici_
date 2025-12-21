@@ -200,8 +200,8 @@ class Settings {
 			array(
 				'id'      => 'email_template',
 				'options' => array(
-					'default' => __( 'Стандартний', 'medici-forms-pro' ),
 					'modern'  => __( 'Сучасний', 'medici-forms-pro' ),
+					'classic' => __( 'Класичний', 'medici-forms-pro' ),
 					'minimal' => __( 'Мінімалістичний', 'medici-forms-pro' ),
 					'plain'   => __( 'Простий текст', 'medici-forms-pro' ),
 				),
@@ -339,6 +339,44 @@ class Settings {
 			array(
 				'id'          => 'enable_bot_detection',
 				'description' => __( 'Автоматична детекція ботів/crawlers за User-Agent для покращення захисту.', 'medici-forms-pro' ),
+			)
+		);
+
+		// Cloudflare Turnstile.
+		add_settings_field(
+			'enable_turnstile',
+			__( 'Cloudflare Turnstile', 'medici-forms-pro' ),
+			array( $this, 'render_checkbox_field' ),
+			'medici_forms_antispam',
+			'medici_forms_antispam',
+			array(
+				'id'          => 'enable_turnstile',
+				'description' => __( 'Увімкнути Cloudflare Turnstile як альтернативу reCAPTCHA.', 'medici-forms-pro' ),
+			)
+		);
+
+		add_settings_field(
+			'turnstile_site_key',
+			__( 'Turnstile Site Key', 'medici-forms-pro' ),
+			array( $this, 'render_text_field' ),
+			'medici_forms_antispam',
+			'medici_forms_antispam',
+			array(
+				'id'          => 'turnstile_site_key',
+				'description' => __( 'Site Key з Cloudflare Turnstile Dashboard.', 'medici-forms-pro' ),
+			)
+		);
+
+		add_settings_field(
+			'turnstile_secret_key',
+			__( 'Turnstile Secret Key', 'medici-forms-pro' ),
+			array( $this, 'render_text_field' ),
+			'medici_forms_antispam',
+			'medici_forms_antispam',
+			array(
+				'id'          => 'turnstile_secret_key',
+				'type'        => 'password',
+				'description' => __( 'Secret Key з Cloudflare Turnstile Dashboard.', 'medici-forms-pro' ),
 			)
 		);
 	}
@@ -503,6 +541,73 @@ class Settings {
 			array(
 				'id'          => 'enable_autogrow_textarea',
 				'description' => __( 'Textarea автоматично збільшується при введенні тексту.', 'medici-forms-pro' ),
+			)
+		);
+
+		// Layout settings.
+		add_settings_field(
+			'form_max_width',
+			__( 'Максимальна ширина форми', 'medici-forms-pro' ),
+			array( $this, 'render_text_field' ),
+			'medici_forms_styling',
+			'medici_forms_styling',
+			array(
+				'id'          => 'form_max_width',
+				'description' => __( 'Наприклад: 600px, 100%, 50rem', 'medici-forms-pro' ),
+			)
+		);
+
+		add_settings_field(
+			'field_width',
+			__( 'Ширина полів', 'medici-forms-pro' ),
+			array( $this, 'render_text_field' ),
+			'medici_forms_styling',
+			'medici_forms_styling',
+			array(
+				'id'          => 'field_width',
+				'description' => __( 'Наприклад: 100%, 400px, auto', 'medici-forms-pro' ),
+			)
+		);
+
+		add_settings_field(
+			'button_max_width',
+			__( 'Максимальна ширина кнопки', 'medici-forms-pro' ),
+			array( $this, 'render_text_field' ),
+			'medici_forms_styling',
+			'medici_forms_styling',
+			array(
+				'id'          => 'button_max_width',
+				'description' => __( 'Наприклад: 200px, auto, 50%', 'medici-forms-pro' ),
+			)
+		);
+
+		add_settings_field(
+			'field_gap',
+			__( 'Відступ між полями (px)', 'medici-forms-pro' ),
+			array( $this, 'render_number_field' ),
+			'medici_forms_styling',
+			'medici_forms_styling',
+			array(
+				'id'          => 'field_gap',
+				'min'         => 0,
+				'max'         => 100,
+				'description' => __( 'Відступ між полями форми в пікселях.', 'medici-forms-pro' ),
+			)
+		);
+
+		add_settings_field(
+			'button_alignment',
+			__( 'Вирівнювання кнопки', 'medici-forms-pro' ),
+			array( $this, 'render_select_field' ),
+			'medici_forms_styling',
+			'medici_forms_styling',
+			array(
+				'id'      => 'button_alignment',
+				'options' => array(
+					'left'   => __( 'Ліворуч', 'medici-forms-pro' ),
+					'center' => __( 'По центру', 'medici-forms-pro' ),
+					'right'  => __( 'Праворуч', 'medici-forms-pro' ),
+				),
 			)
 		);
 	}
@@ -786,7 +891,7 @@ class Settings {
 		// Define checkboxes per tab.
 		$checkboxes_by_tab = array(
 			'general'      => array( 'enable_ajax', 'load_styles', 'load_scripts' ),
-			'antispam'     => array( 'enable_honeypot', 'enable_time_check', 'enable_recaptcha', 'enable_bot_detection' ),
+			'antispam'     => array( 'enable_honeypot', 'enable_time_check', 'enable_recaptcha', 'enable_bot_detection', 'enable_turnstile' ),
 			'integrations' => array( 'webhook_enabled' ),
 			'styling'      => array( 'enable_autogrow_textarea' ),
 			'advanced'     => array( 'log_entries', 'delete_data_on_uninstall' ),
@@ -811,6 +916,11 @@ class Settings {
 			'email_from_name',
 			'recaptcha_site_key',
 			'recaptcha_secret_key',
+			'turnstile_site_key',
+			'turnstile_secret_key',
+			'form_max_width',
+			'field_width',
+			'button_max_width',
 		);
 		foreach ( $text_fields as $key ) {
 			if ( isset( $input[ $key ] ) ) {
@@ -820,10 +930,11 @@ class Settings {
 
 		// Select fields.
 		$select_fields = array(
-			'email_template'     => array( 'default', 'modern', 'minimal', 'plain' ),
+			'email_template'     => array( 'modern', 'classic', 'minimal', 'plain' ),
 			'recaptcha_version'  => array( 'v2_checkbox', 'v2_invisible', 'v3' ),
 			'webhook_method'     => array( 'POST', 'PUT' ),
 			'form_style'         => array( 'modern', 'classic', 'minimal', 'none' ),
+			'button_alignment'   => array( 'left', 'center', 'right' ),
 		);
 
 		foreach ( $select_fields as $key => $valid_values ) {
@@ -847,6 +958,10 @@ class Settings {
 
 		if ( isset( $input['border_radius'] ) ) {
 			$sanitized['border_radius'] = absint( $input['border_radius'] );
+		}
+
+		if ( isset( $input['field_gap'] ) ) {
+			$sanitized['field_gap'] = absint( $input['field_gap'] );
 		}
 
 		// URL.

@@ -71,7 +71,6 @@ function medici_load_modules(): void {
 		'lead/bootstrap.php',           // Lead: Scoring + Validation + Adapters
 		'events/bootstrap.php',         // Events: Dispatcher + Observers
 		'schema/bootstrap.php',         // Schema: Builder pattern
-		'forms-advanced/bootstrap.php', // Forms Advanced: WPForms extension
 		// Legacy modules (backwards compatibility)
 		'class-events.php',
 		'lead-cpt.php',
