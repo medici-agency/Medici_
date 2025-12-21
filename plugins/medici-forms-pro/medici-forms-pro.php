@@ -30,7 +30,7 @@ define( 'MEDICI_FORMS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'MEDICI_FORMS_PLUGIN_FILE', __FILE__ );
 define( 'MEDICI_FORMS_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
-// Autoloader.
+// Autoloader (WordPress naming convention: class-{name}.php).
 spl_autoload_register(
 	static function ( string $class ): void {
 		$prefix   = 'MediciForms\\';
@@ -42,7 +42,22 @@ spl_autoload_register(
 		}
 
 		$relative_class = substr( $class, $len );
-		$file           = $base_dir . str_replace( '\\', '/', $relative_class ) . '.php';
+
+		// Convert namespace separators to directory separators.
+		$path_parts = explode( '\\', $relative_class );
+
+		// Get the class name (last part).
+		$class_name = array_pop( $path_parts );
+
+		// Convert class name to WordPress format: class-{lowercase}.php.
+		$file_name = 'class-' . strtolower( str_replace( '_', '-', $class_name ) ) . '.php';
+
+		// Build the full path.
+		$file = $base_dir;
+		if ( ! empty( $path_parts ) ) {
+			$file .= implode( '/', $path_parts ) . '/';
+		}
+		$file .= $file_name;
 
 		if ( file_exists( $file ) ) {
 			require $file;
