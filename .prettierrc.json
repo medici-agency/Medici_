@@ -10,6 +10,7 @@
   "arrowParens": "always",
   "endOfLine": "lf",
   "plugins": ["@prettier/plugin-php"],
+  "phpVersion": "8.1",
   "overrides": [
     {
       "files": "*.php",
