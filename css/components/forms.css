@@ -80,8 +80,8 @@
 
 /* КРИТИЧНО: Input поле МУСИТЬ бути видимим */
 .newsletter-form .newsletter-form__field input,
-.newsletter-form input[type='email'],
-.newsletter-form__field input[type='email'],
+.newsletter-form input[type="email"],
+.newsletter-form__field input[type="email"],
 .newsletter-form__input {
 	position: static !important;
 	display: block !important;
@@ -114,7 +114,7 @@
 
 .newsletter-form__input:focus,
 .newsletter-form__field input:focus,
-.newsletter-form input[type='email']:focus {
+.newsletter-form input[type="email"]:focus {
 	outline: none !important;
 	border-color: var(--blue-600) !important;
 	box-shadow: 0 0 0 3px rgb(37 99 235 / 10%) !important;
@@ -327,7 +327,7 @@
 
 .consultation-form__textarea-wrapper::after,
 .textarea-wrapper::after {
-	content: attr(data-cloned-val) ' ' !important;
+	content: attr(data-cloned-val) " " !important;
 	white-space: pre-wrap !important;
 	overflow-wrap: break-word !important;
 
@@ -350,7 +350,7 @@
 	align-items: flex-start !important;
 }
 
-.consultation-form__checkbox-row input[type='checkbox'] {
+.consultation-form__checkbox-row input[type="checkbox"] {
 	width: 18px !important;
 	height: 18px !important;
 	margin-top: 0.2rem !important;
@@ -407,67 +407,67 @@
    DARK THEME SUPPORT
 ============================================ */
 
-[data-theme='dark'] .newsletter-form__heading,
-[data-theme='dark'] .consultation-form__heading,
-[data-theme='dark'] .newsletter-form__label,
-[data-theme='dark'] .consultation-form__label {
+[data-theme="dark"] .newsletter-form__heading,
+[data-theme="dark"] .consultation-form__heading,
+[data-theme="dark"] .newsletter-form__label,
+[data-theme="dark"] .consultation-form__label {
 	color: var(--color-gray-50) !important;
 }
 
-[data-theme='dark'] .newsletter-form__description,
-[data-theme='dark'] .consultation-form__description {
+[data-theme="dark"] .newsletter-form__description,
+[data-theme="dark"] .consultation-form__description {
 	color: var(--gray-300) !important;
 }
 
-[data-theme='dark'] .newsletter-form__input,
-[data-theme='dark'] .newsletter-form__field input,
-[data-theme='dark'] .newsletter-form input[type='email'],
-[data-theme='dark'] .consultation-form__input,
-[data-theme='dark'] .consultation-form__select,
-[data-theme='dark'] .consultation-form__textarea,
-[data-theme='dark'] .consultation-form__field input,
-[data-theme='dark'] .consultation-form__field select,
-[data-theme='dark'] .consultation-form__field textarea {
+[data-theme="dark"] .newsletter-form__input,
+[data-theme="dark"] .newsletter-form__field input,
+[data-theme="dark"] .newsletter-form input[type="email"],
+[data-theme="dark"] .consultation-form__input,
+[data-theme="dark"] .consultation-form__select,
+[data-theme="dark"] .consultation-form__textarea,
+[data-theme="dark"] .consultation-form__field input,
+[data-theme="dark"] .consultation-form__field select,
+[data-theme="dark"] .consultation-form__field textarea {
 	color: var(--color-gray-50) !important;
 	background-color: var(--gray-800) !important;
 	border-color: rgb(255 255 255 / 20%) !important;
 }
 
-[data-theme='dark'] .consultation-form__select,
-[data-theme='dark'] .consultation-form select {
+[data-theme="dark"] .consultation-form__select,
+[data-theme="dark"] .consultation-form select {
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23f9fafb' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
 }
 
-[data-theme='dark'] .newsletter-form__input:focus,
-[data-theme='dark'] .newsletter-form__field input:focus,
-[data-theme='dark'] .consultation-form__input:focus,
-[data-theme='dark'] .consultation-form__select:focus,
-[data-theme='dark'] .consultation-form__textarea:focus,
-[data-theme='dark'] .consultation-form__field input:focus,
-[data-theme='dark'] .consultation-form__field select:focus,
-[data-theme='dark'] .consultation-form__field textarea:focus {
+[data-theme="dark"] .newsletter-form__input:focus,
+[data-theme="dark"] .newsletter-form__field input:focus,
+[data-theme="dark"] .consultation-form__input:focus,
+[data-theme="dark"] .consultation-form__select:focus,
+[data-theme="dark"] .consultation-form__textarea:focus,
+[data-theme="dark"] .consultation-form__field input:focus,
+[data-theme="dark"] .consultation-form__field select:focus,
+[data-theme="dark"] .consultation-form__field textarea:focus {
 	border-color: var(--blue-500) !important;
 	box-shadow: 0 0 0 3px rgb(59 130 246 / 20%) !important;
 }
 
-[data-theme='dark'] .newsletter-form__input::placeholder,
-[data-theme='dark'] .newsletter-form__field input::placeholder,
-[data-theme='dark'] .consultation-form__input::placeholder,
-[data-theme='dark'] .consultation-form__textarea::placeholder,
-[data-theme='dark'] .consultation-form__field input::placeholder,
-[data-theme='dark'] .consultation-form__field textarea::placeholder {
+[data-theme="dark"] .newsletter-form__input::placeholder,
+[data-theme="dark"] .newsletter-form__field input::placeholder,
+[data-theme="dark"] .consultation-form__input::placeholder,
+[data-theme="dark"] .consultation-form__textarea::placeholder,
+[data-theme="dark"] .consultation-form__field input::placeholder,
+[data-theme="dark"] .consultation-form__field textarea::placeholder {
 	color: var(--gray-500) !important;
 }
 
-[data-theme='dark'] .newsletter-form__message--success,
-[data-theme='dark'] .consultation-form__message--success {
+[data-theme="dark"] .newsletter-form__message--success,
+[data-theme="dark"] .consultation-form__message--success {
 	background: rgb(34 197 94 / 20%) !important;
 	color: #4ade80 !important;
 	border-color: var(--color-green) !important;
 }
 
-[data-theme='dark'] .newsletter-form__message--error,
-[data-theme='dark'] .consultation-form__message--error {
+[data-theme="dark"] .newsletter-form__message--error,
+[data-theme="dark"] .consultation-form__message--error {
 	background: rgb(239 68 68 / 20%) !important;
 	color: #fca5a5 !important;
 	border-color: var(--color-error) !important;
@@ -537,7 +537,9 @@
 	-webkit-backdrop-filter: blur(4px) !important;
 	backdrop-filter: blur(4px) !important;
 
-	transition: opacity 0.3s ease, visibility 0.3s ease !important;
+	transition:
+		opacity 0.3s ease,
+		visibility 0.3s ease !important;
 
 	opacity: 0 !important;
 	visibility: hidden !important;
@@ -716,7 +718,9 @@
 	font-weight: 700 !important;
 
 	cursor: pointer !important;
-	transition: transform 0.15s ease, background 0.15s ease !important;
+	transition:
+		transform 0.15s ease,
+		background 0.15s ease !important;
 
 	min-height: 44px !important;
 }

@@ -995,21 +995,29 @@ const MediciApp = {
 	/**
 	 * Вивести брендинг в консоль з ASCII art
 	 */
-logBranding() {
-	console.log(`%c
+	logBranding() {
+		console.log(
+			`%c
 	███╗   ███╗███████╗██████╗  ██╗ ██████╗██╗
 	████╗ ████║██╔════╝██╔══██╗ ██║██╔════╝██║
 	██╔████╔██║█████╗  ██║  ██║ ██║██║     ██║
 	██║╚██╔╝██║██╔══╝  ██║  ██║ ██║██║     ██║
 	██║ ╚═╝ ██║███████╗██████╔╝ ██║╚██████╗██║
 	╚═╝     ╚═╝╚══════╝╚═════╝  ╚═╝ ╚═════╝╚═╝
-`, 'color: #FFD700; font-family: monospace; font-size: 12px; font-weight: bold; text-shadow: 2px 2px 4px #0099FF, 3px 3px 6px rgba(0, 153, 255, 0.5);');
-	
-	console.log('%cРозроблено з ❤️ до медицини', 'color: #FFD700; font-size: 14px; font-weight: bold; margin-top: 10px;');
-	console.log('%cMEDICI AGENCY | МЕДИЧНИЙ МАРКЕТИНГ - ЗАКОННО І ЕТИЧНО', 'color: #666; font-size: 12px;');
-	console.log('%chttps://medici.agency', 'color: #0099FF; font-size: 12px;');
-},
+`,
+			'color: #FFD700; font-family: monospace; font-size: 12px; font-weight: bold; text-shadow: 2px 2px 4px #0099FF, 3px 3px 6px rgba(0, 153, 255, 0.5);'
+		);
 
+		console.log(
+			'%cРозроблено з ❤️ до медицини',
+			'color: #FFD700; font-size: 14px; font-weight: bold; margin-top: 10px;'
+		);
+		console.log(
+			'%cMEDICI AGENCY | МЕДИЧНИЙ МАРКЕТИНГ - ЗАКОННО І ЕТИЧНО',
+			'color: #666; font-size: 12px;'
+		);
+		console.log('%chttps://medici.agency', 'color: #0099FF; font-size: 12px;');
+	},
 
 	/**
 	 * Ініціалізація всіх модулів
