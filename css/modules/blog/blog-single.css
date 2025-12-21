@@ -24,14 +24,14 @@
 
 /* Dark Theme */
 [data-theme="dark"] {
-	--border-alpha: rgb(255 255 255 / 10%);
-	--card-bg-alpha: rgb(26 41 55 / 50%);
+	--border-alpha: rgba(255, 255, 255, 0.1);
+	--card-bg-alpha: rgba(26, 41, 55, 0.5);
 }
 
 /* Light Theme */
 [data-theme="light"] {
-	--border-alpha: rgb(0 0 0 / 10%);
-	--card-bg-alpha: rgb(255 255 255 / 95%);
+	--border-alpha: rgba(0, 0, 0, 0.1);
+	--card-bg-alpha: rgba(255, 255, 255, 0.95);
 }
 
 /* ============================================================================
@@ -39,15 +39,15 @@
    ========================================================================= */
 
 .medici-single-post-container {
+	max-width: 1600px; /* Збільшено для 3 колонок (280px + контент + 272px + gaps) */
 	margin: 0 auto;
 	padding: 0 24px;
-	max-width: 1600px; /* Збільшено для 3 колонок (280px + контент + 272px + gaps) */
 	overflow-x: clip; /* Prevent horizontal scroll without breaking position: sticky */
 }
 
 /* Розрахунок: 280px (TOC) + 40px (gap) + контент (~78%) + 40px (gap) + 272px (sidebar, -15%) */
 
-@media (width <= 767px) {
+@media (max-width: 767px) {
 	.medici-single-post-container {
 		padding: 0 16px;
 	}
@@ -58,19 +58,19 @@
    ========================================================================= */
 
 .medici-breadcrumb {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 8px;
 	padding: 24px 0;
-	color: var(--text-secondary);
 	font-size: 14px;
+	color: var(--text-secondary);
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
 }
 
 .medici-breadcrumb a {
 	color: var(--text-secondary);
-	transition: color 0.2s ease;
 	text-decoration: none;
+	transition: color 0.2s ease;
 }
 
 .medici-breadcrumb a:hover {
@@ -92,24 +92,20 @@
 
 .medici-article-layout {
 	display: grid;
-	align-items: start;
-	gap: 40px; /* Мінімальний gap між колонками */
-	padding: 40px 0 80px;
 	grid-template-columns: 280px 1fr 272px; /* TOC (ліво) | Контент (центр) | Sidebar (право, зменшено на 15%) */
 	grid-template-areas: "toc-sidebar main-content right-sidebar";
+	gap: 40px; /* Мінімальний gap між колонками */
+	padding: 40px 0 80px;
+	align-items: start;
 }
 
 /* TOC Sidebar (ліворуч) */
 .medici-toc-sidebar {
+	grid-area: toc-sidebar;
 	position: sticky;
 	top: 100px;
 	height: fit-content;
-	grid-area: toc-sidebar;
 	max-height: calc(100vh - 120px);
-	max-width: 280px; /* Обмеження ширини для запобігання overflow */
-	min-height: 0; /* Дозволити grid стискати висоту */
-	overflow: hidden; /* Запобігти виходу контенту за межі */
-	box-sizing: border-box; /* Padding включається у ширину */
 }
 
 /* Main Content (центр) */
@@ -119,18 +115,18 @@
 
 /* Right Sidebar (праворуч) */
 .medici-right-sidebar {
+	grid-area: right-sidebar;
 	position: sticky;
 	top: 100px;
 	height: fit-content;
-	grid-area: right-sidebar;
 }
 
 /* Tablet: 2 columns (TOC зникає, контент + right sidebar) */
-@media (width <= 1280px) {
+@media (max-width: 1280px) {
 	.medici-article-layout {
-		gap: 40px;
 		grid-template-columns: 1fr 272px; /* Right sidebar зменшено на 15% */
 		grid-template-areas: "main-content right-sidebar";
+		gap: 40px;
 	}
 
 	.medici-toc-sidebar {
@@ -139,13 +135,13 @@
 }
 
 /* Mobile: 1 column */
-@media (width <= 1024px) {
+@media (max-width: 1024px) {
 	.medici-article-layout {
-		gap: 40px;
 		grid-template-columns: 1fr;
 		grid-template-areas:
 			"main-content"
 			"right-sidebar";
+		gap: 40px;
 	}
 
 	.medici-right-sidebar {
@@ -169,26 +165,26 @@
 .medici-article-category {
 	display: inline-block;
 	padding: 8px 16px;
-	background: rgb(168 85 247 / 15%);
 	border-radius: 20px;
-	color: #a855f7;
 	font-size: 12px;
 	font-weight: var(--font-bold);
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
 	margin-bottom: 20px;
+	background: rgba(168, 85, 247, 0.15);
+	color: #a855f7;
 }
 
 .medici-article-title {
-	color: var(--text-primary);
 	font-size: 48px;
 	font-weight: var(--font-extrabold);
 	line-height: var(--leading-tight);
 	margin-bottom: 24px;
 	letter-spacing: -1px;
+	color: var(--text-primary);
 }
 
-@media (width <= 767px) {
+@media (max-width: 767px) {
 	.medici-article-title {
 		font-size: 32px;
 	}
@@ -196,13 +192,13 @@
 
 .medici-article-meta {
 	display: flex;
-	flex-wrap: wrap;
 	gap: 32px;
 	padding: 20px 0;
-	color: var(--text-secondary);
 	border-top: 1px solid var(--border-color);
 	border-bottom: 1px solid var(--border-color);
 	font-size: 14px;
+	color: var(--text-secondary);
+	flex-wrap: wrap;
 }
 
 .meta-item {
@@ -220,37 +216,37 @@
    ========================================================================= */
 
 .takeaways {
-	margin: 40px 0;
-	padding: 32px;
 	background: var(--bg-card);
 	border: 2px solid var(--accent);
 	border-radius: 16px;
+	padding: 32px;
+	margin: 40px 0;
 }
 
 .takeaways h3 {
-	color: var(--accent);
 	font-size: 20px;
 	font-weight: var(--font-bold);
 	margin-bottom: 20px;
+	color: var(--accent);
 }
 
 .takeaways ul {
+	list-style: none;
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
-	margin: 0;
 	padding: 0;
-	list-style: none;
+	margin: 0;
 }
 
 .takeaways li {
 	display: flex;
 	align-items: flex-start;
 	gap: 12px;
-	margin: 0;
-	color: var(--text-primary);
 	font-size: 15px;
 	line-height: var(--leading-normal);
+	color: var(--text-primary);
+	margin: 0;
 }
 
 .takeaways li::before {
@@ -266,34 +262,34 @@
    ========================================================================= */
 
 .medici-article-content {
-	color: var(--text-primary);
 	font-size: 17px;
 	line-height: var(--leading-relaxed);
+	color: var(--text-primary);
 }
 
-@media (width <= 767px) {
+@media (max-width: 767px) {
 	.medici-article-content {
 		font-size: 16px;
 	}
 }
 
 .medici-article-content h2 {
-	margin: 48px 0 24px;
-	color: var(--text-primary);
 	font-size: 32px;
 	font-weight: var(--font-bold);
+	margin: 48px 0 24px;
 	line-height: 1.3;
+	color: var(--text-primary);
 }
 
 .medici-article-content h3 {
-	margin: 36px 0 20px;
-	color: var(--text-primary);
 	font-size: 24px;
 	font-weight: var(--font-bold);
+	margin: 36px 0 20px;
 	line-height: 1.3;
+	color: var(--text-primary);
 }
 
-@media (width <= 767px) {
+@media (max-width: 767px) {
 	.medici-article-content h2 {
 		font-size: 24px;
 	}
@@ -318,19 +314,19 @@
 }
 
 .medici-article-content blockquote {
-	margin: 32px 0;
+	border-left: 4px solid var(--accent);
 	padding: 20px 24px;
+	margin: 32px 0;
 	background: var(--bg-card);
 	border-radius: 8px;
-	color: var(--text-secondary);
-	border-left: 4px solid var(--accent);
 	font-style: italic;
+	color: var(--text-secondary);
 }
 
 .medici-article-content a {
 	color: var(--accent);
-	transition: color 0.2s ease;
 	text-decoration: underline;
+	transition: color 0.2s ease;
 }
 
 .medici-article-content a:hover {
@@ -338,30 +334,30 @@
 }
 
 .medici-article-content strong {
-	color: var(--text-primary);
 	font-weight: var(--font-bold);
+	color: var(--text-primary);
 }
 
 .medici-article-content code {
-	padding: 2px 8px;
 	background: var(--bg-card);
+	padding: 2px 8px;
 	border-radius: 4px;
-	color: var(--accent);
 	font-family: "Courier New", monospace;
 	font-size: 0.9em;
+	color: var(--accent);
 }
 
 .medici-article-content pre {
-	margin: 24px 0;
-	padding: 20px;
 	background: var(--bg-card);
+	padding: 20px;
 	border-radius: 8px;
 	overflow-x: auto;
+	margin: 24px 0;
 }
 
 .medici-article-content pre code {
-	padding: 0;
 	background: none;
+	padding: 0;
 }
 
 /* ============================================================================
@@ -369,18 +365,18 @@
    ========================================================================= */
 
 .warning-box {
-	display: flex;
-	align-items: flex-start;
-	gap: 16px;
-	margin: 32px 0;
-	padding: 24px;
-	background: rgb(255 193 7 / 10%);
+	background: rgba(255, 193, 7, 0.1);
 	border: 2px solid var(--color-amber);
 	border-radius: 12px;
+	padding: 24px;
+	margin: 32px 0;
+	display: flex;
+	gap: 16px;
+	align-items: flex-start;
 }
 
 [data-theme="dark"] .warning-box {
-	background: rgb(255 193 7 / 15%);
+	background: rgba(255, 193, 7, 0.15);
 }
 
 .warning-icon {
@@ -409,48 +405,48 @@
    ========================================================================= */
 
 .inline-cta {
-	margin: 48px 0;
-	padding: 40px;
 	background: linear-gradient(135deg, var(--accent), var(--accent-2));
 	border-radius: 16px;
-	color: white;
+	padding: 40px;
+	margin: 48px 0;
 	text-align: center;
+	color: white;
 }
 
 .inline-cta h3 {
-	color: white;
 	font-size: 24px;
 	font-weight: var(--font-bold);
 	margin-bottom: 12px;
+	color: white;
 }
 
 .inline-cta p {
-	color: white;
-	opacity: 0.9;
 	font-size: 16px;
+	opacity: 0.9;
 	margin-bottom: 24px;
+	color: white;
 }
 
 .btn-white {
+	background: white;
+	color: var(--accent);
+	padding: 14px 28px;
+	border-radius: 10px;
+	text-decoration: none;
+	font-weight: var(--font-bold);
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
-	padding: 14px 28px;
-	background: white;
-	border: 2px solid transparent;
-	border-radius: 10px;
-	color: var(--accent);
 	transition: all 0.2s ease;
-	text-decoration: none;
-	font-weight: var(--font-bold);
 	font-size: 16px;
+	border: 2px solid transparent;
 }
 
 .btn-white:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 	background: white;
 	color: var(--accent);
-	transform: translateY(-2px);
-	box-shadow: 0 8px 20px rgb(0 0 0 / 30%);
 }
 
 .btn-white svg {
@@ -463,32 +459,32 @@
 
 .medici-article-nav {
 	display: grid;
+	grid-template-columns: 1fr 1fr;
 	gap: 24px;
 	margin: 60px 0 0;
-	grid-template-columns: 1fr 1fr;
 	padding-top: 40px;
 	border-top: 1px solid var(--border-color);
 }
 
-@media (width <= 767px) {
+@media (max-width: 767px) {
 	.medici-article-nav {
 		grid-template-columns: 1fr;
 	}
 }
 
 .nav-card {
-	display: block;
-	padding: 24px;
 	background: var(--bg-card);
 	border: 1px solid var(--border-color);
 	border-radius: 12px;
-	transition: all 0.3s ease;
+	padding: 24px;
 	text-decoration: none;
+	transition: all 0.3s ease;
+	display: block;
 }
 
 .nav-card:hover {
-	transform: translateX(4px);
 	border-color: var(--accent);
+	transform: translateX(4px);
 	box-shadow: var(--shadow-lg);
 }
 
@@ -497,18 +493,18 @@
 }
 
 .nav-label {
-	color: var(--text-muted);
 	font-size: 12px;
 	font-weight: var(--font-bold);
 	text-transform: uppercase;
+	color: var(--text-muted);
 	margin-bottom: 8px;
 	letter-spacing: 0.5px;
 }
 
 .nav-title {
-	color: var(--text-primary);
 	font-size: 18px;
 	font-weight: var(--font-bold);
+	color: var(--text-primary);
 	line-height: 1.3;
 }
 
@@ -518,43 +514,44 @@
 
 /* Спільні стилі для sidebar секцій */
 .sidebar-section {
-	width: 100%;
-	padding: 24px;
 	background: var(--bg-card);
 	border: 1px solid var(--border-color);
 	border-radius: 16px;
-	transition: all 0.3s ease;
+	padding: 24px;
 	margin-bottom: 24px;
-
-	/* Запобігти виходу контенту за межі */
-	overflow: hidden;
-	box-sizing: border-box;
+	transition: all 0.3s ease;
 }
 
 .sidebar-section h3 {
-	color: var(--text-primary);
 	font-size: 18px;
 	font-weight: var(--font-bold);
 	margin-bottom: 20px;
-	flex-shrink: 0; /* Заголовок не стискається у flex контейнері */
+	color: var(--text-primary);
 }
 
 /* TOC Sidebar - мінімальні падінги зліва */
 .medici-toc-sidebar .sidebar-section {
 	padding: 20px 24px 20px 16px; /* Менше зліва */
-	max-height: calc(100vh - 140px); /* Обмеження висоти (100px top + 40px запас) */
-	display: flex;
-	flex-direction: column;
-	overflow: hidden; /* Скрол буде у #medici-toc-container */
+}
+
+/* Twemoji іконки у TOC лінках */
+
+.toc-list a img.emoji {
+	display: inline-block;
+
+	width: 1.1em; /* Трохи більше для кращої видимості */
+
+	height: 1.1em;
+
+	margin: 0 0.15em; /* Відступи зліва та справа */
+
+	vertical-align: -0.1em; /* Вирівнювання з текстом */
 }
 
 /* Table of Contents */
 #medici-toc-container {
-	flex: 1; /* Займати доступний простір у flex контейнері */
-	min-height: 0; /* Дозволити flexbox стискати */
-	overflow-y: auto; /* Вертикальна прокрутка */
-	overflow-x: hidden; /* Приховати горизонтальну прокрутку */
-
+	max-height: 500px; /* Максимальна висота TOC */
+	overflow-y: auto; /* Додати вертикальну прокрутку */
 	/* Smooth scrolling for TOC */
 	scroll-behavior: smooth;
 
@@ -569,56 +566,39 @@
 }
 
 .toc-list {
+	list-style: none;
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
-	width: 100%;
-	margin: 0;
 	padding: 0;
-	list-style: none;
-	box-sizing: border-box;
+	margin: 0;
 }
 
 .toc-list a {
-	display: block;
-	padding: 8px 12px;
-	border-radius: 8px;
 	color: var(--text-secondary);
-	transition: all 0.2s ease;
 	text-decoration: none;
 	font-size: 14px;
-
-	/* Перенос довгих заголовків */
-	word-wrap: break-word;
-	overflow-wrap: break-word;
-	hyphens: auto;
-	line-height: 1.5;
-}
-
-/* Twemoji іконки у TOC лінках */
-.toc-list a img.emoji {
-	display: inline-block;
-	width: 1.1em; /* Трохи більше для кращої видимості */
-	height: 1.1em;
-	margin: 0 0.15em; /* Відступи зліва та справа */
-	vertical-align: -0.1em; /* Вирівнювання з текстом */
+	transition: all 0.2s ease;
+	padding: 8px 12px;
+	border-radius: 8px;
+	display: block;
 }
 
 .toc-list a:hover {
-	background: var(--bg-secondary);
 	color: var(--accent);
+	background: var(--bg-secondary);
 }
 
 .toc-list a.active {
-	background: var(--bg-secondary);
 	color: var(--accent);
 	font-weight: var(--font-semibold);
+	background: var(--bg-secondary);
 }
 
 /* Relevant Services Widget */
 .services-description {
-	color: var(--text-secondary);
 	font-size: 13px; /* Узгоджено з newsletter-description */
+	color: var(--text-secondary);
 	margin-bottom: 16px;
 	line-height: var(--leading-medium);
 }
@@ -636,8 +616,8 @@
 	padding: 16px;
 	background: var(--bg-secondary);
 	border-radius: 12px;
-	transition: all 0.2s ease;
 	margin-bottom: 12px;
+	transition: all 0.2s ease;
 }
 
 .service-card:hover {
@@ -646,28 +626,28 @@
 }
 
 .service-card h4 {
-	margin: 0;
-	color: var(--text-primary);
 	font-size: 16px;
 	font-weight: var(--font-bold);
+	margin: 0;
+	color: var(--text-primary);
 }
 
 .service-card p {
-	margin: 0;
-	color: var(--text-secondary);
 	font-size: 13px;
+	color: var(--text-secondary);
 	line-height: var(--leading-medium);
+	margin: 0;
 }
 
 .service-card a {
-	display: flex;
-	align-items: center;
-	gap: 6px;
 	color: var(--accent);
-	transition: all 0.2s ease;
 	text-decoration: none;
 	font-size: 14px;
 	font-weight: var(--font-semibold);
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	transition: all 0.2s ease;
 }
 
 .service-card a:hover {
@@ -676,8 +656,8 @@
 }
 
 .service-card a svg {
-	transition: transform 0.2s ease;
 	flex-shrink: 0;
+	transition: transform 0.2s ease;
 }
 
 .service-card a:hover svg {
@@ -686,8 +666,8 @@
 
 /* Newsletter Form */
 .newsletter-description {
-	color: var(--text-secondary);
 	font-size: 13px; /* Зменшено з 14px */
+	color: var(--text-secondary);
 	margin-bottom: 12px; /* Зменшено з 16px */
 	line-height: var(--leading-medium);
 }
@@ -700,12 +680,12 @@
 
 .newsletter-form input {
 	padding: 10px 14px; /* Зменшено з 12px 16px */
-	background: var(--bg-secondary);
 	border: 2px solid var(--border-color);
 	border-radius: 8px;
+	background: var(--bg-secondary);
 	color: var(--text-primary);
-	transition: border-color 0.2s ease;
 	font-size: 13px; /* Зменшено з 14px */
+	transition: border-color 0.2s ease;
 	font-family: inherit;
 }
 
@@ -720,14 +700,14 @@
 }
 
 .newsletter-form button {
-	padding: 10px 18px; /* Зменшено з 12px 20px */
 	background: var(--accent);
+	color: white;
+	padding: 10px 18px; /* Зменшено з 12px 20px */
 	border: none;
 	border-radius: 8px;
-	color: white;
-	transition: all 0.2s ease;
 	font-weight: var(--font-semibold);
 	cursor: pointer;
+	transition: all 0.2s ease;
 	font-size: 13px; /* Зменшено з 14px */
 	font-family: inherit;
 }
@@ -738,34 +718,34 @@
 }
 
 .newsletter-note {
-	color: var(--text-muted);
 	font-size: 12px;
+	color: var(--text-muted);
 	line-height: var(--leading-medium);
 	margin-top: 8px;
 }
 
 /* Back to Blog Button */
 .btn-back-to-blog {
-	display: inline-flex;
-	justify-content: center;
-	align-items: center;
-	gap: 8px;
-	width: 100%;
-	padding: 12px 20px;
 	background: white;
-	border: 2px solid var(--accent);
-	border-radius: 10px;
 	color: var(--accent);
-	transition: all 0.2s ease;
+	padding: 12px 20px;
+	border-radius: 10px;
 	text-decoration: none;
 	font-weight: var(--font-bold);
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	transition: all 0.2s ease;
+	width: 100%;
+	justify-content: center;
+	border: 2px solid var(--accent);
 }
 
 .btn-back-to-blog:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
 	background: var(--accent);
 	color: white;
-	transform: translateY(-2px);
-	box-shadow: 0 8px 20px rgb(37 99 235 / 30%);
 }
 
 [data-theme="dark"] .btn-back-to-blog {
@@ -788,39 +768,39 @@
 }
 
 .medici-related-section h2 {
-	color: var(--text-primary);
 	font-size: 32px;
 	font-weight: var(--font-bold);
 	margin-bottom: 32px;
+	color: var(--text-primary);
 }
 
 .medici-related-grid {
 	display: grid;
-	gap: 24px;
 	grid-template-columns: repeat(3, 1fr);
+	gap: 24px;
 }
 
-@media (width <= 1024px) {
+@media (max-width: 1024px) {
 	.medici-related-grid {
 		grid-template-columns: repeat(2, 1fr);
 	}
 }
 
-@media (width <= 767px) {
+@media (max-width: 767px) {
 	.medici-related-grid {
 		grid-template-columns: 1fr;
 	}
 }
 
 .related-card {
-	display: block;
-	padding: 24px;
 	background: var(--bg-card);
 	border: 1px solid var(--border-color);
 	border-radius: 12px;
+	padding: 24px;
 	transition: all 0.3s ease;
 	cursor: pointer;
 	text-decoration: none;
+	display: block;
 }
 
 .related-card:hover {
@@ -830,25 +810,25 @@
 }
 
 .related-category {
-	color: var(--accent);
 	font-size: 11px;
 	font-weight: var(--font-bold);
 	text-transform: uppercase;
+	color: var(--accent);
 	margin-bottom: 12px;
 	letter-spacing: 0.5px;
 }
 
 .related-title {
-	color: var(--text-primary);
 	font-size: 18px;
 	font-weight: var(--font-bold);
+	color: var(--text-primary);
 	line-height: 1.3;
 	margin-bottom: 8px;
 }
 
 .related-meta {
-	color: var(--text-muted);
 	font-size: 13px;
+	color: var(--text-muted);
 }
 
 /* ============================================================================
@@ -856,9 +836,9 @@
    ========================================================================= */
 
 .medici-related-section .medici-container {
+	max-width: 1280px;
 	margin: 0 auto;
 	padding: 0 24px;
-	max-width: 1280px;
 }
 
 /* ============================================================================
@@ -873,8 +853,6 @@
 	position: fixed;
 	top: 0;
 	left: 0;
-	z-index: 9999;
-	display: none; /* Hidden on desktop */
 	width: 0%;
 	height: 4px;
 	background: linear-gradient(
@@ -885,27 +863,27 @@
 		#ec4899 75%,
 		var(--color-warning) 100%
 	);
-	transition: width 0.15s ease-out;
 	background-size: 200% 100%;
+	z-index: 9999;
+	transition: width 0.15s ease-out;
 	animation: gradientShift 3s ease infinite;
+	display: none; /* Hidden on desktop */
 }
 
 @keyframes gradientShift {
 	0% {
 		background-position: 0% 50%;
 	}
-
 	50% {
 		background-position: 100% 50%;
 	}
-
 	100% {
 		background-position: 0% 50%;
 	}
 }
 
 /* Show only on mobile (767px and below) */
-@media (width <= 767px) {
+@media (max-width: 767px) {
 	.medici-reading-progress-bar {
 		display: block;
 	}
@@ -917,7 +895,7 @@
 }
 
 /* Tablet adjustments */
-@media (width <= 1024px) {
+@media (max-width: 1024px) {
 	/* TOC на tablet - середня висота */
 	#medici-toc-container {
 		max-height: 400px;
@@ -925,140 +903,27 @@
 }
 
 /* ============================================================================
-   Print Styles - HTML5 Boilerplate Enhanced
-   Оптимізовано для друку статей блогу
-   Source: https://github.com/h5bp/html5-boilerplate
+   Print Styles
    ========================================================================= */
 
 @media print {
-	/* Приховати навігаційні та декоративні елементи */
 	.medici-breadcrumb,
 	.medici-sidebar,
 	.medici-article-nav,
 	.medici-related-section,
-	.medici-reading-progress-bar,
-	.scroll-to-top,
-	.gbp-navigation,
-	.gbp-footer,
-	nav,
-	aside,
-	.no-print {
-		display: none !important;
+	.medici-reading-progress-bar {
+		display: none;
 	}
 
-	/* Layout для друку */
 	.medici-article-layout {
 		display: block;
-		width: 100%;
 	}
 
-	/* Typography оптимізація */
 	.medici-article-title {
 		font-size: 32px;
-		page-break-after: avoid;
 	}
 
 	.medici-article-content {
-		color: #000;
-		font-size: 12pt;
-		line-height: 1.6;
-	}
-
-	/* Заголовки - запобігання розривам */
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		page-break-after: avoid;
-		page-break-inside: avoid;
-	}
-
-	/* Параграфи - orphans/widows оптимізація */
-	p {
-		orphans: 3;
-		widows: 3;
-	}
-
-	/* Зображення, таблиці, pre - запобігання розривам */
-	img,
-	figure,
-	table,
-	pre,
-	blockquote {
-		page-break-inside: avoid;
-	}
-
-	/* Списки - запобігання розривам */
-	ul,
-	ol {
-		page-break-before: avoid;
-	}
-
-	/* Видалити backgrounds, box-shadows (економія чорнила) */
-	*,
-	*::before,
-	*::after {
-		background: transparent !important;
-		box-shadow: none !important;
-		text-shadow: none !important;
-	}
-
-	/* Посилання - показати URL після тексту */
-	a[href]::after {
-		content: " (" attr(href) ")";
-		font-size: 90%;
-		word-break: break-all;
-	}
-
-	/* Виключення для внутрішніх якорів та JavaScript псевдопосилань */
-	a[href^="#"]::after,
-	a[href^="javascript:"]::after {
-		content: "";
-	}
-
-	/* Скорочення - показати розшифровку */
-	abbr[title]::after {
-		content: " (" attr(title) ")";
-	}
-
-	/* Блоки коду та pre - border для візуального розділення */
-	pre,
-	code,
-	blockquote {
-		border: 1px solid #999;
-		page-break-inside: avoid;
-	}
-
-	/* Таблиці - header на кожній сторінці */
-	thead {
-		display: table-header-group;
-	}
-
-	tr {
-		page-break-inside: avoid;
-	}
-
-	/* Зображення - max width для друку */
-	img {
-		max-width: 100% !important;
-		page-break-inside: avoid;
-	}
-
-	/* Meta інформація статті */
-	.medici-article-meta {
-		color: #666;
-		font-size: 10pt;
-		margin-bottom: 1rem;
-		border-bottom: 1px solid #ccc;
-		padding-bottom: 0.5rem;
-	}
-
-	/* Категорії - без фонових кольорів */
-	.medici-category {
-		padding: 2px 6px;
-		border: 1px solid #999;
-		font-size: 9pt;
+		font-size: 14px;
 	}
 }
