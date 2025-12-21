@@ -1,5 +1,3 @@
-=== WPForms - Easy Form Builder for WordPress - Contact Forms, Payment Forms, Surveys, & More ===
-Contributors: wpforms, jaredatch, smub, slaFFik
 Tags: contact form, contact form plugin, forms, form builder, custom form
 Requires at least: 5.5
 Tested up to: 6.8
