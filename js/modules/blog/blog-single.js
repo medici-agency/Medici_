@@ -11,14 +11,10 @@
  * - js-* classes are used for JavaScript functionality
  * - CSS classes are used for styling only
  *
- * Performance Optimizations (v1.3.0):
- * - Cached heading positions (updated on resize)
- * - requestAnimationFrame for scroll handlers
- * - Reduced forced reflows (batch DOM reads)
- *
- * @module Blog/Scripts
- * @since   1.0.16
- * @version 1.3.0
+ * @package
+ * @subpackage Blog/Scripts
+ * @since      1.0.16
+ * @version    1.2.0
  */
 
 (function () {
@@ -45,19 +41,6 @@
 		articleContent: null,
 		headings: null,
 		tocLinks: null,
-	};
-
-	/**
-	 * =====================================================
-	 * POSITION CACHE (Reduces forced reflows)
-	 * =====================================================
-	 */
-	const positionCache = {
-		headingPositions: [], // { id, top } - cached heading positions
-		articleTop: 0,
-		articleHeight: 0,
-		viewportHeight: 0,
-		isDirty: true, // Flag to recalculate positions
 	};
 
 	/**
@@ -91,59 +74,21 @@
 	 */
 
 	/**
-	 * Debounce function for resize events
-	 * @param {Function} func - Function to debounce
+	 * Throttle function for scroll events optimization
+	 * @param {Function} func - Function to throttle
 	 * @param {number}   wait - Wait time in ms
-	 * @return {Function} - Debounced function
+	 * @return {Function} - Throttled function
 	 */
-	function debounce(func, wait) {
+	function throttle(func, wait) {
 		let timeout;
 		return function executedFunction(...args) {
+			const later = () => {
+				clearTimeout(timeout);
+				func(...args);
+			};
 			clearTimeout(timeout);
-			timeout = setTimeout(() => func.apply(this, args), wait);
+			timeout = setTimeout(later, wait);
 		};
-	}
-
-	/**
-	 * =====================================================
-	 * POSITION CACHE MANAGEMENT
-	 * =====================================================
-	 */
-
-	/**
-	 * Update cached positions for all headings and article
-	 * Called on init and resize (not on every scroll!)
-	 */
-	function updatePositionCache() {
-		if (!domCache.articleContent || !domCache.headings) {
-			return;
-		}
-
-		// Batch all DOM reads together (prevents forced reflows)
-		const articleRect = domCache.articleContent.getBoundingClientRect();
-		const scrollTop = window.pageYOffset;
-
-		positionCache.articleTop = articleRect.top + scrollTop;
-		positionCache.articleHeight = domCache.articleContent.offsetHeight;
-		positionCache.viewportHeight = window.innerHeight;
-
-		// Cache all heading positions at once
-		positionCache.headingPositions = [];
-		domCache.headings.forEach((heading) => {
-			positionCache.headingPositions.push({
-				id: heading.id,
-				top: heading.offsetTop,
-			});
-		});
-
-		positionCache.isDirty = false;
-	}
-
-	/**
-	 * Mark position cache as dirty (needs recalculation)
-	 */
-	function invalidatePositionCache() {
-		positionCache.isDirty = true;
 	}
 
 	/**
@@ -249,15 +194,13 @@
 
 	/**
 	 * =====================================================
-	 * SCROLL SPY (Optimized for performance)
+	 * SCROLL SPY
 	 * =====================================================
 	 */
 
 	/**
 	 * Scroll spy - highlight active TOC link based on scroll position
 	 * Підтримує обидві структури: .toc-link (серверний) та .toc-list a (legacy)
-	 *
-	 * Performance: Uses cached positions + requestAnimationFrame
 	 */
 	function initScrollSpy() {
 		const tocLinks = domCache.tocLinks;
@@ -268,66 +211,49 @@
 		}
 
 		const headerHeight = 150; // Offset для визначення активного заголовка
-		let ticking = false; // RAF flag
-		let lastActiveId = null; // Track last active to avoid unnecessary DOM updates
-		let tocScrollTicking = false; // Separate RAF for TOC scroll
 
-		/**
-		 * Update active link (optimized)
-		 * Uses cached positions instead of reading offsetTop on every scroll
-		 */
+		// Update active link
 		function updateActiveLink() {
-			// Update cache if dirty (after resize)
-			if (positionCache.isDirty) {
-				updatePositionCache();
-			}
-
 			const scrollPosition = window.pageYOffset;
 
-			// Use cached positions instead of reading from DOM
-			let currentHeadingId = null;
+			// Знайти поточний активний заголовок
+			let currentHeading = null;
 
-			for (const cached of positionCache.headingPositions) {
-				if (scrollPosition >= cached.top - headerHeight) {
-					currentHeadingId = cached.id;
+			headings.forEach((heading) => {
+				const headingTop = heading.offsetTop - headerHeight;
+
+				if (scrollPosition >= headingTop) {
+					currentHeading = heading;
 				}
-			}
+			});
 
 			// Якщо scroll position близько до верху (< 100px), завжди активувати першу секцію
-			if (scrollPosition < 100 && positionCache.headingPositions.length > 0) {
-				currentHeadingId = positionCache.headingPositions[0].id;
+			// Це виправляє проблему коли користувач натискає scroll-to-top
+			if (scrollPosition < 100 && headings.length > 0) {
+				currentHeading = headings[0];
 			}
 
-			// Skip DOM updates if nothing changed
-			if (currentHeadingId === lastActiveId) {
-				return;
-			}
-			lastActiveId = currentHeadingId;
-
-			// Batch all DOM writes together
+			// Оновити active class
 			let activeLink = null;
 			tocLinks.forEach((link) => {
-				const isActive = currentHeadingId && link.getAttribute('href') === `#${currentHeadingId}`;
-				link.classList.toggle('active', isActive);
-				if (isActive) {
+				link.classList.remove('active');
+
+				if (currentHeading && link.getAttribute('href') === `#${currentHeading.id}`) {
+					link.classList.add('active');
 					activeLink = link;
 				}
 			});
 
-			// Schedule TOC scroll in separate RAF to avoid layout thrashing
-			if (activeLink && !tocScrollTicking) {
-				tocScrollTicking = true;
-				requestAnimationFrame(() => {
-					scrollTocToActiveLink(activeLink);
-					tocScrollTicking = false;
-				});
+			// Auto-scroll TOC до активного елемента
+			if (activeLink) {
+				scrollTocToActiveLink(activeLink);
 			}
 		}
 
 		/**
 		 * Scroll TOC container to show active link
-		 * Optimized: minimal DOM reads, batched
-		 * @param {HTMLElement} activeLink - Active TOC link element
+		 * Автоматично прокручує TOC sidebar щоб активний елемент був видимий
+		 * @param activeLink
 		 */
 		function scrollTocToActiveLink(activeLink) {
 			const tocContainer = domCache.tocContainer;
@@ -335,18 +261,20 @@
 				return;
 			}
 
-			// Batch DOM reads
+			// Отримати позицію активного елемента відносно TOC контейнера
 			const linkRect = activeLink.getBoundingClientRect();
 			const containerRect = tocContainer.getBoundingClientRect();
 
-			// Check visibility
+			// Перевірити чи елемент видимий у контейнері
 			const isLinkVisible =
 				linkRect.top >= containerRect.top && linkRect.bottom <= containerRect.bottom;
 
-			// Only scroll if needed (DOM write)
+			// Якщо елемент не видимий - прокрутити контейнер
 			if (!isLinkVisible) {
 				const linkOffsetTop = activeLink.offsetTop;
 				const containerHeight = tocContainer.clientHeight;
+
+				// Прокрутити так щоб активний елемент був посередині (з невеликим offset)
 				const scrollTo = linkOffsetTop - containerHeight / 2 + activeLink.offsetHeight / 2;
 
 				tocContainer.scrollTo({
@@ -356,28 +284,10 @@
 			}
 		}
 
-		/**
-		 * Scroll handler with requestAnimationFrame
-		 * Prevents forced synchronous layouts
-		 */
-		function onScroll() {
-			if (!ticking) {
-				requestAnimationFrame(() => {
-					updateActiveLink();
-					ticking = false;
-				});
-				ticking = true;
-			}
-		}
+		// Listen to scroll events (throttled)
+		window.addEventListener('scroll', throttle(updateActiveLink, 100));
 
-		// Listen to scroll events with RAF (better than throttle for smooth animations)
-		window.addEventListener('scroll', onScroll, { passive: true });
-
-		// Listen to resize events to invalidate cache
-		window.addEventListener('resize', debounce(invalidatePositionCache, 150));
-
-		// Initial position cache and check
-		updatePositionCache();
+		// Initial check
 		updateActiveLink();
 	}
 
@@ -422,15 +332,13 @@
 
 	/**
 	 * =====================================================
-	 * READING PROGRESS BAR (Optimized)
+	 * READING PROGRESS BAR
 	 * =====================================================
 	 */
 
 	/**
 	 * Initialize reading progress bar (Mobile only)
 	 * Показує animated gradient progress bar на мобільних пристроях
-	 *
-	 * Performance: Uses cached positions + requestAnimationFrame
 	 */
 	function initReadingProgress() {
 		const articleContent = domCache.articleContent;
@@ -444,55 +352,27 @@
 		progressBar.className = 'medici-reading-progress-bar';
 		document.body.appendChild(progressBar);
 
-		let ticking = false;
-		let lastProgress = -1; // Track last value to avoid unnecessary DOM updates
-
-		/**
-		 * Update progress on scroll
-		 * Uses cached positions from positionCache
-		 */
+		// Update progress on scroll
 		function updateProgress() {
-			// Update cache if dirty
-			if (positionCache.isDirty) {
-				updatePositionCache();
-			}
-
+			const articleTop = articleContent.offsetTop;
+			const articleHeight = articleContent.offsetHeight;
+			const viewportHeight = window.innerHeight;
 			const scrollTop = window.pageYOffset;
 
-			// Use cached values instead of reading from DOM
-			const scrollableDistance = positionCache.articleHeight - positionCache.viewportHeight;
-			const scrolled = scrollTop - positionCache.articleTop;
+			// Розрахунок відсотка прочитаного
+			const scrollableDistance = articleHeight - viewportHeight;
+			const scrolled = scrollTop - articleTop;
 
 			// Progress від 0 до 100
 			const progress = Math.min(Math.max((scrolled / scrollableDistance) * 100, 0), 100);
 
-			// Only update DOM if value changed significantly (> 0.5%)
-			if (Math.abs(progress - lastProgress) > 0.5) {
-				lastProgress = progress;
-				progressBar.style.width = progress + '%';
-			}
+			progressBar.style.width = progress + '%';
 		}
 
-		/**
-		 * Scroll handler with requestAnimationFrame
-		 */
-		function onScroll() {
-			if (!ticking) {
-				requestAnimationFrame(() => {
-					updateProgress();
-					ticking = false;
-				});
-				ticking = true;
-			}
-		}
+		// Слухати scroll events з throttling (оптимізація)
+		window.addEventListener('scroll', throttle(updateProgress, 50));
 
-		// Слухати scroll events з RAF (оптимізація)
-		window.addEventListener('scroll', onScroll, { passive: true });
-
-		// Початкове оновлення (ensure cache is ready)
-		if (positionCache.isDirty) {
-			updatePositionCache();
-		}
+		// Початкове оновлення
 		updateProgress();
 	}
 

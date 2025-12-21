@@ -259,12 +259,6 @@
 	margin-top: 1.5rem;
 	font-size: 0.9375rem;
 	text-decoration: none;
-	/* Button reset styles (now using <button> instead of <a>) */
-	border: none;
-	background: none;
-	cursor: pointer;
-	font-family: inherit;
-	padding: 0;
 }
 
 .exit-intent-decline:hover,

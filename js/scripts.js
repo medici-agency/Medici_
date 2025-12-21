@@ -988,35 +988,14 @@ const ResizeHandlerModule = {
 // =====================================================
 // MAIN INITIALIZATION
 // =====================================================
-
 const MediciApp = {
 	_initialized: false,
 
 	/**
-	 * Вивести брендинг в консоль з ASCII art
+	 * Вивести брендинг в консоль
 	 */
 	logBranding() {
-		console.log(
-			`%c
-	███╗   ███╗███████╗██████╗  ██╗ ██████╗██╗
-	████╗ ████║██╔════╝██╔══██╗ ██║██╔════╝██║
-	██╔████╔██║█████╗  ██║  ██║ ██║██║     ██║
-	██║╚██╔╝██║██╔══╝  ██║  ██║ ██║██║     ██║
-	██║ ╚═╝ ██║███████╗██████╔╝ ██║╚██████╗██║
-	╚═╝     ╚═╝╚══════╝╚═════╝  ╚═╝ ╚═════╝╚═╝
-`,
-			'color: #FFD700; font-family: monospace; font-size: 12px; font-weight: bold; text-shadow: 2px 2px 4px #0099FF, 3px 3px 6px rgba(0, 153, 255, 0.5);'
-		);
-
-		console.log(
-			'%cРозроблено з ❤️ до медицини',
-			'color: #FFD700; font-size: 14px; font-weight: bold; margin-top: 10px;'
-		);
-		console.log(
-			'%cMEDICI AGENCY | МЕДИЧНИЙ МАРКЕТИНГ - ЗАКОННО ТА ЕТИЧНО',
-			'color: #666; font-size: 12px;'
-		);
-		console.log('%chttps://medici.agency', 'color: #0099FF; font-size: 12px;');
+		console.log('Розроблено з ❤️ до медицини');
 	},
 
 	/**
@@ -1037,10 +1016,9 @@ const MediciApp = {
 			ResizeHandlerModule.init();
 			ScrollToTopModule.init();
 			ScrollAnimationsModule.init();
-
 			this._initialized = true;
 
-			// Вивести брендинг з ASCII art в консоль
+			// Вивести брендинг в консоль
 			this.logBranding();
 		} catch (error) {
 			handleError(error, 'MediciApp.init');
@@ -1066,7 +1044,6 @@ const MediciApp = {
 			ResizeHandlerModule.destroy();
 			ScrollToTopModule.destroy();
 			ScrollAnimationsModule.destroy();
-
 			clearDOMCache();
 			this._initialized = false;
 		} catch (error) {

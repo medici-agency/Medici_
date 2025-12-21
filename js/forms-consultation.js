@@ -2,39 +2,35 @@
  * Consultation Request Form Handler
  *
  * Usage: Add class 'js-consultation-form' to your form element.
- * (Legacy: 'consultation-form' still supported for backwards compatibility)
+ *        (Legacy: 'consultation-form' still supported for backwards compatibility)
  *
  * Required fields: name, email, phone, consent
  * Optional fields: message, service
  *
  * JS Hooks (recommended):
- * - .js-consultation-form - Form element
+ * - .js-consultation-form    - Form element
  * - .js-consultation-message - Message display element
  *
- * API:
- * - window.MediciConsultationForm.init() - Initialize forms
- * - window.MediciConsultationForm.destroy() - Cleanup event listeners
- *
- * @since 1.4.0
- * @version 1.5.1 Fixed syntax errors, aligned textarea wrapper with CSS, improved validation UX
+ * @package
+ * @since   1.4.0
+ * @version 1.4.0 Added js-* hooks for BEM separation
  */
 
 (function () {
 	'use strict';
 
+	// =====================================================
+	// JS HOOKS SELECTORS (js-* classes convention)
+	// Fallback to CSS classes for backward compatibility
+	// =====================================================
 	const SELECTORS = {
 		form: '.js-consultation-form, .consultation-form',
-		message: '.js-consultation-message, .consultation-message, .consultation-form__message',
-		nameField: 'input[name="name"]',
-		emailField: 'input[name="email"], input[type="email"]',
-		phoneField: 'input[name="phone"], input[type="tel"]',
-		messageField: 'textarea[name="message"]',
-		serviceField: 'input[name="service"], select[name="service"]',
-		consentField: 'input[name="consent"]',
-		submitButton: 'button[type="submit"], input[type="submit"]',
+		message: '.js-consultation-message, .consultation-message',
 	};
 
-	const DEFAULT_I18N = {
+	// i18n texts (from wp_localize_script)
+	const i18n = window.mediciData?.i18n?.consultation ?? {
+		// Fallback texts (if wp_localize_script failed)
 		sending: 'Відправка...',
 		submit: 'Відправити',
 		errorName: "Будь ласка, вкажіть ваше ім'я",
@@ -44,355 +40,229 @@
 		errorPhoneInvalid: 'Будь ласка, вкажіть коректний номер телефону',
 		errorConsent: 'Для відправки потрібна ваша згода на обробку персональних даних',
 		errorGeneral: 'Сталася помилка. Спробуйте ще раз.',
-		success: 'Дякуємо! Заявку отримано.',
 	};
 
-	const i18n = window.mediciData?.i18n?.consultation ?? DEFAULT_I18N;
+	/**
+	 * Initialize consultation forms
+	 * Uses js-* hooks with fallback to legacy selectors
+	 */
+	function init() {
+		// Check if Events API is loaded
+		if (!window.mediciEvents) {
+			console.warn('Consultation forms: mediciEvents API not loaded');
+			return;
+		}
 
-	const state = {
-		initialized: false,
-		forms: [],
-		submitHandlers: new WeakMap(),
-		textareaHandlers: new WeakMap(),
-	};
+		// Find all consultation forms (js-* hook preferred, legacy class supported)
+		const forms = document.querySelectorAll('.js-consultation-form, .consultation-form');
 
+		if (!forms.length) {
+			return;
+		}
+
+		// Attach handlers to each form
+		forms.forEach((form) => {
+			form.addEventListener('submit', handleSubmit);
+
+			// Initialize autogrowing textarea
+			initAutogrowingTextarea(form);
+		});
+	}
+
+	/**
+	 * Initialize autogrowing textarea (CSS Grid technique)
+	 *
+	 * @param {HTMLElement} form - Form element
+	 */
+	function initAutogrowingTextarea(form) {
+		const textareas = form.querySelectorAll('textarea');
+
+		textareas.forEach((textarea) => {
+			// Check if already wrapped
+			if (textarea.parentElement.classList.contains('textarea-wrapper')) {
+				return;
+			}
+
+			// Create wrapper
+			const wrapper = document.createElement('div');
+			wrapper.className = 'textarea-wrapper';
+			wrapper.setAttribute('data-cloned-val', textarea.value);
+
+			// Wrap textarea
+			textarea.parentNode.insertBefore(wrapper, textarea);
+			wrapper.appendChild(textarea);
+
+			// Update wrapper data on input
+			textarea.addEventListener('input', () => {
+				wrapper.setAttribute('data-cloned-val', textarea.value);
+			});
+
+			// Trigger initial update
+			wrapper.setAttribute('data-cloned-val', textarea.value);
+		});
+	}
+
+	/**
+	 * Validate email address
+	 *
+	 * @param {string} email - Email to validate
+	 * @return {boolean} True if valid
+	 */
 	function isValidEmail(email) {
+		// Simple email regex (RFC 5322 compliant)
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		return emailRegex.test(email);
 	}
 
+	/**
+	 * Validate phone number (simple check)
+	 *
+	 * @param {string} phone - Phone to validate
+	 * @return {boolean} True if valid
+	 */
 	function isValidPhone(phone) {
-		// Allow digits, spaces, dashes, parentheses, plus sign; basic length check.
-		const phoneRegex = /^[\d\s\-()+]{10,}$/;
+		// Allow digits, spaces, dashes, parentheses, plus sign
+		// Min length 10 chars (basic check)
+		const phoneRegex = /^[\d\s\-\(\)\+]{10,}$/;
 		return phoneRegex.test(phone);
 	}
 
-	function getOrCreateMessageElement(form) {
-		const existing = form.querySelector(SELECTORS.message);
-		if (existing) {
-			return existing;
-		}
-
-		const messageEl = document.createElement('div');
-		messageEl.className = 'consultation-form__message consultation-message';
-		messageEl.setAttribute('role', 'status');
-		messageEl.setAttribute('aria-live', 'polite');
-
-		const submitBtn = form.querySelector(SELECTORS.submitButton);
-		if (submitBtn && submitBtn.parentNode) {
-			submitBtn.parentNode.insertBefore(messageEl, submitBtn.nextSibling);
-		} else {
-			form.appendChild(messageEl);
-		}
-
-		return messageEl;
-	}
-
-	function showMessage(form, type, text) {
-		const messageEl = getOrCreateMessageElement(form);
-		if (!messageEl) {
-			return;
-		}
-
-		const safeType = type === 'success' ? 'success' : 'error';
-
-		messageEl.className = [
-			'consultation-form__message',
-			`consultation-form__message--${safeType}`,
-			'consultation-message',
-			safeType,
-		].join(' ');
-
-		messageEl.textContent = String(text ?? '');
-	}
-
-	function setBusy(form, submitBtn, isBusy) {
-		form.setAttribute('aria-busy', isBusy ? 'true' : 'false');
-
-		if (!submitBtn) {
-			return;
-		}
-
-		if (submitBtn.tagName === 'BUTTON') {
-			submitBtn.disabled = Boolean(isBusy);
-			submitBtn.textContent = isBusy ? i18n.sending : i18n.submit;
-			return;
-		}
-
-		submitBtn.disabled = Boolean(isBusy);
-		if (submitBtn.value != null) {
-			submitBtn.value = isBusy ? i18n.sending : i18n.submit;
-		}
-	}
-
-	function clearFieldErrors(form) {
-		const errorFields = form.querySelectorAll('.consultation-form__field--error');
-		errorFields.forEach((el) => el.classList.remove('consultation-form__field--error'));
-
-		const errorControls = form.querySelectorAll(
-			'.consultation-form__input--error, .consultation-form__select--error, .consultation-form__textarea--error'
-		);
-
-		errorControls.forEach((el) => {
-			el.classList.remove(
-				'consultation-form__input--error',
-				'consultation-form__select--error',
-				'consultation-form__textarea--error'
-			);
-		});
-	}
-
-	function markControlError(control) {
-		if (!control) {
-			return;
-		}
-
-		const field = control.closest('.consultation-form__field');
-		if (field) {
-			field.classList.add('consultation-form__field--error');
-		}
-
-		if (control.matches('select')) {
-			control.classList.add('consultation-form__select--error');
-			return;
-		}
-
-		if (control.matches('textarea')) {
-			control.classList.add('consultation-form__textarea--error');
-			return;
-		}
-
-		control.classList.add('consultation-form__input--error');
-	}
-
-	function initAutogrowingTextarea(form) {
-		const textareas = form.querySelectorAll('textarea');
-		textareas.forEach((textarea) => {
-			if (!(textarea instanceof HTMLTextAreaElement)) {
-				return;
-			}
-
-			// If already wrapped with our wrapper, do nothing.
-			if (
-				textarea.parentElement &&
-				textarea.parentElement.classList.contains('consultation-form__textarea-wrapper')
-			) {
-				return;
-			}
-
-			// If legacy wrapper exists, keep it and just bind handler.
-			if (textarea.parentElement && textarea.parentElement.classList.contains('textarea-wrapper')) {
-				const wrapper = textarea.parentElement;
-				const inputHandler = () => {
-					wrapper.setAttribute('data-cloned-val', textarea.value);
-				};
-
-				state.textareaHandlers.set(textarea, inputHandler);
-				textarea.addEventListener('input', inputHandler);
-				wrapper.setAttribute('data-cloned-val', textarea.value);
-
-				return;
-			}
-
-			// Create wrapper aligned with CSS (.consultation-form__textarea-wrapper),
-			// and also keep legacy class for backwards compatibility.
-			const wrapper = document.createElement('div');
-			wrapper.className = 'consultation-form__textarea-wrapper textarea-wrapper';
-			wrapper.setAttribute('data-cloned-val', textarea.value);
-
-			const parent = textarea.parentNode;
-			if (!parent) {
-				return;
-			}
-
-			parent.insertBefore(wrapper, textarea);
-			wrapper.appendChild(textarea);
-
-			const inputHandler = () => {
-				wrapper.setAttribute('data-cloned-val', textarea.value);
-			};
-
-			state.textareaHandlers.set(textarea, inputHandler);
-			textarea.addEventListener('input', inputHandler);
-			wrapper.setAttribute('data-cloned-val', textarea.value);
-		});
-	}
-
-	function trackConsultation(service) {
-		if (typeof window.gtag !== 'function') {
-			return;
-		}
-
-		window.gtag('event', 'consultation_request', {
-			event_category: 'lead',
-			event_label: service || 'general',
-		});
-	}
-
-	function handleSubmit(form, event) {
+	/**
+	 * Handle form submission
+	 *
+	 * @param {Event} event - Submit event
+	 */
+	function handleSubmit(event) {
 		event.preventDefault();
 
-		if (!window.mediciEvents || typeof window.mediciEvents.requestConsultation !== 'function') {
-			console.warn('Consultation forms: mediciEvents.requestConsultation API not available');
-			showMessage(form, 'error', i18n.errorGeneral);
-			return;
-		}
+		const form = event.target;
 
-		clearFieldErrors(form);
+		// Get form elements
+		const nameField = form.querySelector('input[name="name"]');
+		const emailField = form.querySelector('input[name="email"]');
+		const phoneField = form.querySelector('input[name="phone"]');
+		const messageField = form.querySelector('textarea[name="message"]');
+		const serviceField = form.querySelector('input[name="service"], select[name="service"]');
+		const consentField = form.querySelector('input[name="consent"]');
+		const submitBtn = form.querySelector('button[type="submit"]');
+		const messageEl = form.querySelector('.js-consultation-message, .consultation-message');
 
-		const nameField = form.querySelector(SELECTORS.nameField);
-		const emailField = form.querySelector(SELECTORS.emailField);
-		const phoneField = form.querySelector(SELECTORS.phoneField);
-		const messageField = form.querySelector(SELECTORS.messageField);
-		const serviceField = form.querySelector(SELECTORS.serviceField);
-		const consentField = form.querySelector(SELECTORS.consentField);
-		const submitBtn = form.querySelector(SELECTORS.submitButton);
-
+		// Validate required fields exist
 		if (!nameField || !emailField || !phoneField || !consentField) {
 			console.error('Consultation form: required fields not found');
-			showMessage(form, 'error', i18n.errorGeneral);
 			return;
 		}
 
-		const name = String(nameField.value ?? '').trim();
-		const email = String(emailField.value ?? '').trim();
-		const phone = String(phoneField.value ?? '').trim();
-		const consent = Boolean(consentField.checked);
+		// Get field values
+		const name = nameField.value.trim();
+		const email = emailField.value.trim();
+		const phone = phoneField.value.trim();
 
+		// Client-side validation (fast, no server roundtrip)
 		if (!name) {
-			markControlError(nameField);
-			showMessage(form, 'error', i18n.errorName);
+			showMessage(messageEl, 'error', i18n.errorName);
 			nameField.focus();
 			return;
 		}
 
 		if (!email) {
-			markControlError(emailField);
-			showMessage(form, 'error', i18n.errorEmail);
+			showMessage(messageEl, 'error', i18n.errorEmail);
 			emailField.focus();
 			return;
 		}
 
 		if (!isValidEmail(email)) {
-			markControlError(emailField);
-			showMessage(form, 'error', i18n.errorEmailInvalid);
+			showMessage(messageEl, 'error', i18n.errorEmailInvalid);
 			emailField.focus();
 			return;
 		}
 
 		if (!phone) {
-			markControlError(phoneField);
-			showMessage(form, 'error', i18n.errorPhone);
+			showMessage(messageEl, 'error', i18n.errorPhone);
 			phoneField.focus();
 			return;
 		}
 
 		if (!isValidPhone(phone)) {
-			markControlError(phoneField);
-			showMessage(form, 'error', i18n.errorPhoneInvalid);
+			showMessage(messageEl, 'error', i18n.errorPhoneInvalid);
 			phoneField.focus();
 			return;
 		}
 
-		if (!consent) {
-			markControlError(consentField);
-			showMessage(form, 'error', i18n.errorConsent);
+		if (!consentField.checked) {
+			showMessage(messageEl, 'error', i18n.errorConsent);
 			consentField.focus();
 			return;
 		}
 
-		setBusy(form, submitBtn, true);
+		// Disable submit button
+		if (submitBtn) {
+			submitBtn.disabled = true;
+			submitBtn.textContent = i18n.sending;
+		}
 
-		const payload = {
+		// Prepare data
+		const data = {
 			name,
 			email,
 			phone,
-			message: messageField ? String(messageField.value ?? '').trim() : '',
-			service: serviceField ? String(serviceField.value ?? '') : '',
-			consent,
+			message: messageField ? messageField.value.trim() : '',
+			service: serviceField ? serviceField.value : '',
+			consent: consentField.checked,
 		};
 
-		window.mediciEvents
-			.requestConsultation(payload)
+		// Send event
+		mediciEvents
+			.requestConsultation(data)
 			.then((result) => {
-				const message =
-					(result && typeof result.message === 'string' && result.message.trim()) || i18n.success;
+				// Success
+				showMessage(messageEl, 'success', result.message);
 
-				showMessage(form, 'success', message);
+				// Reset form
 				form.reset();
-				clearFieldErrors(form);
-				trackConsultation(payload.service);
+
+				// Track event (if analytics available)
+				if (typeof gtag === 'function') {
+					gtag('event', 'consultation_request', {
+						event_category: 'lead',
+						event_label: data.service || 'general',
+					});
+				}
 			})
 			.catch((error) => {
-				const message =
-					(error && typeof error.message === 'string' && error.message.trim()) || i18n.errorGeneral;
+				// Error
+				showMessage(messageEl, 'error', error.message || i18n.errorGeneral);
 
-				showMessage(form, 'error', message);
 				console.error('Consultation request error:', error);
 			})
 			.finally(() => {
-				setBusy(form, submitBtn, false);
-			});
-	}
-
-	function init() {
-		if (state.initialized) {
-			return;
-		}
-
-		const forms = document.querySelectorAll(SELECTORS.form);
-		if (!forms.length) {
-			return;
-		}
-
-		forms.forEach((form) => {
-			if (!(form instanceof HTMLFormElement)) {
-				return;
-			}
-
-			const handler = handleSubmit.bind(null, form);
-			state.submitHandlers.set(form, handler);
-			form.addEventListener('submit', handler);
-
-			initAutogrowingTextarea(form);
-
-			state.forms.push(form);
-		});
-
-		state.initialized = true;
-	}
-
-	function destroy() {
-		if (!state.initialized) {
-			return;
-		}
-
-		state.forms.forEach((form) => {
-			const handler = state.submitHandlers.get(form);
-			if (handler) {
-				form.removeEventListener('submit', handler);
-				state.submitHandlers.delete(form);
-			}
-
-			const textareas = form.querySelectorAll('textarea');
-			textareas.forEach((textarea) => {
-				const inputHandler = state.textareaHandlers.get(textarea);
-				if (inputHandler) {
-					textarea.removeEventListener('input', inputHandler);
-					state.textareaHandlers.delete(textarea);
+				// Re-enable submit button
+				if (submitBtn) {
+					submitBtn.disabled = false;
+					submitBtn.textContent = i18n.submit;
 				}
 			});
-		});
-
-		state.forms = [];
-		state.initialized = false;
 	}
 
-	window.MediciConsultationForm = {
-		init,
-		destroy,
-	};
+	/**
+	 * Show message to user
+	 *
+	 * @param {HTMLElement|null} messageEl - Message element
+	 * @param {string}           type      - Message type ('success' or 'error')
+	 * @param {string}           text      - Message text
+	 */
+	function showMessage(messageEl, type, text) {
+		if (!messageEl) {
+			return;
+		}
 
+		// Use BEM modifier classes (--success, --error)
+		// Keep both old and new class naming for backwards compatibility
+		messageEl.className = `consultation-form__message consultation-form__message--${type} consultation-message ${type}`;
+		messageEl.textContent = text;
+	}
+
+	// Initialize on DOM ready
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', init);
 	} else {

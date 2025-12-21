@@ -3,12 +3,11 @@
  * Lead Creation Observer
  *
  * Creates Lead CPT entry for consultation requests.
- * Skips creation if lead_id is already set on event (by legacy handler).
  *
  * @package    Medici_Agency
  * @subpackage Events\Observers
  * @since      2.0.0
- * @version    1.1.0
+ * @version    1.0.0
  */
 
 declare(strict_types=1);
@@ -66,15 +65,6 @@ final class LeadCreationObserver implements ObserverInterface {
 	 */
 	public function handle( EventInterface $event ): void {
 		if ( ! $event instanceof ConsultationRequestEvent ) {
-			return;
-		}
-
-		// Skip if lead already created (by legacy handler in class-events.php)
-		$existing_lead_id = $event->getLeadId();
-		if ( null !== $existing_lead_id && $existing_lead_id > 0 ) {
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( sprintf( '[Medici Events] LeadCreationObserver: Skipping - lead already exists (ID=%d)', $existing_lead_id ) );
-			}
 			return;
 		}
 
