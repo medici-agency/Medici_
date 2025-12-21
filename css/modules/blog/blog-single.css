@@ -106,6 +106,9 @@
 	height: fit-content;
 	grid-area: toc-sidebar;
 	max-height: calc(100vh - 120px);
+	max-width: 280px; /* Обмеження ширини для запобігання overflow */
+	overflow: hidden; /* Запобігти виходу контенту за межі */
+	box-sizing: border-box; /* Padding включається у ширину */
 }
 
 /* Main Content (центр) */
