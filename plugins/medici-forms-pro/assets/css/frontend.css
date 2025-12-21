@@ -6,430 +6,434 @@
  */
 
 :root {
-  --mf-primary-color: #2563eb;
-  --mf-primary-hover: #1d4ed8;
-  --mf-success-color: #16a34a;
-  --mf-error-color: #dc2626;
-  --mf-border-color: #d1d5db;
-  --mf-border-focus: #2563eb;
-  --mf-bg-color: #ffffff;
-  --mf-text-color: #1f2937;
-  --mf-text-muted: #6b7280;
-  --mf-border-radius: 8px;
-  --mf-spacing: 1rem;
-  --mf-transition: 0.2s ease;
+	--mf-primary-color: #2563eb;
+	--mf-primary-hover: #1d4ed8;
+	--mf-success-color: #16a34a;
+	--mf-error-color: #dc2626;
+	--mf-border-color: #d1d5db;
+	--mf-border-focus: #2563eb;
+	--mf-bg-color: #ffffff;
+	--mf-text-color: #1f2937;
+	--mf-text-muted: #6b7280;
+	--mf-border-radius: 8px;
+	--mf-spacing: 1rem;
+	--mf-transition: 0.2s ease;
 }
 
 /* Form Wrapper */
 .medici-form-wrapper {
-  max-width: 100%;
+	max-width: 100%;
 }
 
 .medici-form-title {
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--mf-text-color);
+	margin-bottom: 1.5rem;
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: var(--mf-text-color);
 }
 
 /* Form Base */
 .medici-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mf-spacing);
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--mf-spacing);
 }
 
 /* Fields Container */
 .medici-form-fields {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mf-spacing);
-  width: 100%;
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--mf-spacing);
+	width: 100%;
 }
 
 /* Field */
 .medici-form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
 }
 
 .medici-form-field--width-100 {
-  width: 100%;
+	width: 100%;
 }
 
 .medici-form-field--width-50 {
-  width: calc(50% - 0.5rem);
+	width: calc(50% - 0.5rem);
 }
 
 .medici-form-field--width-33 {
-  width: calc(33.333% - 0.667rem);
+	width: calc(33.333% - 0.667rem);
 }
 
 /* Label */
 .medici-form-label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--mf-text-color);
+	display: block;
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: var(--mf-text-color);
 }
 
 .medici-form--labels-hidden .medici-form-label {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
 }
 
 .medici-form-required {
-  color: var(--mf-error-color);
-  margin-left: 0.25rem;
+	color: var(--mf-error-color);
+	margin-left: 0.25rem;
 }
 
 /* Input Fields */
 .medici-form-input,
 .medici-form-textarea,
 .medici-form-select {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: var(--mf-text-color);
-  background-color: var(--mf-bg-color);
-  border: 1px solid var(--mf-border-color);
-  border-radius: var(--mf-border-radius);
-  transition: border-color var(--mf-transition), box-shadow var(--mf-transition);
+	width: 100%;
+	padding: 0.75rem 1rem;
+	font-size: 1rem;
+	line-height: 1.5;
+	color: var(--mf-text-color);
+	background-color: var(--mf-bg-color);
+	border: 1px solid var(--mf-border-color);
+	border-radius: var(--mf-border-radius);
+	transition:
+		border-color var(--mf-transition),
+		box-shadow var(--mf-transition);
 }
 
 .medici-form-input:focus,
 .medici-form-textarea:focus,
 .medici-form-select:focus {
-  outline: none;
-  border-color: var(--mf-border-focus);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+	outline: none;
+	border-color: var(--mf-border-focus);
+	box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .medici-form-input::placeholder,
 .medici-form-textarea::placeholder {
-  color: var(--mf-text-muted);
+	color: var(--mf-text-muted);
 }
 
 /* Select */
 .medici-form-select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
-  background-position: right 0.75rem center;
-  background-repeat: no-repeat;
-  background-size: 1.25rem;
-  padding-right: 2.5rem;
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+	background-position: right 0.75rem center;
+	background-repeat: no-repeat;
+	background-size: 1.25rem;
+	padding-right: 2.5rem;
 }
 
 /* Textarea */
 .medici-form-textarea {
-  min-height: 120px;
-  resize: vertical;
+	min-height: 120px;
+	resize: vertical;
 }
 
 /* Checkbox & Radio */
 .medici-form-choices {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
 }
 
 .medici-form-choice {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
 }
 
 .medici-form-choice input[type="checkbox"],
 .medici-form-choice input[type="radio"] {
-  width: 1.125rem;
-  height: 1.125rem;
-  margin: 0;
-  accent-color: var(--mf-primary-color);
+	width: 1.125rem;
+	height: 1.125rem;
+	margin: 0;
+	accent-color: var(--mf-primary-color);
 }
 
 .medici-form-choice__text {
-  font-size: 0.9375rem;
-  color: var(--mf-text-color);
+	font-size: 0.9375rem;
+	color: var(--mf-text-color);
 }
 
 /* Consent Checkbox */
 .medici-form-field--consent {
-  width: 100%;
+	width: 100%;
 }
 
 .medici-form-checkbox {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  cursor: pointer;
+	display: flex;
+	align-items: flex-start;
+	gap: 0.5rem;
+	cursor: pointer;
 }
 
 .medici-form-checkbox input[type="checkbox"] {
-  width: 1.25rem;
-  height: 1.25rem;
-  margin-top: 0.125rem;
-  flex-shrink: 0;
-  accent-color: var(--mf-primary-color);
+	width: 1.25rem;
+	height: 1.25rem;
+	margin-top: 0.125rem;
+	flex-shrink: 0;
+	accent-color: var(--mf-primary-color);
 }
 
 .medici-form-checkbox__text {
-  font-size: 0.875rem;
-  color: var(--mf-text-muted);
-  line-height: 1.5;
+	font-size: 0.875rem;
+	color: var(--mf-text-muted);
+	line-height: 1.5;
 }
 
 .medici-form-checkbox__text a {
-  color: var(--mf-primary-color);
-  text-decoration: underline;
+	color: var(--mf-primary-color);
+	text-decoration: underline;
 }
 
 /* Name Field */
 .medici-form-name-fields {
-  display: flex;
-  gap: 0.75rem;
-  width: 100%;
+	display: flex;
+	gap: 0.75rem;
+	width: 100%;
 }
 
 .medici-form-name-field {
-  flex: 1;
+	flex: 1;
 }
 
 /* File Input */
 .medici-form-file {
-  padding: 0.5rem;
-  border: 2px dashed var(--mf-border-color);
-  border-radius: var(--mf-border-radius);
-  cursor: pointer;
+	padding: 0.5rem;
+	border: 2px dashed var(--mf-border-color);
+	border-radius: var(--mf-border-radius);
+	cursor: pointer;
 }
 
 .medici-form-file:hover {
-  border-color: var(--mf-primary-color);
+	border-color: var(--mf-primary-color);
 }
 
 /* Layout Elements */
 .medici-form-divider {
-  width: 100%;
-  height: 1px;
-  background-color: var(--mf-border-color);
-  border: none;
-  margin: 0.5rem 0;
+	width: 100%;
+	height: 1px;
+	background-color: var(--mf-border-color);
+	border: none;
+	margin: 0.5rem 0;
 }
 
 .medici-form-heading {
-  width: 100%;
-  margin: 0.5rem 0;
-  font-weight: 600;
-  color: var(--mf-text-color);
+	width: 100%;
+	margin: 0.5rem 0;
+	font-weight: 600;
+	color: var(--mf-text-color);
 }
 
 .medici-form-html {
-  width: 100%;
-  color: var(--mf-text-color);
+	width: 100%;
+	color: var(--mf-text-color);
 }
 
 /* Submit Button */
 .medici-form-submit {
-  width: 100%;
-  margin-top: 0.5rem;
+	width: 100%;
+	margin-top: 0.5rem;
 }
 
 .medici-form-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.875rem 2rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #ffffff;
-  background-color: var(--mf-primary-color);
-  border: none;
-  border-radius: var(--mf-border-radius);
-  cursor: pointer;
-  transition: background-color var(--mf-transition), transform var(--mf-transition);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.875rem 2rem;
+	font-size: 1rem;
+	font-weight: 600;
+	color: #ffffff;
+	background-color: var(--mf-primary-color);
+	border: none;
+	border-radius: var(--mf-border-radius);
+	cursor: pointer;
+	transition:
+		background-color var(--mf-transition),
+		transform var(--mf-transition);
 }
 
 .medici-form-button:hover {
-  background-color: var(--mf-primary-hover);
+	background-color: var(--mf-primary-hover);
 }
 
 .medici-form-button:active {
-  transform: scale(0.98);
+	transform: scale(0.98);
 }
 
 .medici-form-button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+	opacity: 0.7;
+	cursor: not-allowed;
 }
 
 .medici-form-button__loading {
-  display: none;
+	display: none;
 }
 
 .medici-form-button.is-loading .medici-form-button__text {
-  display: none;
+	display: none;
 }
 
 .medici-form-button.is-loading .medici-form-button__loading {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
 }
 
 .medici-form-button.is-loading::after {
-  content: "";
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid #ffffff;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: mf-spin 0.8s linear infinite;
+	content: "";
+	width: 1rem;
+	height: 1rem;
+	border: 2px solid #ffffff;
+	border-top-color: transparent;
+	border-radius: 50%;
+	animation: mf-spin 0.8s linear infinite;
 }
 
 @keyframes mf-spin {
-  to {
-    transform: rotate(360deg);
-  }
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 /* Messages */
 .medici-form-messages {
-  width: 100%;
+	width: 100%;
 }
 
 .medici-form-message {
-  padding: 1rem 1.25rem;
-  border-radius: var(--mf-border-radius);
-  font-size: 0.9375rem;
-  margin-top: 1rem;
+	padding: 1rem 1.25rem;
+	border-radius: var(--mf-border-radius);
+	font-size: 0.9375rem;
+	margin-top: 1rem;
 }
 
 .medici-form-message--success {
-  background-color: rgba(22, 163, 74, 0.1);
-  color: var(--mf-success-color);
-  border: 1px solid rgba(22, 163, 74, 0.2);
+	background-color: rgba(22, 163, 74, 0.1);
+	color: var(--mf-success-color);
+	border: 1px solid rgba(22, 163, 74, 0.2);
 }
 
 .medici-form-message--error {
-  background-color: rgba(220, 38, 38, 0.1);
-  color: var(--mf-error-color);
-  border: 1px solid rgba(220, 38, 38, 0.2);
+	background-color: rgba(220, 38, 38, 0.1);
+	color: var(--mf-error-color);
+	border: 1px solid rgba(220, 38, 38, 0.2);
 }
 
 /* Field Errors */
 .medici-form-field--error .medici-form-input,
 .medici-form-field--error .medici-form-textarea,
 .medici-form-field--error .medici-form-select {
-  border-color: var(--mf-error-color);
+	border-color: var(--mf-error-color);
 }
 
 .medici-form-field__error {
-  font-size: 0.8125rem;
-  color: var(--mf-error-color);
+	font-size: 0.8125rem;
+	color: var(--mf-error-color);
 }
 
 /* reCAPTCHA */
 .medici-form-recaptcha {
-  width: 100%;
-  margin: 0.5rem 0;
+	width: 100%;
+	margin: 0.5rem 0;
 }
 
 /* Honeypot */
 .mf-hp-field {
-  position: absolute;
-  left: -9999px;
-  top: -9999px;
-  opacity: 0;
-  height: 0;
-  width: 0;
-  overflow: hidden;
+	position: absolute;
+	left: -9999px;
+	top: -9999px;
+	opacity: 0;
+	height: 0;
+	width: 0;
+	overflow: hidden;
 }
 
 /* Style: Modern (default) */
 .medici-form--modern .medici-form-input,
 .medici-form--modern .medici-form-textarea,
 .medici-form--modern .medici-form-select {
-  background-color: #f9fafb;
-  border-color: transparent;
+	background-color: #f9fafb;
+	border-color: transparent;
 }
 
 .medici-form--modern .medici-form-input:focus,
 .medici-form--modern .medici-form-textarea:focus,
 .medici-form--modern .medici-form-select:focus {
-  background-color: #ffffff;
-  border-color: var(--mf-border-focus);
+	background-color: #ffffff;
+	border-color: var(--mf-border-focus);
 }
 
 /* Style: Classic */
 .medici-form--classic .medici-form-input,
 .medici-form--classic .medici-form-textarea,
 .medici-form--classic .medici-form-select {
-  border-radius: 4px;
+	border-radius: 4px;
 }
 
 .medici-form--classic .medici-form-button {
-  border-radius: 4px;
+	border-radius: 4px;
 }
 
 /* Style: Minimal */
 .medici-form--minimal .medici-form-input,
 .medici-form--minimal .medici-form-textarea,
 .medici-form--minimal .medici-form-select {
-  border: none;
-  border-bottom: 2px solid var(--mf-border-color);
-  border-radius: 0;
-  padding-left: 0;
-  padding-right: 0;
+	border: none;
+	border-bottom: 2px solid var(--mf-border-color);
+	border-radius: 0;
+	padding-left: 0;
+	padding-right: 0;
 }
 
 .medici-form--minimal .medici-form-input:focus,
 .medici-form--minimal .medici-form-textarea:focus,
 .medici-form--minimal .medici-form-select:focus {
-  border-bottom-color: var(--mf-primary-color);
-  box-shadow: none;
+	border-bottom-color: var(--mf-primary-color);
+	box-shadow: none;
 }
 
 .medici-form--minimal .medici-form-button {
-  border-radius: 0;
+	border-radius: 0;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .medici-form-field--width-50,
-  .medici-form-field--width-33 {
-    width: 100%;
-  }
+	.medici-form-field--width-50,
+	.medici-form-field--width-33 {
+		width: 100%;
+	}
 
-  .medici-form-name-fields {
-    flex-direction: column;
-  }
+	.medici-form-name-fields {
+		flex-direction: column;
+	}
 
-  .medici-form-button {
-    width: 100%;
-  }
+	.medici-form-button {
+		width: 100%;
+	}
 }
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --mf-bg-color: #1f2937;
-    --mf-text-color: #f9fafb;
-    --mf-text-muted: #9ca3af;
-    --mf-border-color: #374151;
-  }
+	:root {
+		--mf-bg-color: #1f2937;
+		--mf-text-color: #f9fafb;
+		--mf-text-muted: #9ca3af;
+		--mf-border-color: #374151;
+	}
 }
 
 /* Print */
 @media print {
-  .medici-form-button,
-  .medici-form-recaptcha,
-  .mf-hp-field {
-    display: none !important;
-  }
+	.medici-form-button,
+	.medici-form-recaptcha,
+	.mf-hp-field {
+		display: none !important;
+	}
 }

@@ -737,10 +737,15 @@ class Settings {
 	 * Sanitize settings.
 	 *
 	 * @since 1.0.0
-	 * @param array<string, mixed> $input Input data.
+	 * @param array<string, mixed>|null $input Input data (can be null on first save).
 	 * @return array<string, mixed>
 	 */
-	public function sanitize_settings( array $input ): array {
+	public function sanitize_settings( ?array $input ): array {
+		// Handle null input (can happen on first save or when options are cleared).
+		if ( null === $input ) {
+			return get_option( self::OPTION_NAME, array() );
+		}
+
 		$sanitized = array();
 
 		// Checkboxes.

@@ -154,7 +154,8 @@ final class Plugin {
 	 * @since 1.0.0
 	 */
 	private function register_hooks(): void {
-		add_action( 'init', array( $this, 'load_textdomain' ) );
+		// Load textdomain BEFORE post types (priority 1) to avoid _load_textdomain_just_in_time warning.
+		add_action( 'init', array( $this, 'load_textdomain' ), 1 );
 		add_action( 'init', array( $this, 'register_post_types' ), 5 );
 		add_action( 'init', array( $this, 'register_shortcodes' ) );
 	}
