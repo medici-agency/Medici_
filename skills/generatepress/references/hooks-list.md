@@ -267,7 +267,7 @@ function add_reading_time()
 	printf(
 		'<span class="reading-time">%s %s</span>',
 		esc_html($reading_time),
-		esc_html__('min read', 'textdomain')
+		esc_html__('min read', 'textdomain'),
 	);
 }
 ```

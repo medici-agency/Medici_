@@ -26,7 +26,7 @@ $wpdb->prefix; // 'wp_' (or custom prefix)
 ```php
 // Single value
 $result = $wpdb->get_var(
-	$wpdb->prepare("SELECT post_title FROM {$wpdb->posts} WHERE ID = %d", $post_id)
+	$wpdb->prepare("SELECT post_title FROM {$wpdb->posts} WHERE ID = %d", $post_id),
 );
 
 // Single row
@@ -37,8 +37,8 @@ $results = $wpdb->get_results(
 	$wpdb->prepare(
 		"SELECT * FROM {$wpdb->posts} WHERE post_author = %d AND post_status = %s",
 		$author_id,
-		'publish'
-	)
+		'publish',
+	),
 );
 
 // Single column
@@ -62,7 +62,7 @@ $wpdb->insert(
 		'column1' => $value1,
 		'column2' => $value2,
 	],
-	['%s', '%d'] // Format for each value
+	['%s', '%d'], // Format for each value
 );
 $inserted_id = $wpdb->insert_id;
 
@@ -72,7 +72,7 @@ $wpdb->update(
 	['column1' => $new_value], // Data
 	['id' => $id], // Where
 	['%s'], // Data format
-	['%d'] // Where format
+	['%d'], // Where format
 );
 
 // Delete
@@ -85,7 +85,7 @@ $wpdb->replace(
 		'id' => $id,
 		'column1' => $value,
 	],
-	['%d', '%s']
+	['%d', '%s'],
 );
 ```
 
@@ -226,7 +226,7 @@ $wpdb->get_results('SELECT id, title FROM ...');
 
 // Add LIMIT to prevent large result sets
 $wpdb->get_results(
-	$wpdb->prepare("SELECT * FROM {$wpdb->posts} WHERE post_type = %s LIMIT %d", 'post', 100)
+	$wpdb->prepare("SELECT * FROM {$wpdb->posts} WHERE post_type = %s LIMIT %d", 'post', 100),
 );
 
 // Use indexes

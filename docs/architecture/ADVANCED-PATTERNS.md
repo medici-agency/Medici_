@@ -85,8 +85,8 @@ class PostRepository
 					"INSERT INTO {$this->wpdb->postmeta} (post_id, meta_key, meta_value)
                 VALUES (%d, 'medici_views', 1)
                 ON DUPLICATE KEY UPDATE meta_value = meta_value + 1",
-					$post_id
-				)
+					$post_id,
+				),
 			);
 	}
 }
@@ -127,7 +127,7 @@ $cache = new CacheManager();
 $top_posts = $cache->remember(
 	'top_posts_10',
 	fn() => $repository->getTopViewedPosts(10),
-	HOUR_IN_SECONDS
+	HOUR_IN_SECONDS,
 );
 ```
 
@@ -231,8 +231,8 @@ add_action('shutdown', function () {
 			sprintf(
 				'Queries: %d, Time: %.4fs',
 				count($wpdb->queries),
-				array_sum(wp_list_pluck($wpdb->queries, 1))
-			)
+				array_sum(wp_list_pluck($wpdb->queries, 1)),
+			),
 		);
 	}
 });

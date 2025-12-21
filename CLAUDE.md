@@ -434,7 +434,7 @@ document.querySelector('.exit-intent-content [data-gb-close-panel]');
 wp_add_inline_script(
 	'medici-exit-intent-overlay',
 	'window.mediciExitIntentConfig = {...};',
-	'before' // КРИТИЧНО!
+	'before', // КРИТИЧНО!
 );
 ```
 

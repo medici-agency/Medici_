@@ -41,8 +41,8 @@ $results = $wpdb->get_results(
 	$wpdb->prepare(
 		"SELECT * FROM {$wpdb->posts} WHERE post_author = %d AND post_status = %s",
 		$author_id,
-		'publish'
-	)
+		'publish',
+	),
 );
 
 // Nonce verification
@@ -256,7 +256,7 @@ function my_prefix_enqueue_scripts()
 		plugin_dir_url(__FILE__) . 'js/ajax.js',
 		['jquery'],
 		'1.0.0',
-		true
+		true,
 	);
 	wp_localize_script('my-prefix-ajax', 'myPrefixAjax', [
 		'ajaxurl' => admin_url('admin-ajax.php'),
@@ -291,7 +291,7 @@ function my_prefix_enqueue_assets()
 		'my-prefix-style',
 		get_template_directory_uri() . '/assets/css/style.css',
 		[],
-		filemtime(get_template_directory() . '/assets/css/style.css')
+		filemtime(get_template_directory() . '/assets/css/style.css'),
 	);
 
 	// Scripts
@@ -300,7 +300,7 @@ function my_prefix_enqueue_assets()
 		get_template_directory_uri() . '/assets/js/script.js',
 		['jquery'],
 		filemtime(get_template_directory() . '/assets/js/script.js'),
-		true // In footer
+		true, // In footer
 	);
 
 	// Conditional loading

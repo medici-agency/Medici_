@@ -1015,7 +1015,7 @@ class Button_Config
 		public readonly string $text,
 		public readonly string $url,
 		public readonly string $style = 'primary',
-		public readonly bool $open_new_tab = false
+		public readonly bool $open_new_tab = false,
 	) {}
 }
 
@@ -1034,7 +1034,7 @@ function render_button(Button_Config $config): void
 		esc_url($config->url),
 		esc_attr($config->style),
 		$target,
-		esc_html($config->text)
+		esc_html($config->text),
 	);
 }
 
@@ -1104,7 +1104,7 @@ class Reading_Time_Calculator
 	private const WORDS_PER_MINUTE_FAST = 250;
 
 	public function __construct(
-		private readonly int $words_per_minute = self::WORDS_PER_MINUTE_AVERAGE
+		private readonly int $words_per_minute = self::WORDS_PER_MINUTE_AVERAGE,
 	) {}
 
 	/**
@@ -1131,7 +1131,7 @@ class Reading_Time_Calculator
 	{
 		return sprintf(
 			_n('%d хвилина читання', '%d хвилини читання', $minutes, 'medici.agency'),
-			$minutes
+			$minutes,
 		);
 	}
 }
@@ -1545,7 +1545,7 @@ add_action(
 	function () {
 		Medici\Theme\Core\Theme::get_instance()->init();
 	},
-	1
+	1,
 );
 ```
 
@@ -1794,7 +1794,7 @@ add_filter('generate_excerpt_more_output', function (): string {
 		' ... <a title="%1$s" class="read-more" href="%2$s">%3$s</a>',
 		the_title_attribute(['echo' => false]),
 		esc_url(get_permalink()),
-		__('Читати далі', 'medici.agency')
+		__('Читати далі', 'medici.agency'),
 	);
 });
 
@@ -1858,7 +1858,7 @@ add_action(
 			MEDICI_URL . '/assets/js/main.js',
 			['generate-main'], // Залежність від скрипта GP
 			filemtime(MEDICI_DIR . '/assets/js/main.js'), // Версія = час модифікації файлу
-			true // В footer
+			true, // В footer
 		);
 
 		// Локалізація для AJAX
@@ -1873,11 +1873,11 @@ add_action(
 				'medici-blog-single',
 				MEDICI_URL . '/assets/css/blog-single.css',
 				[],
-				filemtime(MEDICI_DIR . '/assets/css/blog-single.css')
+				filemtime(MEDICI_DIR . '/assets/css/blog-single.css'),
 			);
 		}
 	},
-	20
+	20,
 ); // Priority 20 - після GP (щоб override працював)
 ```
 
@@ -1895,7 +1895,7 @@ function medici_render_cta_button(string $text, string $url): void
 	printf(
 		'<a href="%s" class="gb-button gbp-button--primary">%s</a>',
 		esc_url($url),
-		esc_html($text)
+		esc_html($text),
 	);
 }
 ```
@@ -1917,7 +1917,7 @@ function medici_render_hero_section(string $title, string $subtitle): string
         </div>
         <!-- /wp:generateblocks/container -->',
 		esc_html($title),
-		esc_html($subtitle)
+		esc_html($subtitle),
 	);
 }
 ```

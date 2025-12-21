@@ -95,7 +95,7 @@ $table = $wpdb->prefix . 'medici_events';
 $subscribers = $wpdb->get_results(
 	"SELECT email, created_at FROM {$table}
 	 WHERE event_type = 'newsletter_subscribe'
-	 ORDER BY created_at DESC"
+	 ORDER BY created_at DESC",
 );
 
 // Get consultation requests (last 7 days)
@@ -104,8 +104,8 @@ $consultations = $wpdb->get_results(
 		"SELECT payload FROM {$table}
 		 WHERE event_type = 'consultation_request'
 		 AND created_at >= %s",
-		gmdate('Y-m-d H:i:s', strtotime('-7 days'))
-	)
+		gmdate('Y-m-d H:i:s', strtotime('-7 days')),
+	),
 );
 ```
 

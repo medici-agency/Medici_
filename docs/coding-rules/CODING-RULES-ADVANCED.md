@@ -188,7 +188,7 @@ add_filter(
 		return $args;
 	},
 	10,
-	2
+	2,
 );
 ```
 
@@ -551,7 +551,7 @@ add_filter(
 		return $price_html;
 	},
 	10,
-	2
+	2,
 );
 ```
 
@@ -797,7 +797,7 @@ add_action(
 			'generatepress',
 			get_template_directory_uri() . '/style.css',
 			[],
-			wp_get_theme()->parent()->get('Version')
+			wp_get_theme()->parent()->get('Version'),
 		);
 
 		// Child theme styles
@@ -805,10 +805,10 @@ add_action(
 			'generatepress-child',
 			get_stylesheet_uri(),
 			['generatepress'],
-			CHILD_THEME_VERSION
+			CHILD_THEME_VERSION,
 		);
 	},
-	15
+	15,
 );
 
 /**

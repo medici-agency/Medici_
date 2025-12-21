@@ -404,7 +404,7 @@ function gp_child_enqueue_styles()
 		'gp-child-style',
 		get_stylesheet_directory_uri() . '/style.css',
 		['generate-style'],
-		filemtime(get_stylesheet_directory() . '/style.css')
+		filemtime(get_stylesheet_directory() . '/style.css'),
 	);
 }
 

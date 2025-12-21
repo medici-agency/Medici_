@@ -198,7 +198,7 @@ add_filter(
 	function () {
 		return 'no-sidebar';
 	},
-	99
+	99,
 );
 
 // Modify content width
@@ -207,7 +207,7 @@ add_filter(
 	function ($width) {
 		return is_home() ? 1200 : $width;
 	},
-	99
+	99,
 );
 ```
 

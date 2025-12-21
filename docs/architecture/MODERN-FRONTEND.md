@@ -170,7 +170,7 @@ add_action(
 	function () {
 		echo '<link rel="preload" as="image" href="hero.jpg" fetchpriority="high">';
 	},
-	1
+	1,
 );
 ```
 

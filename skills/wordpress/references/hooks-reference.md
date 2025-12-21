@@ -203,7 +203,7 @@ add_filter(
 		return $where;
 	},
 	10,
-	2
+	2,
 );
 ```
 

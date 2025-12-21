@@ -177,7 +177,7 @@ function theme_name_scripts()
 		THEME_URI . '/assets/js/navigation.js',
 		[],
 		THEME_VERSION,
-		true
+		true,
 	);
 
 	// Main script
@@ -186,7 +186,7 @@ function theme_name_scripts()
 		THEME_URI . '/assets/js/main.js',
 		['jquery'],
 		THEME_VERSION,
-		true
+		true,
 	);
 
 	// Comment reply script

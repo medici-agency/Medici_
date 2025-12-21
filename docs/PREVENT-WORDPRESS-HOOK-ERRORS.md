@@ -247,7 +247,7 @@ class Test_Sitemap_Optimization extends WP_UnitTestCase
 		$this->assertInstanceOf(
 			WP_Sitemaps_Provider::class,
 			$result,
-			'Non-users provider should be kept'
+			'Non-users provider should be kept',
 		);
 	}
 
@@ -258,7 +258,7 @@ class Test_Sitemap_Optimization extends WP_UnitTestCase
 	{
 		$this->assertIsInt(
 			has_filter('wp_sitemaps_add_provider', 'medici_disable_user_sitemap'),
-			'Filter should be hooked'
+			'Filter should be hooked',
 		);
 	}
 }
